@@ -31,7 +31,7 @@ setup(
     description='The mayavi visualisation plugin for SimPhoNy',
     long_description=README_TEXT,
     install_requires=[
-        "simphony-common",
+        "simphony",
         "mayavi"],
     packages=find_packages(),
     entry_points={
