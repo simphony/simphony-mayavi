@@ -35,4 +35,4 @@ setup(
         "mayavi"],
     packages=find_packages(),
     entry_points={
-        'simphony.visualisation': ['mayavi = simphony_mayavi.api']})
+        'simphony.visualisation': ['mayavi = simphony_mayavi']})
