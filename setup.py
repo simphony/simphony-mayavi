@@ -71,8 +71,8 @@ if not is_released:
             from traits._version import full_version as full_v
         except ImportError:
             raise ImportError("Unable to import git_revision. Try removing "
-                              "simphony_mayavi/_version.py and the build directory "
-                              "before building.")
+                              "simphony_mayavi/_version.py and the build "
+                              "directory before building.")
 
         match = re.match(r'.*?\.dev(?P<dev_num>\d+)', full_v)
         if match is None:
