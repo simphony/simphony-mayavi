@@ -1,5 +1,4 @@
 from numpy import array
-from tvtk.api import tvtk
 from mayavi.scripts import mayavi2
 
 from simphony.cuds.particles import ParticleContainer, Particle, Bond
@@ -24,14 +23,14 @@ def view():
     from mayavi.modules.glyph import Glyph
     from simphony.visualization import mayavi_tools as tools
 
-    mayavi.new_scene()
+    mayavi.new_scene()  # noqa
     src = tools.ParticleSource.from_particles(container)
-    mayavi.add_source(src)
+    mayavi.add_source(src)  # noqa
     g = Glyph()
     s = Surface()
 
-    mayavi.add_module(g)
-    mayavi.add_module(s)
+    mayavi.add_module(g)  # noqa
+    mayavi.add_module(s)  # noqa
 
 if __name__ == '__main__':
     view()
