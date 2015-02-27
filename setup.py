@@ -106,6 +106,6 @@ if __name__ == "__main__":
             "mayavi"],
         packages=find_packages(),
         entry_points={
-            'simphony.visualisation': ['mayavi = simphony_mayavi']},
+            'simphony.visualisation': ['mayavi_tools = simphony_mayavi']},
         version=__version__,
         license='BSD')
