@@ -54,5 +54,3 @@ class TestParticleSource(unittest.TestCase):
         data = numpy.array([2, 0, 1, 2, 0, 3, 3, 1, 3, 2])
         slices = [slice for slice in cell_array_slicer(data)]
         assert_array_equal(slices, [[0, 1], [0, 3], [1, 3, 2]])
-
-    def test_particle_data_properties(self):
