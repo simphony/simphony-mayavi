@@ -5,7 +5,7 @@ from mayavi.scripts import mayavi2
 from simphony.cuds.particles import ParticleContainer, Particle, Bond
 
 points = array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]], 'f')
-bonds = array([[0, 1], [0, 3], [1, 2]])
+bonds = array([[0, 1], [0, 3], [1, 3, 2]])
 
 container = ParticleContainer('test')
 uids = [
