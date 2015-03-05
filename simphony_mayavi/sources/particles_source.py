@@ -3,7 +3,7 @@ from tvtk.api import tvtk
 from traits.api import Dict
 
 
-class ParticleSource(VTKDataSource):
+class ParticlesSource(VTKDataSource):
     """ A Mayavi Source wrapping a SImphony CUDS Particle container.
 
     """

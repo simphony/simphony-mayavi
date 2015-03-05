@@ -4,10 +4,10 @@ import numpy
 from numpy.testing import assert_array_equal
 
 from simphony.cuds.particles import ParticleContainer, Particle, Bond
-from simphony_mayavi.sources import ParticleSource, cell_array_slicer
+from simphony_mayavi.sources import ParticlesSource, cell_array_slicer
 
 
-class TestParticleSource(unittest.TestCase):
+class TestParticlesSource(unittest.TestCase):
 
     def setUp(self):
         self.points = [
@@ -24,7 +24,7 @@ class TestParticleSource(unittest.TestCase):
 
     def test_particles(self):
         container = self.container
-        source = ParticleSource.from_particles(container)
+        source = ParticlesSource.from_particles(container)
         points = source.data.points.to_array()
 
         number_of_particles = len(self.points)
@@ -37,7 +37,7 @@ class TestParticleSource(unittest.TestCase):
 
     def test_bonds(self):
         container = self.container
-        source = ParticleSource.from_particles(container)
+        source = ParticlesSource.from_particles(container)
         vtk_source = source.data
         bonds = [
             bond for bond in cell_array_slicer(vtk_source.lines.to_array())]
