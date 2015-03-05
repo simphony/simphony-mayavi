@@ -4,7 +4,7 @@ from traits.api import Dict
 
 
 class ParticleSource(VTKDataSource):
-    """ A Mayavi Source wrapping a SImphony CUDS Particle container.
+    """ A Mayavi Source wrapping a SimPhoNy CUDS Particle container.
 
     """
 
