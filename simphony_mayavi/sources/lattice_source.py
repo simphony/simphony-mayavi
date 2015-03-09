@@ -21,7 +21,7 @@ class LatticeSource(VTKDataSource):
             extent = 0, size[0] - 1, 0, size[1] - 1, 0, 0
             data = tvtk.ImageData(spacing=spacing, origin=origin)
             data.extent = extent
-        elif lattice_type == ('Cubic', 'OrthorombicP'):
+        elif lattice_type in ('Cubic', 'OrthorombicP'):
             spacing = base_vectors
             origin = origin
             extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
