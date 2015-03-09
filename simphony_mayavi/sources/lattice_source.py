@@ -21,7 +21,7 @@ class LatticeSource(VTKDataSource):
             extent = 0, size[0] - 1, 0, size[1] - 1, 0, 0
             data = tvtk.ImageData(spacing=spacing, origin=origin)
             data.extent = extent
-        elif lattice_type == 'Cubic':
+        elif lattice_type == ('Cubic', 'OrthorombicP'):
             spacing = base_vectors
             origin = origin
             extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
@@ -33,15 +33,6 @@ class LatticeSource(VTKDataSource):
             points[0] += origin[0]
             points[1] *= base_vectors[1]
             points[1] += origin[1]
-            data = tvtk.PolyData(points=points.T.reshape(numpy.prod(size), 3))
-        elif lattice_type == 'OrthorombicP':
-            points = numpy.mgrid[:size[0], :size[1], :size[2]].astype('float')
-            points[0] *= base_vectors[0]
-            points[0] += origin[0]
-            points[1] *= base_vectors[1]
-            points[1] += origin[1]
-            points[1] *= base_vectors[2]
-            points[1] += origin[2]
             data = tvtk.PolyData(points=points.T.reshape(numpy.prod(size), 3))
         else:
             message = 'Unknown lattice type: {}'.format(lattice_type)
