@@ -49,5 +49,5 @@ class TestParticlesSource(unittest.TestCase):
 
     def test_source_from_unknown(self):
         lattice = Lattice('test', '', (1, 1, 1), (1, 1, 1), (0, 0, 0))
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             LatticeSource.from_lattice(lattice)

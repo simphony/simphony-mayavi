@@ -45,5 +45,5 @@ class LatticeSource(VTKDataSource):
             data = tvtk.PolyData(points=points.T.reshape(numpy.prod(size), 3))
         else:
             message = 'Unknown lattice type: {}'.format(lattice_type)
-            raise RuntimeError(message)
+            raise ValueError(message)
         return cls(data=data)
