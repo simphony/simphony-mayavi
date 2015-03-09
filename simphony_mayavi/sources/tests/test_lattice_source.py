@@ -1,7 +1,7 @@
 import unittest
 
 from simphony.cuds.lattice import (
-    Lattice, LatticeNode, make_hexagonal_lattice, make_square_lattice,
+    Lattice, make_hexagonal_lattice, make_square_lattice,
     make_cubic_lattice, make_rectangular_lattice, make_orthorombicp_lattice)
 from simphony_mayavi.sources import LatticeSource
 
