@@ -29,7 +29,7 @@ def view():
     g = Glyph()
     gs = g.glyph.glyph_source
     gs.glyph_source = gs.glyph_dict['sphere_source']
-    g.glyph.glyph.scale_factor = 0.05    
+    g.glyph.glyph.scale_factor = 0.05
     s = Surface()
 
     mayavi.add_module(g)  # noqa
