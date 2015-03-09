@@ -7,8 +7,8 @@ A plugin-library for the Simphony framework to provide visualization support of 
   :target: https://travis-ci.org/simphony/simphony-mayavi
   :alt: Build status
 
-.. image:: https://coveralls.io/repos/simphony/simphony-mayavi/badge.svg
-  :target: https://coveralls.io/r/simphony/simphony-mayavi
+.. image:: https://coveralls.io/repos/simphony/simphony-mayavi/badge.svg?branch=master
+  :target: https://coveralls.io/r/simphony/simphony-mayavi?branch=master
   :alt: Test coverage
 
 .. image:: https://readthedocs.org/projects/simphony-mayavi/badge/?version=master
