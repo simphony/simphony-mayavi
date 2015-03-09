@@ -28,12 +28,6 @@ class TestParticlesSource(unittest.TestCase):
         data = source.data
         self.assertEqual(data.number_of_points, 14 * 24 * 34)
 
-    def test_source_from_a_cubic_lattice(self):
-        lattice = make_cubic_lattice('test', 0.4, (14, 24, 34), (4, 5, 6))
-        source = LatticeSource.from_lattice(lattice)
-        data = source.data
-        self.assertEqual(data.number_of_points, 14 * 24 * 34)
-
     def test_source_from_a_orthotombicp_lattice(self):
         lattice = make_orthorombicp_lattice(
             'test',  (0.5, 0.54, 0.58), (15, 25, 35), (7, 8, 9))
