@@ -28,8 +28,9 @@ class LatticeSource(VTKDataSource):
             data = tvtk.ImageData(spacing=spacing, origin=origin)
             data.extent = extent
         elif lattice_type == 'Hexagonal':
-            points = numpy.mgrid[0:size[0], 0:size[1], 0:1].astype('float')
+            points = numpy.mgrid[:size[0], :size[1], :1].astype('float')
             points[0] *= base_vectors[0]
+            points[0, :, ::2] += 0.5 * base_vectors[0]
             points[0] += origin[0]
             points[1] *= base_vectors[1]
             points[1] += origin[1]
