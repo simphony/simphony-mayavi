@@ -3,7 +3,7 @@ from mayavi.scripts import mayavi2
 from simphony.cuds.lattice import make_hexagonal_lattice
 
 
-lattice = make_hexagonal_lattice('test', 0.1, (11, 21))
+lattice = make_hexagonal_lattice('test', 0.1, (3, 4))
 
 
 # Now view the data.
