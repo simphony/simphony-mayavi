@@ -6,7 +6,7 @@ from simphony.cuds.lattice import (
 from simphony_mayavi.sources import LatticeSource
 
 
-class TestParticlesSource(unittest.TestCase):
+class TestLatticeSource(unittest.TestCase):
 
     def test_source_from_a_square_lattice(self):
         lattice = make_square_lattice(
