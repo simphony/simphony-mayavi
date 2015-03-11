@@ -10,3 +10,6 @@ class TestPluginLoading(unittest.TestCase):
             self.fail('Could not import the mayavi visualization')
 
         self.assertTrue(hasattr(mayavi_tools, 'show'))
+
+        # try accessing the functions.
+        mayavi_tools.show
