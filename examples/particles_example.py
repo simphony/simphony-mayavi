@@ -21,10 +21,10 @@ temperature = array([10., 20., 30., 40.])
 def view():
     from mayavi.modules.surface import Surface
     from mayavi.modules.glyph import Glyph
-    from simphony.visualization import mayavi_tools as tools
+    from simphony.source.api import ParticlesSource
 
     mayavi.new_scene()  # noqa
-    src = tools.ParticlesSource.from_particles(container)
+    src = ParticlesSource.from_particles(container)
     mayavi.add_source(src)  # noqa
     g = Glyph()
     gs = g.glyph.glyph_source
