@@ -21,7 +21,7 @@ temperature = array([10., 20., 30., 40.])
 def view():
     from mayavi.modules.surface import Surface
     from mayavi.modules.glyph import Glyph
-    from simphony.source.api import ParticlesSource
+    from simphony_mayavi.sources.api import ParticlesSource
 
     mayavi.new_scene()  # noqa
     src = ParticlesSource.from_particles(container)
