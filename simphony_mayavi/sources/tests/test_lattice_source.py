@@ -49,7 +49,9 @@ class TestLatticeSource(unittest.TestCase):
         self.assertEqual(data.number_of_points, 5 * 4)
         xspace, yspace = lattice.base_vect
         for index, point in enumerate(data.points):
-            # The lattice has 4 rows and 5 columns
+            # The lattice has 4 rows (y axis) and 5 columns (x axis).
+            # Thus the correct size to unravel is (4, 5) instead of
+            # (5, 4).
             row, column = numpy.unravel_index(index,  (4, 5))
             assert_array_equal(
                 point, (
