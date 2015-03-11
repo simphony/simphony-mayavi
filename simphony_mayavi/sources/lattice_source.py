@@ -7,6 +7,7 @@ from tvtk.api import tvtk
 class LatticeSource(VTKDataSource):
     """ A Mayavi Source wrapping a SimPhoNy CUDS Particle container.
 
+
     """
 
     @classmethod
@@ -26,13 +27,14 @@ class LatticeSource(VTKDataSource):
             data = tvtk.ImageData(spacing=spacing, origin=origin)
             data.extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
         elif lattice_type == 'Hexagonal':
-            points = numpy.mgrid[:size[0], :size[1], :1].astype('float')
-            points[0] *= base_vectors[0]
-            points[0, :, ::2] += 0.5 * base_vectors[0]
-            points[0] += origin[0]
-            points[1] *= base_vectors[1]
-            points[1] += origin[1]
-            data = tvtk.PolyData(points=points.T.reshape(numpy.prod(size), 3))
+            x, y = numpy.meshgrid(range(size[0]), range(size[1]))
+            points = numpy.zeros(shape=(x.size, 3), dtype='double')
+            points[:, 0] += base_vectors[0] * x.ravel() \
+                + 0.5 * base_vectors[0] * (y.ravel() % 2)
+            points[:, 1] += base_vectors[1] * y.ravel()
+            points[:, 0] += origin[0]
+            points[:, 1] += origin[1]
+            data = tvtk.PolyData(points=points)
         else:
             message = 'Unknown lattice type: {}'.format(lattice_type)
             raise ValueError(message)

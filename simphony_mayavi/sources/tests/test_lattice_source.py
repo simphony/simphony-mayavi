@@ -1,5 +1,6 @@
 import unittest
 
+import numpy
 from numpy.testing import assert_array_equal
 
 from simphony.cuds.lattice import (
@@ -42,10 +43,19 @@ class TestLatticeSource(unittest.TestCase):
         assert_array_equal(data.origin, (7.0, 9.0, 8.0))
 
     def test_source_from_a_hexagonal_lattice(self):
-        lattice = make_hexagonal_lattice('test', 0.1, (11, 21))
+        lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
         source = LatticeSource.from_lattice(lattice)
         data = source.data
-        self.assertEqual(data.number_of_points, 11 * 21)
+        self.assertEqual(data.number_of_points, 5 * 4)
+        xspace, yspace = lattice.base_vect
+        for index, point in enumerate(data.points):
+            # The lattice has 4 rows and 5 columns
+            row, column = numpy.unravel_index(index,  (4, 5))
+            assert_array_equal(
+                point, (
+                    xspace * column + 0.5 * xspace * (row % 2),
+                    yspace * row,
+                    0.0))
 
     def test_source_from_unknown(self):
         lattice = Lattice('test', '', (1, 1, 1), (1, 1, 1), (0, 0, 0))
