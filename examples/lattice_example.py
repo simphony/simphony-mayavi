@@ -10,10 +10,10 @@ lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
 @mayavi2.standalone
 def view():
     from mayavi.modules.glyph import Glyph
-    from simphony.visualization import mayavi_tools as tools
+    from simphony_mayavi.sources.api import LatticeSource
 
     mayavi.new_scene()  # noqa
-    src = tools.LatticeSource.from_lattice(lattice)
+    src = LatticeSource.from_lattice(lattice)
     mayavi.add_source(src)  # noqa
     g = Glyph()
     gs = g.glyph.glyph_source

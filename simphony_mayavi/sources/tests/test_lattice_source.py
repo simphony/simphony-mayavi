@@ -6,7 +6,7 @@ from numpy.testing import assert_array_equal
 from simphony.cuds.lattice import (
     Lattice, make_hexagonal_lattice, make_square_lattice,
     make_cubic_lattice, make_rectangular_lattice, make_orthorombicp_lattice)
-from simphony_mayavi.sources import LatticeSource
+from simphony_mayavi.sources.api import LatticeSource
 
 
 class TestLatticeSource(unittest.TestCase):

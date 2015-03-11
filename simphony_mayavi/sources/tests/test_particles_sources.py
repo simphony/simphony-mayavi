@@ -4,7 +4,7 @@ import numpy
 from numpy.testing import assert_array_equal
 
 from simphony.cuds.particles import ParticleContainer, Particle, Bond
-from simphony_mayavi.sources import ParticlesSource, cell_array_slicer
+from simphony_mayavi.sources.api import ParticlesSource, cell_array_slicer
 
 
 class TestParticlesSource(unittest.TestCase):
