@@ -95,17 +95,15 @@ if not is_released:
 if __name__ == "__main__":
     write_version_py()
     from simphony_mayavi import __version__
+    plugin = ['mayavi_tools = simphony_mayavi.plugin']
 
     setup(
         name='simphony_mayavi',
         author='SimPhoNy FP7 European Project',
         description='The mayavi visualisation plugin for SimPhoNy',
         long_description=open('README.rst').read(),
-        requires=[
-            "simphony",
-            "mayavi"],
+        requires=["simphony", "mayavi"],
         packages=find_packages(),
-        entry_points={
-            'simphony.visualisation': ['mayavi_tools = simphony_mayavi']},
+        entry_points={'simphony.visualisation': plugin},
         version=__version__,
         license='BSD')
