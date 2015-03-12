@@ -2,7 +2,6 @@ import unittest
 
 import numpy
 from numpy.testing import assert_array_equal
-from tvtk.api import tvtk
 
 
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
