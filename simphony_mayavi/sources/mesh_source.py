@@ -15,12 +15,15 @@ CELL2VTKCELL = {
     10: tvtk.PentagonalPrism().cell_type,
     12: tvtk.HexagonalPrism().cell_type}
 
+_polygon_type = tvtk.Polygon().cell_type
+_polyline_type = tvtk.PolyLine().cell_type
+
 FACE2VTKCELL = defaultdict(
-    lambda: tvtk.Polygon().cell_type,
+    lambda: _polygon_type,
     {3: tvtk.Triangle().cell_type, 4: tvtk.Quad().cell_type})
 
 EDGE2VTKCELL = defaultdict(
-    lambda: tvtk.PolyLine().cell_type, {2: tvtk.Line().cell_type})
+    lambda: _polyline_type, {2: tvtk.Line().cell_type})
 
 
 class MeshSource(VTKDataSource):
