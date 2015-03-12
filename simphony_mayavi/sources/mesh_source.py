@@ -69,6 +69,7 @@ class MeshSource(VTKDataSource):
         cell_array.set_cells(len(cell_offset), elements)
         data = tvtk.UnstructuredGrid(points=points)
         data.set_cells(element_types, cell_offset, cell_array)
+
         return cls(
             data=data,
             point2index=point2index,

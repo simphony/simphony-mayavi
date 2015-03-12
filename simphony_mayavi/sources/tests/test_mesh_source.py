@@ -2,6 +2,8 @@ import unittest
 
 import numpy
 from numpy.testing import assert_array_equal
+from tvtk.api import tvtk
+
 
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony_mayavi.sources.api import MeshSource, cell_array_slicer
@@ -58,6 +60,9 @@ class TestParticlesSource(unittest.TestCase):
 
         for key, index in source.element2index.iteritems():
             cell = container.get_cell(key)
+            self.assertEqual(
+                vtk_source.get_cell_type(index),
+                CELL2VTKCELL[len(cell.points)])
             points = [source.point2index[uid] for uid in cell.points]
             self.assertEqual(cells[index], points)
 
@@ -79,6 +84,9 @@ class TestParticlesSource(unittest.TestCase):
 
         for key, index in source.element2index.iteritems():
             edge = container.get_edge(key)
+            self.assertEqual(
+                vtk_source.get_cell_type(index),
+                EDGE2VTKCELL[len(edge.points)])
             points = [source.point2index[uid] for uid in edge.points]
             self.assertEqual(edges[index], points)
 
@@ -100,10 +108,13 @@ class TestParticlesSource(unittest.TestCase):
 
         for key, index in source.element2index.iteritems():
             face = container.get_face(key)
+            self.assertEqual(
+                vtk_source.get_cell_type(index),
+                FACE2VTKCELL[len(face.points)])
             points = [source.point2index[uid] for uid in face.points]
             self.assertEqual(faces[index], points)
 
-    def test_all(self):
+    def test_all_element_types(self):
         container = self.container
         for face in self.faces:
             container.add_face(
@@ -130,10 +141,16 @@ class TestParticlesSource(unittest.TestCase):
             cell_type = vtk_source.get_cell_type(index)
             if cell_type in EDGE2VTKCELL.values():
                 element = container.get_edge(key)
+                self.assertEqual(
+                    cell_type, EDGE2VTKCELL[len(element.points)])
             elif cell_type in FACE2VTKCELL.values():
                 element = container.get_face(key)
+                self.assertEqual(
+                    cell_type, FACE2VTKCELL[len(element.points)])
             elif cell_type in CELL2VTKCELL.values():
                 element = container.get_cell(key)
+                self.assertEqual(
+                    cell_type, CELL2VTKCELL[len(element.points)])
             else:
                 self.fail('vtk source has an unknown cell type')
             points = [source.point2index[uid] for uid in element.points]
