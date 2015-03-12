@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import count
 
 import numpy
 
@@ -38,44 +39,82 @@ class MeshSource(VTKDataSource):
         points = []
         point2index = {}
         element2index = {}
+        counter = count()
+
         for index, point in enumerate(mesh.iter_points()):
             point2index[point.uid] = index
             points.append(point.coordinates)
 
-        cells = []
-        cells_size = [0]
-        cell_types = []
+        edges, edges_size, edge_types, edge2index = gather_cells(
+            mesh.iter_edges(), EDGE2VTKCELL, point2index, counter)
 
-        for index, edge in enumerate(mesh.iter_edges()):
-            element2index[edge.uid] = index
-            npoints = len(edge.points)
-            cells_size.append(npoints + 1)
-            cells.append(npoints)
-            cells.extend(point2index[uid] for uid in edge.points)
-            cell_types.append(EDGE2VTKCELL[npoints])
+        faces, faces_size, face_types, face2index = gather_cells(
+            mesh.iter_faces(), FACE2VTKCELL, point2index, counter)
 
-        for index, face in enumerate(mesh.iter_faces()):
-            element2index[face.uid] = index
-            npoints = len(face.points)
-            cells_size.append(npoints + 1)
-            cells.append(npoints)
-            cells.extend(point2index[uid] for uid in face.points)
-            cell_types.append(FACE2VTKCELL[npoints])
+        cells, cells_size, cell_types, cell2index = gather_cells(
+            mesh.iter_cells(), CELL2VTKCELL, point2index, counter)
 
-        for index, cell in enumerate(mesh.iter_cells()):
-            element2index[cell.uid] = index
-            npoints = len(cell.points)
-            cells_size.append(npoints + 1)
-            cells.append(npoints)
-            cells.extend(point2index[uid] for uid in cell.points)
-            cell_types.append(CELL2VTKCELL[npoints])
+        elements = edges + faces + cells
+        elements_size = [0] + edges_size + faces_size + cells_size
+        element_types = edge_types + face_types + cell_types
+        element2index.update(edge2index)
+        element2index.update(face2index)
+        element2index.update(cell2index)
 
-        offset = numpy.cumsum(cells_size[:-1])
+        cell_offset = numpy.cumsum(elements_size[:-1])
         cell_array = tvtk.CellArray()
-        cell_array.set_cells(len(offset), cells)
+        cell_array.set_cells(len(cell_offset), elements)
         data = tvtk.UnstructuredGrid(points=points)
-        data.set_cells(cell_types, offset, cell_array)
+        data.set_cells(element_types, cell_offset, cell_array)
         return cls(
             data=data,
             point2index=point2index,
             element2index=element2index)
+
+
+def gather_cells(iterable, vtk_mapping, point2index, counter):
+    """ Gather the vtk cell information from an element iterator.
+
+    Arguments
+    ---------
+    iterable :
+        The Element iterable object
+
+    mapping : dict
+        The mapping from points number to tvtk.Cell type.
+
+    point2index: dict
+        The mapping from points uid to the index of the vtk points array.
+
+    index : itertools.count
+        The counter object to use when evaluating the ``elements2index`` mapping.
+
+    Returns
+    -------
+    cells : list
+         The cell point information encoded in a one dimensional list.
+
+    cells_size : list
+         The list of points number per cell.
+
+    cells_types : list
+         The list of cell types in sequence.
+
+    element2index : dict
+         The mapping from element uid to iteration index.
+
+    """
+    cells = []
+    cells_size = []
+    cell_types = []
+    element2index = {}
+
+    for element in iter(iterable):
+        element2index[element.uid] = counter.next()
+        npoints = len(element.points)
+        cells_size.append(npoints + 1)
+        cells.append(npoints)
+        cells.extend(point2index[uid] for uid in element.points)
+        cell_types.append(vtk_mapping[npoints])
+
+    return cells, cells_size, cell_types, element2index
