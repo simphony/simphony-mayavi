@@ -87,7 +87,8 @@ def gather_cells(iterable, vtk_mapping, point2index, counter):
         The mapping from points uid to the index of the vtk points array.
 
     index : itertools.count
-        The counter object to use when evaluating the ``elements2index`` mapping.
+        The counter object to use when evaluating the ``elements2index``
+        mapping.
 
     Returns
     -------
