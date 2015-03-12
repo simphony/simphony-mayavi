@@ -5,6 +5,8 @@ from numpy.testing import assert_array_equal
 
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony_mayavi.sources.api import MeshSource, cell_array_slicer
+from simphony_mayavi.sources.mesh_source import (
+    CELL2VTKCELL, FACE2VTKCELL, EDGE2VTKCELL)
 
 
 class TestParticlesSource(unittest.TestCase):
@@ -100,3 +102,39 @@ class TestParticlesSource(unittest.TestCase):
             face = container.get_face(key)
             points = [source.point2index[uid] for uid in face.points]
             self.assertEqual(faces[index], points)
+
+    def test_all(self):
+        container = self.container
+        for face in self.faces:
+            container.add_face(
+                Face(points=[self.point_uids[index] for index in face]))
+        for edge in self.edges:
+            container.add_edge(
+                Edge(points=[self.point_uids[index] for index in edge]))
+        for cell in self.cells:
+            container.add_cell(
+                Cell(points=[self.point_uids[index] for index in cell]))
+
+        source = MeshSource.from_mesh(container)
+        vtk_source = source.data
+        elements = [
+            element
+            for element in cell_array_slicer(
+                vtk_source.get_cells().to_array())]
+
+        number_of_elements = \
+            len(self.faces) + len(self.edges) + len(self.cells)
+        self.assertEqual(len(elements), number_of_elements)
+        self.assertEqual(len(source.element2index), number_of_elements)
+        for key, index in source.element2index.iteritems():
+            cell_type = vtk_source.get_cell_type(index)
+            if cell_type in EDGE2VTKCELL.values():
+                element = container.get_edge(key)
+            elif cell_type in FACE2VTKCELL.values():
+                element = container.get_face(key)
+            elif cell_type in CELL2VTKCELL.values():
+                element = container.get_cell(key)
+            else:
+                self.fail('vtk source has an unknown cell type')
+            points = [source.point2index[uid] for uid in element.points]
+            self.assertEqual(elements[index], points)
