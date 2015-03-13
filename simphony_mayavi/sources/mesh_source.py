@@ -27,7 +27,7 @@ EDGE2VTKCELL = defaultdict(
 
 
 class MeshSource(VTKDataSource):
-    """ A Mayavi Source wrapping a SimPhoNy CUDS Particle container.
+    """ A Mayavi Source wrapping a SimPhoNy CUDS Mesh container.
 
     """
 
