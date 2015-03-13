@@ -27,14 +27,14 @@ EDGE2VTKCELL = defaultdict(
 
 
 class MeshSource(VTKDataSource):
-    """ A Mayavi Source wrapping a SimPhoNy CUDS Particle container.
+    """ A Mayavi Source wrapping a SimPhoNy CUDS Mesh container.
 
     """
 
-    #: The mapping from the point uid to the vtk polydata points array.
+    #: The mapping from the point uid to the vtk points array.
     point2index = Dict
 
-    #: The mapping from the element uid to the vtk polydata cell index.
+    #: The mapping from the element uid to the vtk cell index.
     element2index = Dict
 
     @classmethod
