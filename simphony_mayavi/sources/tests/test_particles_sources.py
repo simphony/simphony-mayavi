@@ -3,7 +3,7 @@ import unittest
 import numpy
 from numpy.testing import assert_array_equal
 
-from simphony.cuds.particles import ParticleContainer, Particle, Bond
+from simphony.cuds.particles import Particles, Particle, Bond
 from simphony_mayavi.sources.api import ParticlesSource, cell_array_slicer
 
 
@@ -13,7 +13,7 @@ class TestParticlesSource(unittest.TestCase):
         self.points = [
             [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
         self.bonds = [[0, 1], [0, 3], [1, 3, 2]]
-        self.container = ParticleContainer('test')
+        self.container = Particles('test')
         self.point_uids = [
             self.container.add_particle(Particle(coordinates=point))
             for point in self.points]
