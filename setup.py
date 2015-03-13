@@ -67,8 +67,8 @@ if not is_released:
     elif os.path.exists('simphony_mayavi/_version.py'):
         # must be a source distribution, use existing version file
         try:
-            from traits._version import git_revision as git_rev
-            from traits._version import full_version as full_v
+            from simphony_mayavi._version import git_revision as git_rev
+            from simphony_mayavi._version import full_version as full_v
         except ImportError:
             raise ImportError("Unable to import git_revision. Try removing "
                               "simphony_mayavi/_version.py and the build "
