@@ -56,7 +56,6 @@ class CUDSDataExtractor(HasStrictTraits):
             for item in generator:
                 available.update(item.data.viewkeys())
         else:
-            available.add(selected)
             data = {}
             for item in generator:
                 data[item.uid] = item.data.get(selected, None)

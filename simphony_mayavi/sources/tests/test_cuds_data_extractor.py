@@ -32,7 +32,9 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
 
         self.bond_uids = [
             self.container.add_bond(
-                Bond(particles=[self.point_uids[index] for index in indices]))
+                Bond(
+                    particles=[self.point_uids[index] for index in indices],
+                    data=DataContainer(NAME=str(len(indices)))))
             for indices in self.bonds]
 
     def test_initialization(self):
@@ -42,16 +44,44 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
             extractor.available, set((CUBA.TEMPERATURE, CUBA.VELOCITY)))
         self.assertEqual(extractor.data, {})
 
-    def test_selected_change(self):
+    def test_selectinng_available(self):
         container = self.container
         extractor = CUDSDataExtractor(function=container.iter_particles)
 
         with self.assertTraitChanges(extractor, 'data', count=1):
             extractor.selected = CUBA.TEMPERATURE
+
         for uid, data in extractor.data.iteritems():
             particle = container.get_particle(uid)
             self.assertEqual(particle.data[CUBA.TEMPERATURE], data)
 
-        with self.assertTraitChanges(extractor, 'data', count=1):
+    def test_selecting_none(self):
+        extractor = CUDSDataExtractor(function=self.container.iter_particles)
+
+        with self.assertTraitChanges(extractor, 'data', count=2):
+            extractor.selected = CUBA.TEMPERATURE
             extractor.selected = None
-            self.assertEqual(extractor.data, {})
+
+        self.assertEqual(extractor.data, {})
+
+    def test_selecting_unavailable(self):
+        container = self.container
+        extractor = CUDSDataExtractor(function=container.iter_particles)
+
+        with self.assertTraitChanges(extractor, 'data', count=1):
+            extractor.selected = CUBA.NAME
+        for uid, data in extractor.data.iteritems():
+            self.assertTrue(container.has_particle(uid))
+            self.assertEqual(data, None)
+
+    def test_function_change(self):
+        container = self.container
+        extractor = CUDSDataExtractor(function=container.iter_particles)
+        extractor.selected = CUBA.TEMPERATURE
+
+        with self.assertTraitChanges(extractor, 'data,available'):
+            extractor.function = container.iter_bonds
+
+        for uid, data in extractor.data.iteritems():
+            self.assertTrue(container.has_bond(uid))
+            self.assertEqual(data, None)
