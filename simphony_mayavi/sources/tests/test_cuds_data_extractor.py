@@ -1,7 +1,6 @@
 import unittest
 
 import numpy
-from numpy.testing import assert_array_equal
 
 from traits.testing.api import UnittestTools
 
