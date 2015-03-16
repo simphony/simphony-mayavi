@@ -51,6 +51,7 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
         with self.assertTraitChanges(extractor, 'data', count=1):
             extractor.selected = CUBA.TEMPERATURE
 
+        self.assertEqual(len(extractor.data), 4)
         for uid, data in extractor.data.iteritems():
             particle = container.get_particle(uid)
             self.assertEqual(particle.data[CUBA.TEMPERATURE], data)
@@ -70,6 +71,8 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
 
         with self.assertTraitChanges(extractor, 'data', count=1):
             extractor.selected = CUBA.NAME
+
+        self.assertEqual(len(extractor.data), 4)
         for uid, data in extractor.data.iteritems():
             self.assertTrue(container.has_particle(uid))
             self.assertEqual(data, None)
@@ -82,6 +85,32 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
         with self.assertTraitChanges(extractor, 'data,available'):
             extractor.function = container.iter_bonds
 
+        self.assertEqual(len(extractor.data), 3)
         for uid, data in extractor.data.iteritems():
             self.assertTrue(container.has_bond(uid))
             self.assertEqual(data, None)
+
+    def test_keys_filtering(self):
+        container = self.container
+        extractor = CUDSDataExtractor(
+            function=container.iter_particles, keys=self.point_uids[:1])
+        extractor.selected = CUBA.TEMPERATURE
+
+        particle = container.get_particle(self.point_uids[0])
+        self.assertEqual(
+            extractor.data,
+            {self.point_uids[0]: particle.data[CUBA.TEMPERATURE]})
+
+    def test_keys_filtering_change(self):
+        container = self.container
+        extractor = CUDSDataExtractor(
+            function=container.iter_particles, keys=self.point_uids[:1])
+        extractor.selected = CUBA.TEMPERATURE
+
+        with self.assertTraitChanges(extractor, 'data', count=1):
+            extractor.keys = self.point_uids
+
+        self.assertEqual(len(extractor.data), 4)
+        for uid, data in extractor.data.iteritems():
+            particle = container.get_particle(uid)
+            self.assertEqual(particle.data[CUBA.TEMPERATURE], data)

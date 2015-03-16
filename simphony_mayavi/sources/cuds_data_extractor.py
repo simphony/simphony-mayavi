@@ -19,7 +19,7 @@ class CUDSDataExtractor(HasStrictTraits):
     function = Callable
 
     # The list of keys to restrict the data extraction.
-    keys = Either(None, List(UUID))
+    keys = Either(None, Set(UUID))
 
     #: The list of cuba keys that are available (read only)
     available = Property(Set(CUBATrait), depends_on='_available')
@@ -71,3 +71,7 @@ class CUDSDataExtractor(HasStrictTraits):
             self._data = {
                 item.uid: item.data.get(selected, None)
                 for item in generator}
+
+    def _keys_changed(self, keys):
+        # TODO: re-use cached values
+        self._selected_changed(self.selected)
