@@ -3,9 +3,8 @@ import uuid
 from simphony.core.cuba import CUBA
 
 from traits.api import (
-    HasStrictTraits, ReadOnly, Either, List, Set,
-    Dict, Instance, Property, Any, cached_property,
-    on_trait_change)
+    HasStrictTraits, ReadOnly, Either, Set, Dict,
+    Instance, Property, Any, cached_property, on_trait_change)
 
 CUBATrait = Instance(CUBA)
 UUID = Instance(uuid.UUID)
