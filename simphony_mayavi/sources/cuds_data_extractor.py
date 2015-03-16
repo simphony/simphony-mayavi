@@ -57,7 +57,7 @@ class CUDSDataExtractor(HasStrictTraits):
 
     def reset(self):
         """ Reset the ``available`` and ``data`` attributes.
-        
+
         """
         function = self.function
         generator = function(self.keys)
