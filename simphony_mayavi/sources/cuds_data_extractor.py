@@ -15,20 +15,19 @@ class CUDSDataExtractor(HasStrictTraits):
     """
 
     #: The function to call that returns a generator over the desired
-    #: items. Iteration should return a tuple of (uid, data). This
-    #: value cannot be changed after initialisation.
+    #: items. This value cannot be changed after initialisation.
     function = ReadOnly
 
     # The list of keys to restrict the data extraction.
     keys = Either(None, Set(UUID))
 
-    #: The list of cuba keys that are available (read only)
+    #: The list of cuba keys that are available (read only).
     available = Property(Set(CUBATrait), depends_on='_available')
 
-    #: Currently selected CUBA key
+    #: Currently selected CUBA key.
     selected = CUBATrait
 
-    #: The dictionary mapping uid to the extracted value.
+    #: The dictionary mapping of item uid to the extracted data value.
     data = Property(Dict(UUID, Any), depends_on='_data')
 
     # Private traits #########################################################
@@ -41,6 +40,7 @@ class CUDSDataExtractor(HasStrictTraits):
 
     def __init__(self, **traits):
         super(CUDSDataExtractor, self).__init__(**traits)
+        # Reset the data information after all necessary value have been set.
         self.reset()
 
     # Property getters setters ###############################################
@@ -56,6 +56,9 @@ class CUDSDataExtractor(HasStrictTraits):
     # Public methods  ########################################################
 
     def reset(self):
+        """ Reset the ``available`` and ``data`` attributes.
+        
+        """
         function = self.function
         generator = function(self.keys)
         available = set()
