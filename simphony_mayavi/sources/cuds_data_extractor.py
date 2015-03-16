@@ -3,8 +3,9 @@ import uuid
 from simphony.core.cuba import CUBA
 
 from traits.api import (
-    HasStrictTraits, Callable, Either, List, Set,
-    Dict, Instance, Property, Any, cached_property)
+    HasStrictTraits, ReadOnly, Either, List, Set,
+    Dict, Instance, Property, Any, cached_property,
+    on_trait_change)
 
 CUBATrait = Instance(CUBA)
 UUID = Instance(uuid.UUID)
@@ -15,8 +16,9 @@ class CUDSDataExtractor(HasStrictTraits):
     """
 
     #: The function to call that returns a generator over the desired
-    #: items. Iteration should return a tuple of (uid, data).
-    function = Callable
+    #: items. Iteration should return a tuple of (uid, data). This
+    #: value cannot be changed after initialisation.
+    function = ReadOnly
 
     # The list of keys to restrict the data extraction.
     keys = Either(None, Set(UUID))
@@ -36,6 +38,12 @@ class CUDSDataExtractor(HasStrictTraits):
 
     _data = Dict(UUID, Any)
 
+    # Constructor ############################################################
+
+    def __init__(self, **traits):
+        super(CUDSDataExtractor, self).__init__(**traits)
+        self.reset()
+
     # Property getters setters ###############################################
 
     @cached_property
@@ -46,9 +54,10 @@ class CUDSDataExtractor(HasStrictTraits):
     def _get_data(self):
         return self._data
 
-    # Change handlers ########################################################
+    # Public methods  ########################################################
 
-    def _function_changed(self, function):
+    def reset(self):
+        function = self.function
         generator = function(self.keys)
         available = set()
         selected = self.selected
@@ -63,7 +72,11 @@ class CUDSDataExtractor(HasStrictTraits):
             self._data = data
         self._available = available
 
-    def _selected_changed(self, selected):
+    # Change handlers ########################################################
+
+    @on_trait_change('selected,keys', post_init=True)
+    def _selected_updated(self):
+        selected = self.selected
         generator = self.function(self.keys)
         if selected is None:
             self._data = {}
@@ -71,7 +84,3 @@ class CUDSDataExtractor(HasStrictTraits):
             self._data = {
                 item.uid: item.data.get(selected, None)
                 for item in generator}
-
-    def _keys_changed(self, keys):
-        # TODO: re-use cached values
-        self._selected_changed(self.selected)
