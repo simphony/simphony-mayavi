@@ -10,6 +10,10 @@ class CUDSDataAccumulator(object):
         self._record_size = 0
         self._expand(self._keys)
 
+    @property
+    def keys(self):
+        return set(self._keys)
+
     def append(self, data):
         if self._expand_mode:
             new_keys = set(data.keys()) - self._keys
@@ -25,10 +29,6 @@ class CUDSDataAccumulator(object):
 
     def __len__(self):
         return self._record_size
-
-    @property
-    def keys(self):
-        return set(self._keys)
 
     def __getitem__(self, key):
         return self._data[key]
