@@ -2,6 +2,8 @@ from mayavi.sources.vtk_data_source import VTKDataSource
 from tvtk.api import tvtk
 from traits.api import Dict
 
+from .cuds_data_accumulator import CUDSDataAccumulator
+
 
 class ParticlesSource(VTKDataSource):
     """ A Mayavi Source wrapping a SimPhoNy CUDS Particle container.
@@ -20,14 +22,22 @@ class ParticlesSource(VTKDataSource):
         lines = []
         point2index = {}
         bond2index = {}
+        point_data = CUDSDataAccumulator()
+        bond_data = CUDSDataAccumulator()
+
         for index, point in enumerate(particles.iter_particles()):
             point2index[point.uid] = index
             points.append(point.coordinates)
+            point_data.append(point.data)
         for index, bond in enumerate(particles.iter_bonds()):
             bond2index[bond.uid] = index
             lines.append([point2index[uid] for uid in bond.particles])
+            bond_data.append(bond.data)
 
         data = tvtk.PolyData(points=points, lines=lines)
+        point_data.load_onto_vtk(data.point_data)
+        bond_data.load_onto_vtk(data.cell_data)
+
         return cls(
             data=data,
             point2index=point2index,
