@@ -1,11 +1,8 @@
 import warnings
-import collections
 
 import numpy
 
 from simphony.testing.utils import dummy_cuba_value
-
-
 
 
 class CUDSDataAccumulator(object):
@@ -50,7 +47,7 @@ class CUDSDataAccumulator(object):
             if isinstance(default, (float, int)):
                 data = numpy.array(self._data[cuba], dtype=float)
                 index = vtk_data.add_array(data)
-                vtk_data.get_array(0).name = cuba.name
+                vtk_data.get_array(index).name = cuba.name
             else:
                 message = 'proprrty {!r} is currently ignored'
                 warnings.warn(message.format(cuba))
