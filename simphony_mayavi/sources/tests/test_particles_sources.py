@@ -24,8 +24,7 @@ class TestParticlesSource(unittest.TestCase):
                 Particle(
                     coordinates=point,
                     data=DataContainer(
-                        TEMPERATURE=self.point_temperature[index])
-                     ))
+                        TEMPERATURE=self.point_temperature[index])))
             for index, point in enumerate(self.points)]
         self.bond_uids = [
             self.container.add_bond(
