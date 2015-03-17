@@ -10,7 +10,6 @@ from simphony_mayavi.sources.cuds_data_accumulator import CUDSDataAccumulator
 class TestCUDSDataAccumulator(unittest.TestCase):
 
     def test_accumulate(self):
-
         cuds_data = [create_data_container() for i in range(10)]
         accumulator = CUDSDataAccumulator()
         for data in cuds_data:
@@ -23,7 +22,6 @@ class TestCUDSDataAccumulator(unittest.TestCase):
                 accumulator[cuba], [dummy_cuba_value(cuba)] * 10)
 
     def test_accumulate_on_keys(self):
-
         cuds_data = [create_data_container() for i in range(10)]
         accumulator = CUDSDataAccumulator(keys=[CUBA.NAME, CUBA.TEMPERATURE])
         for data in cuds_data:
@@ -36,7 +34,6 @@ class TestCUDSDataAccumulator(unittest.TestCase):
                 accumulator[cuba], [dummy_cuba_value(cuba)] * 10)
 
     def test_accumulate_with_missing_values(self):
-
         accumulator = CUDSDataAccumulator()
         accumulator.append(create_data_container())
         accumulator.append(
@@ -54,7 +51,6 @@ class TestCUDSDataAccumulator(unittest.TestCase):
                 self.assertIsNone(accumulator[cuba][1])
 
     def test_accumulate_and_expand(self):
-
         accumulator = CUDSDataAccumulator()
         accumulator.append(create_data_container(restrict=[CUBA.NAME]))
         accumulator.append(
