@@ -1,6 +1,9 @@
 import unittest
 
+import numpy
 from numpy.testing import assert_array_equal
+from tvtk.api import tvtk
+
 from simphony.core.cuba import CUBA
 from simphony.testing.utils import create_data_container, dummy_cuba_value
 
@@ -64,3 +67,17 @@ class TestCUDSDataAccumulator(unittest.TestCase):
         assert_array_equal(
             accumulator[CUBA.NAME],
             [dummy_cuba_value(CUBA.NAME)] * 2)
+
+    def test_load_onto_vtk(self):
+        accumulator = CUDSDataAccumulator()
+        accumulator.append(create_data_container(restrict=[CUBA.NAME]))
+        accumulator.append(
+            create_data_container(restrict=[CUBA.NAME, CUBA.TEMPERATURE]))
+
+        vtk_data = tvtk.PointData()
+        accumulator.load_onto_vtk(vtk_data)
+        self.assertEqual(vtk_data.number_of_arrays, 1)
+        expected = numpy.array(
+            [None, dummy_cuba_value(CUBA.TEMPERATURE)], dtype=float)
+        assert_array_equal(vtk_data.get_array(0), expected)
+        assert_array_equal(vtk_data.get_array(CUBA.TEMPERATURE.name), expected)

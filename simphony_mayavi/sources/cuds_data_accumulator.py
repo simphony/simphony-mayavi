@@ -1,13 +1,23 @@
+import warnings
+import collections
+
+import numpy
+
+from simphony.testing.utils import dummy_cuba_value
+
+
+
+
 class CUDSDataAccumulator(object):
     """ Accumulate data information per CUBA key.
 
     """
-
     def __init__(self, keys=()):
         self._keys = set(keys)
         self._expand_mode = len(keys) == 0
         self._data = {}
         self._record_size = 0
+        self._default_values = {}
         self._expand(self._keys)
 
     @property
@@ -25,6 +35,7 @@ class CUDSDataAccumulator(object):
 
     def _expand(self, keys):
         for key in keys:
+            self._default_values[key] = _cuba_default(key)
             self._data[key] = [None] * self._record_size
 
     def __len__(self):
@@ -32,3 +43,22 @@ class CUDSDataAccumulator(object):
 
     def __getitem__(self, key):
         return self._data[key]
+
+    def load_onto_vtk(self, vtk_data):
+        for cuba in self.keys:
+            default = self._default_values[cuba]
+            if isinstance(default, (float, int)):
+                data = numpy.array(self._data[cuba], dtype=float)
+                index = vtk_data.add_array(data)
+                vtk_data.get_array(0).name = cuba.name
+            else:
+                message = 'proprrty {!r} is currently ignored'
+                warnings.warn(message.format(cuba))
+
+
+def _cuba_default(cuba):
+    value = dummy_cuba_value(cuba)
+    if isinstance(value, (float, int)):
+        return numpy.NaN
+    else:
+        return None
