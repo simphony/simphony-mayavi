@@ -14,7 +14,6 @@ class CUDSDataAccumulator(object):
         self._expand_mode = len(keys) == 0
         self._data = {}
         self._record_size = 0
-        self._default_values = {}
         self._expand(self._keys)
 
     @property
@@ -32,7 +31,6 @@ class CUDSDataAccumulator(object):
 
     def _expand(self, keys):
         for key in keys:
-            self._default_values[key] = _cuba_default(key)
             self._data[key] = [None] * self._record_size
 
     def __len__(self):
@@ -43,7 +41,7 @@ class CUDSDataAccumulator(object):
 
     def load_onto_vtk(self, vtk_data):
         for cuba in self.keys:
-            default = self._default_values[cuba]
+            default = dummy_cuba_value(cuba)
             if isinstance(default, (float, int)):
                 data = numpy.array(self._data[cuba], dtype=float)
                 index = vtk_data.add_array(data)
@@ -52,10 +50,3 @@ class CUDSDataAccumulator(object):
                 message = 'proprrty {!r} is currently ignored'
                 warnings.warn(message.format(cuba))
 
-
-def _cuba_default(cuba):
-    value = dummy_cuba_value(cuba)
-    if isinstance(value, (float, int)):
-        return numpy.NaN
-    else:
-        return None
