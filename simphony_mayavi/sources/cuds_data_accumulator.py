@@ -47,6 +47,5 @@ class CUDSDataAccumulator(object):
                 index = vtk_data.add_array(data)
                 vtk_data.get_array(index).name = cuba.name
             else:
-                message = 'proprrty {!r} is currently ignored'
+                message = 'property {!r} is currently ignored'
                 warnings.warn(message.format(cuba))
-
