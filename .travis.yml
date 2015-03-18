@@ -21,6 +21,6 @@ install:
   - python setup.py develop
 script:
   - flake8 .
-  - coverage run -m unittest discover
+  - coverage run -m haas
 after_success:
   - coveralls
