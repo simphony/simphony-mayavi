@@ -27,12 +27,18 @@ class LatticeSource(VTKDataSource):
             origin = tuple(origin) + (0.0,)
             data = tvtk.ImageData(spacing=spacing, origin=origin)
             data.extent = 0, size[0] - 1, 0, size[1] - 1, 0, 0
+            x, y = numpy.meshgrid(range(size[0]), range(size[1]))
+            indices = izip(x.ravel(), y.ravel())
 
         elif lattice_type in ('Cubic', 'OrthorombicP'):
             spacing = base_vectors
             origin = origin
             data = tvtk.ImageData(spacing=spacing, origin=origin)
             data.extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
+            y, z, x = numpy.meshgrid(
+                range(size[1]), range(size[2]), range(size[0]))
+            indices = izip(x.ravel(), y.ravel(), z.ravel())
+
         elif lattice_type == 'Hexagonal':
             x, y = numpy.meshgrid(range(size[0]), range(size[1]))
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
@@ -42,12 +48,14 @@ class LatticeSource(VTKDataSource):
             points[:, 0] += origin[0]
             points[:, 1] += origin[1]
             data = tvtk.PolyData(points=points)
-
             indices = izip(x.ravel(), y.ravel())
-            for node in lattice.iter_nodes(indices):
-                node_data.append(node.data)
-            node_data.load_onto_vtk(data.point_data)
+
         else:
             message = 'Unknown lattice type: {}'.format(lattice_type)
             raise ValueError(message)
+
+        for node in lattice.iter_nodes(indices):
+            node_data.append(node.data)
+        node_data.load_onto_vtk(data.point_data)
+
         return cls(data=data)
