@@ -68,7 +68,7 @@ class TestCUDSDataAccumulator(unittest.TestCase):
             accumulator[CUBA.NAME],
             [dummy_cuba_value(CUBA.NAME)] * 2)
 
-    def test_load_onto_vtk(self):
+    def test_load_scalars_onto_vtk(self):
         accumulator = CUDSDataAccumulator()
         accumulator.append(create_data_container(restrict=[CUBA.NAME]))
         accumulator.append(
@@ -81,3 +81,17 @@ class TestCUDSDataAccumulator(unittest.TestCase):
             [None, dummy_cuba_value(CUBA.TEMPERATURE)], dtype=float)
         assert_array_equal(vtk_data.get_array(0), expected)
         assert_array_equal(vtk_data.get_array(CUBA.TEMPERATURE.name), expected)
+
+    def test_load_vectors_onto_vtk(self):
+        accumulator = CUDSDataAccumulator()
+        accumulator.append(create_data_container(restrict=[CUBA.NAME]))
+        accumulator.append(
+            create_data_container(restrict=[CUBA.NAME, CUBA.VELOCITY]))
+
+        vtk_data = tvtk.PointData()
+        accumulator.load_onto_vtk(vtk_data)
+        self.assertEqual(vtk_data.number_of_arrays, 1)
+        expected = numpy.array(
+            [[None, None, None], dummy_cuba_value(CUBA.VELOCITY)], dtype=float)
+        assert_array_equal(vtk_data.get_array(0), expected)
+        assert_array_equal(vtk_data.get_array(CUBA.VELOCITY.name), expected)
