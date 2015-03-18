@@ -1,7 +1,11 @@
+from itertools import izip
+
 import numpy
 
 from mayavi.sources.vtk_data_source import VTKDataSource
 from tvtk.api import tvtk
+
+from .cuds_data_accumulator import CUDSDataAccumulator
 
 
 class LatticeSource(VTKDataSource):
@@ -16,11 +20,14 @@ class LatticeSource(VTKDataSource):
         origin = lattice.origin
         lattice_type = lattice.type
         size = lattice.size
+        node_data = CUDSDataAccumulator()
+
         if lattice_type in ('Square', 'Rectangular'):
             spacing = tuple(base_vectors) + (0.0,)
             origin = tuple(origin) + (0.0,)
             data = tvtk.ImageData(spacing=spacing, origin=origin)
             data.extent = 0, size[0] - 1, 0, size[1] - 1, 0, 0
+
         elif lattice_type in ('Cubic', 'OrthorombicP'):
             spacing = base_vectors
             origin = origin
@@ -35,6 +42,11 @@ class LatticeSource(VTKDataSource):
             points[:, 0] += origin[0]
             points[:, 1] += origin[1]
             data = tvtk.PolyData(points=points)
+
+            indices = izip(x.ravel(), y.ravel())
+            for node in lattice.iter_nodes(indices):
+                node_data.append(node.data)
+            node_data.load_onto_vtk(data.point_data)
         else:
             message = 'Unknown lattice type: {}'.format(lattice_type)
             raise ValueError(message)
