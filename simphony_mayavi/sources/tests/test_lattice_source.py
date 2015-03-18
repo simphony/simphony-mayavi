@@ -32,7 +32,6 @@ class TestLatticeSource(unittest.TestCase):
                 data.get_point(point_id)[:2])
             assert_array_equal(vectors[point_id], index)
 
-
     def test_source_from_a_rectangular_lattice(self):
         lattice = make_rectangular_lattice(
             'test', (0.3, 0.35), (13, 23), origin=(0.2, -2.7))
@@ -86,6 +85,7 @@ class TestLatticeSource(unittest.TestCase):
 
     def test_source_from_a_hexagonal_lattice(self):
         lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
+        self.add_velocity(lattice)
         source = LatticeSource.from_lattice(lattice)
         data = source.data
         self.assertEqual(data.number_of_points, 5 * 4)
@@ -101,6 +101,16 @@ class TestLatticeSource(unittest.TestCase):
                     xspace * column + 0.5 * xspace * (row % 2),
                     yspace * row,
                     0.0))
+
+        vectors = data.point_data.vectors.to_array()
+        for node in lattice.iter_nodes():
+            position = (
+                node.index[0] * xspace + 0.5 * xspace * (node.index[1] % 2),
+                node.index[1] * yspace,
+                0.0)
+            point_id = data.find_point(position)
+            assert_array_equal(vectors[point_id][:2], node.index)
+
 
     def test_source_from_unknown(self):
         lattice = Lattice('test', '', (1, 1, 1), (1, 1, 1), (0, 0, 0))
