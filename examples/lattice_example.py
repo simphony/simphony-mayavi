@@ -1,22 +1,30 @@
-from mayavi.scripts import mayavi2
+import numpy
 
-from simphony.cuds.lattice import make_hexagonal_lattice
+from mayavi.scripts import mayavi2
+from simphony.cuds.lattice import (
+    make_hexagonal_lattice, make_cubic_lattice, make_square_lattice)
 from simphony.core.cuba import CUBA
 
-lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
+hexagonal = make_hexagonal_lattice('test', 0.1, (5, 4))
+square = make_square_lattice('test', 0.1, (5, 4))
+cubic = make_cubic_lattice('test', 0.1, (2, 3, 4))
 
-temperature = 0.2
-for node in lattice.iter_nodes():
-    node.data[CUBA.TEMPERATURE] = temperature
-    lattice.update_node(node)
-    temperature += 0.2
+
+def add_temperature(lattice):
+    for node in lattice.iter_nodes():
+        index = numpy.array(node.index) + 1.0
+        node.data[CUBA.TEMPERATURE] = numpy.prod(index)
+        lattice.update_node(node)
+
+add_temperature(hexagonal)
+add_temperature(cubic)
+add_temperature(square)
 
 # Now view the data.
 @mayavi2.standalone
-def view():
+def view(lattice):
     from mayavi.modules.glyph import Glyph
     from simphony_mayavi.sources.api import LatticeSource
-
     mayavi.new_scene()  # noqa
     src = LatticeSource.from_lattice(lattice)
     mayavi.add_source(src)  # noqa
@@ -28,4 +36,4 @@ def view():
     mayavi.add_module(g)  # noqa
 
 if __name__ == '__main__':
-    view()
+    view(cubic)
