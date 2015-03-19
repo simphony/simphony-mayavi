@@ -7,6 +7,8 @@ from mayavi.sources.vtk_data_source import VTKDataSource
 from tvtk.api import tvtk
 from traits.api import Dict
 
+from .cuds_data_accumulator import CUDSDataAccumulator
+
 CELL2VTKCELL = {
     4: tvtk.Tetra().cell_type,
     8: tvtk.Hexahedron().cell_type,
@@ -44,18 +46,22 @@ class MeshSource(VTKDataSource):
         element2index = {}
         counter = count()
 
+        point_data = CUDSDataAccumulator()
+        cell_data = CUDSDataAccumulator()
+
         for index, point in enumerate(mesh.iter_points()):
             point2index[point.uid] = index
             points.append(point.coordinates)
+            point_data.append(point.data)
 
         edges, edges_size, edge_types, edge2index = gather_cells(
-            mesh.iter_edges(), EDGE2VTKCELL, point2index, counter)
+            mesh.iter_edges(), EDGE2VTKCELL, point2index, counter, cell_data)
 
         faces, faces_size, face_types, face2index = gather_cells(
-            mesh.iter_faces(), FACE2VTKCELL, point2index, counter)
+            mesh.iter_faces(), FACE2VTKCELL, point2index, counter, cell_data)
 
         cells, cells_size, cell_types, cell2index = gather_cells(
-            mesh.iter_cells(), CELL2VTKCELL, point2index, counter)
+            mesh.iter_cells(), CELL2VTKCELL, point2index, counter, cell_data)
 
         elements = edges + faces + cells
         elements_size = [0] + edges_size + faces_size + cells_size
@@ -70,13 +76,17 @@ class MeshSource(VTKDataSource):
         data = tvtk.UnstructuredGrid(points=points)
         data.set_cells(element_types, cell_offset, cell_array)
 
+        point_data.load_onto_vtk(data.point_data)
+        cell_data.load_onto_vtk(data.cell_data)
+
         return cls(
             data=data,
             point2index=point2index,
             element2index=element2index)
 
 
-def gather_cells(iterable, vtk_mapping, point2index, counter):
+def gather_cells(
+        iterable, vtk_mapping, point2index, counter, accumulator):
     """ Gather the vtk cell information from an element iterator.
 
     Arguments
@@ -93,6 +103,9 @@ def gather_cells(iterable, vtk_mapping, point2index, counter):
     index : itertools.count
         The counter object to use when evaluating the ``elements2index``
         mapping.
+
+    accumulator : CUDSDataAccumulator
+        The accumulator instance to use and collect the data information
 
     Returns
     -------
@@ -121,5 +134,6 @@ def gather_cells(iterable, vtk_mapping, point2index, counter):
         cells.append(npoints)
         cells.extend(point2index[uid] for uid in element.points)
         cell_types.append(vtk_mapping[npoints])
+        accumulator.append(element.data)
 
     return cells, cells_size, cell_types, element2index

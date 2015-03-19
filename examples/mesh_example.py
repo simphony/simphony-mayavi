@@ -2,6 +2,8 @@ from numpy import array
 from mayavi.scripts import mayavi2
 
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
+from simphony.core.data_container import DataContainer
+
 
 points = array([
     [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
@@ -20,25 +22,33 @@ container = Mesh('test')
 
 # add points
 uids = [
-    container.add_point(Point(coordinates=point)) for point in points]
+    container.add_point(
+        Point(coordinates=point, data=DataContainer(TEMPERATURE=index)))
+    for index, point in enumerate(points)]
 
 # add edges
 edge_uids = [
     container.add_edge(
-        Edge(points=[uids[index] for index in element]))
-    for element in edges]
+        Edge(
+            points=[uids[index] for index in element],
+            data=DataContainer(TEMPERATURE=index + 20)))
+    for index, element in enumerate(edges)]
 
 # add faces
 face_uids = [
     container.add_face(
-        Face(points=[uids[index] for index in element]))
-    for element in faces]
+        Face(
+            points=[uids[index] for index in element],
+            data=DataContainer(TEMPERATURE=index + 30)))
+    for index, element in enumerate(faces)]
 
 # add cells
 cell_uids = [
     container.add_cell(
-        Cell(points=[uids[index] for index in element]))
-    for element in cells]
+        Cell(
+            points=[uids[index] for index in element],
+            data=DataContainer(TEMPERATURE=index + 40)))
+    for index, element in enumerate(cells)]
 
 
 # Now view the data.

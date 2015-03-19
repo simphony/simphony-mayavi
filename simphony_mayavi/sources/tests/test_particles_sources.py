@@ -5,8 +5,9 @@ from numpy.testing import assert_array_equal
 
 from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particles, Particle, Bond
-from simphony_mayavi.sources.api import ParticlesSource, cell_array_slicer
 from simphony.core.data_container import DataContainer
+
+from simphony_mayavi.sources.api import ParticlesSource, cell_array_slicer
 
 
 class TestParticlesSource(unittest.TestCase):
