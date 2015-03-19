@@ -111,7 +111,6 @@ class TestLatticeSource(unittest.TestCase):
             point_id = data.find_point(position)
             assert_array_equal(vectors[point_id][:2], node.index)
 
-
     def test_source_from_unknown(self):
         lattice = Lattice('test', '', (1, 1, 1), (1, 1, 1), (0, 0, 0))
         with self.assertRaises(ValueError):

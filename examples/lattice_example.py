@@ -20,6 +20,7 @@ add_temperature(hexagonal)
 add_temperature(cubic)
 add_temperature(square)
 
+
 # Now view the data.
 @mayavi2.standalone
 def view(lattice):
