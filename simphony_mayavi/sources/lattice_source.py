@@ -35,7 +35,7 @@ class LatticeSource(VTKDataSource):
             origin = origin
             data = tvtk.ImageData(spacing=spacing, origin=origin)
             data.extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
-            # vtk ravels the point positions in a very wierd way
+            # vtk ravels the point positions in a very weird way
             # this setup has been supported by tests.
             y, z, x = numpy.meshgrid(
                 range(size[1]), range(size[2]), range(size[0]))
