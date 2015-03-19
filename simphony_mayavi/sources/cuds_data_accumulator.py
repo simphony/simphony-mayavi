@@ -46,6 +46,14 @@ class CUDSDataAccumulator(object):
                 data = numpy.array(self._data[cuba], dtype=float)
                 index = vtk_data.add_array(data)
                 vtk_data.get_array(index).name = cuba.name
+            elif isinstance(default, numpy.ndarray) and len(default) == 3:
+                nan = numpy.array([None, None, None], dtype=float)
+                replacer = lambda x: nan if x is None else x
+                data = numpy.array(
+                    tuple(replacer(data) for data in self._data[cuba]),
+                    dtype=numpy.float)
+                index = vtk_data.add_array(data)
+                vtk_data.get_array(index).name = cuba.name
             else:
                 message = 'property {!r} is currently ignored'
                 warnings.warn(message.format(cuba))

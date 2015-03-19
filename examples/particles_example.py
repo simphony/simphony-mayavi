@@ -20,8 +20,6 @@ for index, point in enumerate(points):
 for indices in bonds:
     container.add_bond(Bond(particles=[uids[index] for index in indices]))
 
-# The numpy array data.
-
 
 # Now view the data.
 @mayavi2.standalone
