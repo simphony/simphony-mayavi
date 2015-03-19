@@ -7,7 +7,7 @@ from simphony.core.cuba import CUBA
 
 hexagonal = make_hexagonal_lattice('test', 0.1, (5, 4))
 square = make_square_lattice('test', 0.1, (5, 4))
-cubic = make_cubic_lattice('test', 0.1, (2, 3, 4))
+cubic = make_cubic_lattice('test', 0.1, (5, 10, 12))
 
 
 def add_temperature(lattice):
