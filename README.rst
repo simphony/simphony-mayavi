@@ -1,7 +1,8 @@
 Simphony-Mayavi
 ===============
 
-A plugin-library for the Simphony framework to provide visualization support of the CUDS highlevel components
+A plugin-library for the Simphony framework (http://www.simphony-project.eu/) to provide 
+visualization support of the CUDS highlevel components.
 
 .. image:: https://travis-ci.org/simphony/simphony-mayavi.svg?branch=master
   :target: https://travis-ci.org/simphony/simphony-mayavi
@@ -73,8 +74,8 @@ Usage
 
 After installation the user should be able to import the ``mayavi`` visualization plugin module by::
 
-  from simphony.visualization import mayavi
-  mayavi.show(cuds)
+  from simphony.visualization import mayavi_tools
+  mayavi_tools.show(cuds)
 
 
 Directory structure
