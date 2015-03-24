@@ -16,6 +16,11 @@ def mock_modules():
     else:
         MOCK_MODULES = []
 
+    try:
+        import numpy  # noqa
+    except ImportError:
+        MOCK_MODULES.append('simphony')
+
     class Mock(MagicMock):
 
         @classmethod
