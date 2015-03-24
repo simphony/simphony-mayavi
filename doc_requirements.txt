@@ -1,0 +1,3 @@
+sphinx
+-e git://github.com/enthought/sectiondoc.git@8a0c2be#egg=sectiondoc
+-e git://github.com/enthought/trait-documenter.git#egg=trait-documenter
