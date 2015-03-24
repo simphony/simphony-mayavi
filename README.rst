@@ -25,7 +25,7 @@ Requirements
 ------------
 
 - mayavi >= 4.4.0
-- simphony >= 0.0.1
+- simphony >= 0.1.1
 
 Optional requirements
 ~~~~~~~~~~~~~~~~~~~~~
