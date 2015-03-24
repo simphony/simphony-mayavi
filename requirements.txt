@@ -1,3 +1,2 @@
--e git://github.com/simphony/simphony-common.git#egg=simphony
-tables
+-e git://github.com/simphony/simphony-common.git@0.1.1#egg=simphony
 mayavi
