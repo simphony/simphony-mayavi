@@ -8,21 +8,32 @@ Mayavi Sources
 
 .. autosummary::
 
-   ~api.ParticlesSource
-   ~api.LatticeSource
-   ~api.MeshSource
+    ~particles_source.ParticlesSource
+    ~lattice_source.LatticeSource
+    ~mesh_source.MeshSource
 
 .. rubric:: Functions
 
-.. currentmodule:: simphony_mayavi.sources
-
 .. autosummary::
 
-   ~api.cell_array_slicer
+   ~utils.cell_array_slicer
 
 .. rubric:: Implementation
 
-.. automodule:: simphony_mayavi.sources.api
-    :members:
-    :undoc-members:
-    :show-inheritance:
+
+.. autoclass:: simphony_mayavi.sources.particles_source.ParticlesSource
+     :members:
+     :undoc-members:
+     :show-inheritance:
+
+.. autoclass:: simphony_mayavi.sources.mesh_source.MeshSource
+     :members:
+     :undoc-members:
+     :show-inheritance:
+
+.. autoclass:: simphony_mayavi.sources.lattice_source.LatticeSource
+     :members:
+     :undoc-members:
+     :show-inheritance:
+
+.. autofunction:: simphony_mayavi.sources.utils.cell_array_slicer
