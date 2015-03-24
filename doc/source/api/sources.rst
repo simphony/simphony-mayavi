@@ -1,7 +1,6 @@
-Core
-====
+Mayavi Sources
+==============
 
-Core components and objects of the simphony package.
 
 .. rubric:: Classes
 
