@@ -7,14 +7,15 @@
 def mock_modules():
     import sys
 
-    from mock import Mock as MagicMock
+    from mock import MagicMock
+
+    MOCK_MODULES = []
+    MOCK_TYPES = []
 
     try:
         import numpy  # noqa
     except ImportError:
         MOCK_MODULES = ['numpy']
-    else:
-        MOCK_MODULES = []
 
     try:
         import simphony  # noqa
@@ -40,17 +41,29 @@ def mock_modules():
             'mayavi.tools',
             'mayavi.tools.tools'))
 
+        MOCK_TYPES.append(('mayavi.sources.vtk_data_source', 'VTKDataSource'))
+
     class Mock(MagicMock):
 
+        TYPES = {
+            mock_type: type(mock_type, (object,), {'__module__': path})
+            for path, mock_type in MOCK_TYPES}
+
         @classmethod
-        def __getattr__(cls, name):
-            return Mock()
+        def __getattr__(self, name):
+
+            return Mock.TYPES.get(name, Mock(mocked_name=name))
 
         def __call__(self, *args, **kwards):
             return Mock()
 
-    sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-    print 'mocking {}'.format(MOCK_MODULES)
+        @property
+        def __name__(self):
+            return self.mocked_name
+
+    sys.modules.update(
+        (mod_name, Mock(mocked_name=mod_name)) for mod_name in MOCK_MODULES)
+    print 'mocking modules {} and types {}'.format(MOCK_MODULES, MOCK_TYPES)
 
 # -- General configuration ------------------------------------------------
 

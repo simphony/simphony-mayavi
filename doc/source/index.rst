@@ -14,7 +14,7 @@ User Manual
 .. toctree::
    :maxdepth: 1
 
-   Python <plugins>
+   SimPhoNy <simphony>
    Mayavi2 <mayavi2>
 
 API Reference
