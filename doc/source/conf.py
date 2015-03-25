@@ -7,7 +7,7 @@
 def mock_modules():
     import sys
 
-    from mock import MagicMock
+    from mock import Mock as MagicMock
 
     try:
         import numpy  # noqa
@@ -19,12 +19,26 @@ def mock_modules():
     try:
         import simphony  # noqa
     except ImportError:
-        MOCK_MODULES.append('simphony')
+        MOCK_MODULES.extend([
+            'simphony',
+            'simphony.testing',
+            'simphony.testing.utils',
+            'simphony.cuds',
+            'simphony.cuds.abstractmesh',
+            'simphony.cuds.abstractparticles',
+            'simphony.cuds.abstractlattice'])
 
     try:
         import mayavi  # noqa
     except ImportError:
-        MOCK_MODULES.append('mayavi')
+        MOCK_MODULES.extend((
+            'tvtk',
+            'tvtk.api',
+            'mayavi',
+            'mayavi.sources',
+            'mayavi.sources.vtk_data_source',
+            'mayavi.tools',
+            'mayavi.tools.tools'))
 
     class Mock(MagicMock):
 
@@ -38,11 +52,11 @@ def mock_modules():
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
     print 'mocking {}'.format(MOCK_MODULES)
 
-
 # -- General configuration ------------------------------------------------
 
 # check and mock missing modules
 mock_modules()
+
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -63,6 +77,7 @@ copyright = u'2015, SimPhoNy FP7 Collaboration'
 version = '0.1.0'
 release = '0.1.0.dev0'
 pygments_style = 'sphinx'
+
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
 
