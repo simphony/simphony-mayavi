@@ -21,6 +21,11 @@ def mock_modules():
     except ImportError:
         MOCK_MODULES.append('simphony')
 
+    try:
+        import mayavi  # noqa
+    except ImportError:
+        MOCK_MODULES.append('mayavi')
+
     class Mock(MagicMock):
 
         @classmethod
