@@ -45,9 +45,6 @@ def mock_modules():
         class VTKDataSource(HasTraits):
             pass
 
-        MOCK_TYPES.append(
-            ('mayavi.sources.vtk_data_source', 'VTKDataSource', (MockTraits,)))
-
     class Mock(MagicMock):
 
         TYPES = {mock_type: VTKDataSource}
