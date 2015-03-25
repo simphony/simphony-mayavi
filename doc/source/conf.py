@@ -17,7 +17,7 @@ def mock_modules():
         MOCK_MODULES = []
 
     try:
-        import numpy  # noqa
+        import simphony  # noqa
     except ImportError:
         MOCK_MODULES.append('simphony')
 
