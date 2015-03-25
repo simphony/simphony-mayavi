@@ -75,12 +75,12 @@ mock_modules()
 
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
+    #'sphinx.ext.intersphinx',
+    #'sphinx.ext.todo',
+    #'sphinx.ext.coverage',
+    #'sphinx.ext.mathjax',
+    #'sphinx.ext.ifconfig',
+    #'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'trait_documenter',
     'sectiondoc']
