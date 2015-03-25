@@ -42,8 +42,8 @@ def mock_modules():
             'mayavi.tools.tools'))
 
         from traits.api import HasTraits
-        class VTKDataSource(HasTraits):
-            pass
+    class VTKDataSource(HasTraits):
+        pass
 
     class Mock(MagicMock):
 
@@ -73,6 +73,7 @@ mock_modules()
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     #'sphinx.ext.intersphinx',
     #'sphinx.ext.todo',
     #'sphinx.ext.coverage',
@@ -82,6 +83,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'trait_documenter',
     'sectiondoc']
+
+
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
