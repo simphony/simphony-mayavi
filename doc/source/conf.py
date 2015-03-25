@@ -87,7 +87,7 @@ extensions = [
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
-project = u'SimPhoNy'
+project = u'SimPhoNy-Mayavi'
 copyright = u'2015, SimPhoNy FP7 Collaboration'
 version = '0.1.0'
 release = '0.1.0.dev0'
@@ -127,7 +127,7 @@ texinfo_documents = [(
 
 # -- Options for Epub output ----------------------------------------------
 
-epub_title = u'SimPhoNy'
+epub_title = u'SimPhoNy-Mayavi'
 epub_author = u'SimPhoNy FP7 Collaboration'
 epub_publisher = u'SimPhoNy FP7 Collaboration'
 epub_copyright = u'2015, SimPhoNy FP7 Collaboration'
