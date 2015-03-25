@@ -47,7 +47,7 @@ def mock_modules():
 
     class Mock(MagicMock):
 
-        TYPES = {mock_type: VTKDataSource}
+        TYPES = {'VTKDataSource': VTKDataSource}
 
         @classmethod
         def __getattr__(self, name):
