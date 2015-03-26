@@ -82,7 +82,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'trait_documenter',
-    'sectiondoc']
+    #'sectiondoc'
+]
 
 
 templates_path = ['_templates']
