@@ -12,6 +12,8 @@ IS_RELEASED = False
 
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
+# When installation takes place inside a READTHEDOCS build
+# we need to set zip_safe = False
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
