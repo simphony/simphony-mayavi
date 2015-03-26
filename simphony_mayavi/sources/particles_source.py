@@ -6,7 +6,7 @@ from .cuds_data_accumulator import CUDSDataAccumulator
 
 
 class ParticlesSource(VTKDataSource):
-    """ A Mayavi Source wrapping a SimPhoNy CUDS Particle container.
+    """ SimPhoNy CUDS Particle container to Mayavi Source  converter
 
     """
 
@@ -18,6 +18,14 @@ class ParticlesSource(VTKDataSource):
 
     @classmethod
     def from_particles(cls, particles):
+        """ Return a ParticlesSource from a CUDS Particles container.
+
+        Parameters
+        ----------
+        particles : Particles
+            The CUDS Particles instance to copy the information from.
+
+        """
         points = []
         lines = []
         point2index = {}

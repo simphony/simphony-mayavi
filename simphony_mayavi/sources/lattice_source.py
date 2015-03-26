@@ -9,13 +9,20 @@ from .cuds_data_accumulator import CUDSDataAccumulator
 
 
 class LatticeSource(VTKDataSource):
-    """ A Mayavi Source wrapping a SimPhoNy CUDS Particle container.
-
+    """ SimPhoNy CUDS Lattice container to Mayavi Source converter
 
     """
 
     @classmethod
     def from_lattice(cls, lattice):
+        """ Return a LatticeSource from a CUDS Lattice container.
+
+        Parameters
+        ----------
+        lattice : Lattice
+            The cuds Lattice instance to copy the information from.
+
+        """
         base_vectors = lattice.base_vect
         origin = lattice.origin
         lattice_type = lattice.type

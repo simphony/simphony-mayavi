@@ -29,7 +29,7 @@ EDGE2VTKCELL = defaultdict(
 
 
 class MeshSource(VTKDataSource):
-    """ A Mayavi Source wrapping a SimPhoNy CUDS Mesh container.
+    """ SimPhoNy CUDS Mesh container to Mayavi Source converter
 
     """
 
@@ -41,6 +41,14 @@ class MeshSource(VTKDataSource):
 
     @classmethod
     def from_mesh(cls, mesh):
+        """ Return a MeshSource from a CUDS Mesh container.
+
+        Parameters
+        ----------
+        mesh : Mesh
+            The CUDS Mesh instance to copy the information from.
+
+        """
         points = []
         point2index = {}
         element2index = {}
