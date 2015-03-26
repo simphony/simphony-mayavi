@@ -74,16 +74,10 @@ sys.path.append(os.path.join('..', '..', 'simphony_mayavi'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    #'sphinx.ext.intersphinx',
-    #'sphinx.ext.todo',
-    #'sphinx.ext.coverage',
-    #'sphinx.ext.mathjax',
-    #'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'trait_documenter',
-    #'sectiondoc'
-]
+    'sectiondoc']
 
 
 templates_path = ['_templates']
