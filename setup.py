@@ -18,6 +18,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
 
+
 # Return the git revision as a string
 def git_version():
     def _minimal_ext_cmd(cmd):
