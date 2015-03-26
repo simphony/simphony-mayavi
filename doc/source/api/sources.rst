@@ -20,6 +20,7 @@ Mayavi Sources
 
 .. rubric:: Implementation
 
+-----
 
 .. autoclass:: simphony_mayavi.sources.particles_source.ParticlesSource
      :members:
