@@ -5,6 +5,7 @@
 import os
 import sys
 
+
 def mock_modules():
 
     from mock import MagicMock
@@ -42,12 +43,14 @@ def mock_modules():
             'mayavi.tools.tools'))
 
         from traits.api import HasTraits
-    class VTKDataSource(HasTraits):
-        pass
+        MOCK_TYPES.append(
+            ('mayavi.sources.vtk_data_source', 'VTKDataSource', (HasTraits,)))
 
     class Mock(MagicMock):
 
-        TYPES = {'VTKDataSource': VTKDataSource}
+        TYPES = {
+            mock_type: type(mock_type, bases, {'__module__': path})
+            for path, mock_type, bases in MOCK_TYPES}
 
         @classmethod
         def __getattr__(self, name):
@@ -78,7 +81,6 @@ extensions = [
     'sphinx.ext.autosummary',
     'trait_documenter',
     'sectiondoc']
-
 
 templates_path = ['_templates']
 source_suffix = '.rst'
