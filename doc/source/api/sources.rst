@@ -11,6 +11,7 @@ Mayavi Sources
     ~particles_source.ParticlesSource
     ~lattice_source.LatticeSource
     ~mesh_source.MeshSource
+    ~cuds_data_accumulator.CUDSDataAccumulator
 
 .. rubric:: Functions
 
@@ -33,6 +34,11 @@ Mayavi Sources
      :show-inheritance:
 
 .. autoclass:: simphony_mayavi.sources.lattice_source.LatticeSource
+     :members:
+     :undoc-members:
+     :show-inheritance:
+
+.. autoclass:: simphony_mayavi.sources.cuds_data_accumulator.CUDSDataAccumulator
      :members:
      :undoc-members:
      :show-inheritance:
