@@ -20,37 +20,37 @@ class CUDSDataAccumulator(object):
     values will be saved as ``None``. Where ``expand`` will extend
     the internal table of values when ever a new key is introduced.
 
-    Example::
+    .. rubric:: expand operation
 
-      # "expand" mode
-      >>> accumulator = CUDSDataAccumulator():
-      >>> accumulator.append(DataContainer(TEMPERATURE=34))
-      >>> accumulator.keys()
-      {CUBA.TEMPERATURE}
-      >>> accumulator.append(DataContainer(VELOCITY=(0.1, 0.1, 0.1))
-      >>> accumulator.append(DataContainer(TEMPERATURE=56))
-      >>> accumulator.keys()
-      {CUBA.TEMPERATURE, CUBA.VELOCITY}
-      >>> accumulator[CUBA.TEMPERATURE]
-      [34, None, 56]
-      >>> accumulator[CUBA.VELOCITY]
-      [None, (0.1, 0.1, 0.1), None]
-
-      # "fixed" mode
-      >>> accumulator = CUDSDataAccumulator([CUBA.TEMPERATURE, CUBA.PRESSURE]):
-      >>> accumulator.keys()
-      {CUBA.TEMPERATURE, CUBA.PRESSURE}
-      >>> accumulator.append(DataContainer(TEMPERATURE=34))
-      >>> accumulator.append(DataContainer(VELOCITY=(0.1, 0.1, 0.1))
-      >>> accumulator.append(DataContainer(TEMPERATURE=56))
-      >>> accumulator.keys()
-      {CUBA.TEMPERATURE, CUBA.PRESSURE}
-      >>> accumulator[CUBA.TEMPERATURE]
-      [34, None, 56]
-      >>> accumulator[CUBA.PRESSURE]
-      [None, None, None]
-      >>> accumulator[CUBA.VELOCITY]
-      KeyError(...)
+    >>> accumulator = CUDSDataAccumulator():
+    >>> accumulator.append(DataContainer(TEMPERATURE=34))
+    >>> accumulator.keys()
+    {CUBA.TEMPERATURE}
+    >>> accumulator.append(DataContainer(VELOCITY=(0.1, 0.1, 0.1))
+    >>> accumulator.append(DataContainer(TEMPERATURE=56))
+    >>> accumulator.keys()
+    {CUBA.TEMPERATURE, CUBA.VELOCITY}
+    >>> accumulator[CUBA.TEMPERATURE]
+    [34, None, 56]
+    >>> accumulator[CUBA.VELOCITY]
+    [None, (0.1, 0.1, 0.1), None]
+    
+    .. rubric:: fixed operation
+    
+    >>> accumulator = CUDSDataAccumulator([CUBA.TEMPERATURE, CUBA.PRESSURE]):
+    >>> accumulator.keys()
+    {CUBA.TEMPERATURE, CUBA.PRESSURE}
+    >>> accumulator.append(DataContainer(TEMPERATURE=34))
+    >>> accumulator.append(DataContainer(VELOCITY=(0.1, 0.1, 0.1))
+    >>> accumulator.append(DataContainer(TEMPERATURE=56))
+    >>> accumulator.keys()
+    {CUBA.TEMPERATURE, CUBA.PRESSURE}
+    >>> accumulator[CUBA.TEMPERATURE]
+    [34, None, 56]
+    >>> accumulator[CUBA.PRESSURE]
+    [None, None, None]
+    >>> accumulator[CUBA.VELOCITY]
+    KeyError(...)
 
     """
     def __init__(self, keys=()):
