@@ -10,7 +10,15 @@ from simphony_mayavi.sources.api import (
 
 
 def show(cuds):
+    """ Show the cuds objects using the default visualisation.
 
+     Parameters
+     ----------
+     cuds :
+         A top level cuds object (e.g. a mesh). The method will detect
+         the type of object and create the appropriate visualisation.
+
+    """
     if isinstance(cuds, ABCMesh):
         source = MeshSource.from_mesh(cuds)
         mlab.pipeline.surface(source, name=cuds.name)
