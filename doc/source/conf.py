@@ -2,7 +2,6 @@
 #
 # SimPhoNy-Mayavi documentation build configuration file
 #
-import os
 import sys
 
 
