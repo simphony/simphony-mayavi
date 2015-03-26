@@ -11,23 +11,38 @@ UUID = Instance(uuid.UUID)
 
 
 class CUDSDataExtractor(HasStrictTraits):
-    """  Extract data from cuds items.
+    """Extract data from cuds items.
+
+    The class that supports extracting data values of a specific CUBA key
+    from an iterable that returns low level CUDS objects
+    (e.g. :class:`~Point`).
+
     """
 
     #: The function to call that returns a generator over the desired
-    #: items. This value cannot be changed after initialisation.
+    #: items (e.g. Mesh.iter_points). This value cannot be changed after
+    #: initialisation.
     function = ReadOnly
 
-    # The list of keys to restrict the data extraction.
+    #: The list of uuid keys to restrict the data extraction. This attribute
+    #: is passed to the function generator method to restrict iteration over
+    #: the provided keys (e.g Mesh.iter_points(uids=keys))
     keys = Either(None, Set(UUID))
 
-    #: The list of cuba keys that are available (read only).
+    #: The list of cuba keys that are available (read only). The value is
+    #: recalculated at initialialisation and when the ``reset`` method is
+    #: called.
     available = Property(Set(CUBATrait), depends_on='_available')
 
-    #: Currently selected CUBA key.
+    #: Currently selected CUBA key. Changing the selected key will fire events
+    #: that will result in executing the generator function and extracting
+    #: the related values from the CUDS items that the iterator yields. The
+    #: resulting mapping of ``uid -> value`` will be stored in ``data``.
     selected = CUBATrait
 
-    #: The dictionary mapping of item uid to the extracted data value.
+    #: The dictionary mapping of item uid to the extracted data value. A change
+    #: Event is fired for ``data`` when ``selected`` or ``keys`` change or
+    #: the ``reset`` method is called.
     data = Property(Dict(UUID, Any), depends_on='_data')
 
     # Private traits #########################################################
