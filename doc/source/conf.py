@@ -73,11 +73,6 @@ def mock_modules():
 
 # -- General configuration ------------------------------------------------
 
-try:
-    import traits
-except ImportError:
-    print 'TRAITS IS NOT AVAILABLE'
-
 # check and mock missing modules
 mock_modules()
 
