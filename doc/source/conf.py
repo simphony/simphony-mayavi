@@ -74,7 +74,6 @@ def mock_modules():
 
 # check and mock missing modules
 mock_modules()
-sys.path.append(os.path.join('..', '..', 'simphony_mayavi'))
 
 extensions = [
     'sphinx.ext.autodoc',
