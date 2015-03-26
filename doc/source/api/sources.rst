@@ -1,6 +1,9 @@
-Mayavi Sources
+Sources module
 ==============
 
+A module containing tools to convert from CUDS containers to Mayavi
+compatible sources. Please use the ``simphony_mayavi.sources.api``
+module to access the provided tools.
 
 .. rubric:: Classes
 
