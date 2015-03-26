@@ -73,6 +73,10 @@ def mock_modules():
 
 # -- General configuration ------------------------------------------------
 
+import subprocess
+
+subprocess.check_call(['pip', 'freeze'])
+
 # check and mock missing modules
 mock_modules()
 
