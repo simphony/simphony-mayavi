@@ -1,5 +1,4 @@
 from numpy import array
-from mayavi.scripts import mayavi2
 
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony.core.data_container import DataContainer
@@ -18,50 +17,35 @@ cells = [
 faces = [[2, 7, 11]]
 edges = [[1, 4], [3, 8]]
 
-container = Mesh('test')
+mesh = Mesh('example')
 
 # add points
 uids = [
-    container.add_point(
+    mesh.add_point(
         Point(coordinates=point, data=DataContainer(TEMPERATURE=index)))
     for index, point in enumerate(points)]
 
 # add edges
 edge_uids = [
-    container.add_edge(
-        Edge(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 20)))
+    mesh.add_edge(
+        Edge(points=[uids[index] for index in element]))
     for index, element in enumerate(edges)]
 
 # add faces
 face_uids = [
-    container.add_face(
-        Face(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 30)))
+    mesh.add_face(
+        Face(points=[uids[index] for index in element]))
     for index, element in enumerate(faces)]
 
 # add cells
 cell_uids = [
-    container.add_cell(
-        Cell(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 40)))
+    mesh.add_cell(
+        Cell(points=[uids[index] for index in element]))
     for index, element in enumerate(cells)]
 
 
-# Now view the data.
-@mayavi2.standalone
-def view():
-    from mayavi.modules.surface import Surface
-    from simphony_mayavi.sources.api import MeshSource
-
-    mayavi.new_scene()  # noqa
-    src = MeshSource.from_mesh(container)
-    mayavi.add_source(src)  # noqa
-    s = Surface()
-    mayavi.add_module(s)  # noqa
-
 if __name__ == '__main__':
-    view()
+    from simphony.visualisation import mayavi_tools
+
+    # Visualise the Mesh object
+    mayavi_tools.show(mesh)
