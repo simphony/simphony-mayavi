@@ -1,0 +1,4 @@
+git+https://github.com/enthought/traits.git#egg=traits
+git+https://github.com/enthought/sectiondoc.git@8a0c2be#egg=sectiondoc
+git+https://github.com/enthought/trait-documenter.git#egg=trait-documenter
+mock
