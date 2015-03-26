@@ -1,9 +1,10 @@
 Mayavi2
 =======
 
-The Simphony-Mayavi library provides a set of tools to easily create mayavi ``Source`` instances
-from SimPhoNy CUDS containers. With these tools one can use the SimPhoNy libraries and enviroment
-for inside the Mayavi2 application, as it is demonstrated in the examples.
+The Simphony-Mayavi library provides a set of tools to easily create
+mayavi ``Source`` instances from SimPhoNy CUDS containers. With the
+provided tools one can use the SimPhoNy libraries to work inside the
+Mayavi2 application, as it is demonstrated in the examples.
 
 
 .. rubric:: Source from a CUDS Mesh

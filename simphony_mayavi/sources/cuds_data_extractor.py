@@ -11,7 +11,7 @@ UUID = Instance(uuid.UUID)
 
 
 class CUDSDataExtractor(HasStrictTraits):
-    """Extract data from cuds items.
+    """Extract data from cuds items iterable.
 
     The class that supports extracting data values of a specific CUBA key
     from an iterable that returns low level CUDS objects

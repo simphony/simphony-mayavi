@@ -1,7 +1,8 @@
 Plugin module
 =============
 
-This module is available as a visualisation plug-in for the simphony framework and provides a
-set of tools to visualize CUDS objects.
+This module ``simphony_mayavi.plugin` provides a set of tools to
+visualize CUDS objects. The tools are also available as a visualisation
+plug-in to the simphony library.
 
 .. autofunction:: simphony_mayavi.show.show

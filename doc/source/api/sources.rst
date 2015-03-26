@@ -23,9 +23,9 @@ module to access the provided tools.
 
    ~utils.cell_array_slicer
 
-.. rubric:: Implementation
+Description
+-----------
 
------
 
 .. autoclass:: simphony_mayavi.sources.particles_source.ParticlesSource
      :members:

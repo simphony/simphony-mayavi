@@ -8,25 +8,53 @@ from simphony.testing.utils import dummy_cuba_value
 class CUDSDataAccumulator(object):
     """ Accumulate data information per CUBA key.
 
-    A collector object that stores the information of the added
-    :class:`~DataContainer` into a list of values per CUBA key.
-    The currently stored values can be retrieved based by CUBA key.
+    A collector object that stores :class:``DataContainer`` data into
+    a list of values per CUBA key. By appending :class:`DataContainer`
+    instanced the user can effectively convert the per item mapping of
+    data values in a CUDS container to a per CUBA key mapping of the
+    data values (useful for coping data to vtk array containers).
+
+    The Accumulator has two modes of operation ``fixed`` and
+    ``expand``. ``fixed`` means that data will be stored for
+    a predefined set of keys on every ``append`` call and missing
+    values will be saved as ``None``. Where ``expand`` will extend
+    the internal table of values when ever a new key is introduced.
 
     Example::
 
+      # "expand" mode
       >>> accumulator = CUDSDataAccumulator():
       >>> accumulator.append(DataContainer(TEMPERATURE=34))
-      >>> accumulator.append(DataContainer()
-      >>> accumulator.append(DataContainer(TEMPERATURE=56))
       >>> accumulator.keys()
       {CUBA.TEMPERATURE}
+      >>> accumulator.append(DataContainer(VELOCITY=(0.1, 0.1, 0.1))
+      >>> accumulator.append(DataContainer(TEMPERATURE=56))
+      >>> accumulator.keys()
+      {CUBA.TEMPERATURE, CUBA.VELOCITY}
       >>> accumulator[CUBA.TEMPERATURE]
       [34, None, 56]
+      >>> accumulator[CUBA.VELOCITY]
+      [None, (0.1, 0.1, 0.1), None]
 
+      # "fixed" mode
+      >>> accumulator = CUDSDataAccumulator([CUBA.TEMPERATURE, CUBA.PRESSURE]):
+      >>> accumulator.keys()
+      {CUBA.TEMPERATURE, CUBA.PRESSURE}
+      >>> accumulator.append(DataContainer(TEMPERATURE=34))
+      >>> accumulator.append(DataContainer(VELOCITY=(0.1, 0.1, 0.1))
+      >>> accumulator.append(DataContainer(TEMPERATURE=56))
+      >>> accumulator.keys()
+      {CUBA.TEMPERATURE, CUBA.PRESSURE}
+      >>> accumulator[CUBA.TEMPERATURE]
+      [34, None, 56]
+      >>> accumulator[CUBA.PRESSURE]
+      [None, None, None]
+      >>> accumulator[CUBA.VELOCITY]
+      KeyError(...)
 
     """
     def __init__(self, keys=()):
-        """ Constructor
+        """Constructor
 
         Parameters
         ----------
@@ -34,11 +62,8 @@ class CUDSDataAccumulator(object):
 
             The list of keys that the accumulator should care
             about. Providing this value at initialisation sets up the
-            accumulator to ``fixed`` mode where only the provided keys
-            will be stored. IF no keys are provided then all keys with
-            value will be stored and the accumulator operates in
-            ``expand`` mode where every newly seen key will be added
-            to the set of keys and initialised with missing values.
+            accumulator to operate in ``fixed`` mode. If no keys are
+            provided then accumulator operates in ``expand`` mode.
 
         """
         self._keys = set(keys)
@@ -64,10 +89,9 @@ class CUDSDataAccumulator(object):
 
         If the accumulator operates in ``fixed`` mode:
 
-        - Any keys in self.keys() that have values in ``data`` will be stored
-          (appended to the related key lits).
-        - Missing keys will be store as ``None``
-        - New keys will be ignored
+        - Any keys in :code:`self.keys()` that have values in ``data``
+          will be stored (appended to the related key lits).
+        - Missing keys will be stored as ``None``
 
         If the accumulator operates in ``expand`` mode:
 
@@ -75,7 +99,7 @@ class CUDSDataAccumulator(object):
           and the related list of values with length equal to the current
           record size will be initialised with values of ``None``.
         - Any keys in the modified :code:`self.keys()` that have values in
-          ``data`` will be stored (appended to the related key lits).
+          ``data`` will be stored (appended to the list of the related key).
         - Missing keys will be store as ``None``.
 
         """
@@ -97,7 +121,7 @@ class CUDSDataAccumulator(object):
 
         Data are loaded onto the vtk container based on their data
         type. The name of the added array is the name of the CUBA key
-        (i.e. :samp:`{CUBA}.name`). Currently only scalars and there
+        (i.e. :samp:`{CUBA}.name`). Currently only scalars and three
         dimensional vectors are supported.
 
         """
@@ -122,7 +146,7 @@ class CUDSDataAccumulator(object):
     def __len__(self):
         """ The number of values that are stored per key
 
-        .. note:: Behaviour it temporary and will probably change soon.
+        .. note:: Behaviour is temporary and will probably change soon.
 
         """
         return self._record_size

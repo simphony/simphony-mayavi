@@ -2,20 +2,20 @@ SimPhoNy
 ========
 
 
-Mayavi tools are available in from the simphony library through the
-visualisation plugin entry point ``mayavi_tools``::
+Mayavi tools are available in the simphony library through the
+visualisation plug-in named ``mayavi_tools``.
+
+e.g::
 
   from simphony.visualisation import mayavi_tools
-
 
 Visualizing CUDS
 ----------------
 
 The :func:`~simphony_mayavi.show.show` function is available to
 visualise any top level CUDS container. The function will open a
-window with a 3D view and a mayavi toolbar. The user can manipulate
-the view and through the toolbar have access to common `mayavi
-operations`_.
+window containing a 3D view and a mayavi toolbar. Interaction
+allows the common `mayavi operations`_.
 
 .. rubric:: Mesh example
 
