@@ -28,7 +28,8 @@ def show(cuds):
         mlab.pipeline.glyph(
             source, name=cuds.name,
             scale_factor=scale_factor, scale_mode='none')
-        mlab.pipeline.surface(source)
+        surface = mlab.pipeline.surface(source)
+        surface.actor.mapper.scalar_visibility = False
     elif isinstance(cuds, ABCLattice):
         source = LatticeSource.from_lattice(cuds)
         scale_factor = _typical_distance(source.data) * 0.5
