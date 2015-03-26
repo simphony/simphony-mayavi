@@ -44,6 +44,7 @@ module to access the provided tools.
 
 .. autoclass:: simphony_mayavi.sources.cuds_data_accumulator.CUDSDataAccumulator
      :members:
+     :special-members: __getitem__, __len__
      :undoc-members:
      :show-inheritance:
 
