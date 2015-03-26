@@ -57,6 +57,11 @@ class CUDSDataAccumulator(object):
     def append(self, data):
         """ Append info from a ``DataContainer``.
 
+        Parameters
+        ----------
+        data : DataContainer
+            The data information to append.
+
         If the accumulator operates in ``fixed`` mode:
 
         - Any keys in self.keys() that have values in ``data`` will be stored
@@ -73,11 +78,6 @@ class CUDSDataAccumulator(object):
           ``data`` will be stored (appended to the related key lits).
         - Missing keys will be store as ``None``.
 
-        Parameters
-        ----------
-        data : DataContainer
-            The data information to append.
-
         """
         if self._expand_mode:
             new_keys = set(data.keys()) - self._keys
@@ -87,9 +87,37 @@ class CUDSDataAccumulator(object):
             self._data[key].append(data.get(key, None))
         self._record_size += 1
 
-    def _expand(self, keys):
-        for key in keys:
-            self._data[key] = [None] * self._record_size
+    def load_onto_vtk(self, vtk_data):
+        """ Load the stored information onto a vtk data container.
+
+        Parameters
+        ----------
+        vtk_data : vtkPointData or vtkCellData
+            The vtk container to load the value onto.
+
+        Data are loaded onto the vtk container based on their data
+        type. The name of the added array is the name of the CUBA key
+        (i.e. :samp:`{CUBA}.name`). Currently only scalars and there
+        dimensional vectors are supported.
+
+        """
+        for cuba in self.keys:
+            default = dummy_cuba_value(cuba)
+            if isinstance(default, (float, int)):
+                data = numpy.array(self._data[cuba], dtype=float)
+                index = vtk_data.add_array(data)
+                vtk_data.get_array(index).name = cuba.name
+            elif isinstance(default, numpy.ndarray) and len(default) == 3:
+                nan = numpy.array([None, None, None], dtype=float)
+                replacer = lambda x: nan if x is None else x
+                data = numpy.array(
+                    tuple(replacer(data) for data in self._data[cuba]),
+                    dtype=numpy.float)
+                index = vtk_data.add_array(data)
+                vtk_data.get_array(index).name = cuba.name
+            else:
+                message = 'property {!r} is currently ignored'
+                warnings.warn(message.format(cuba))
 
     def __len__(self):
         """ The number of values that are stored per key
@@ -116,34 +144,6 @@ class CUDSDataAccumulator(object):
         """
         return self._data[key]
 
-    def load_onto_vtk(self, vtk_data):
-        """ Load the stored information onto a vtk data container.
-
-        Data are loaded onto the vtk container based on their data
-        type. The name of the added array is the name of the CUBA key
-        (i.e. :samp:`{CUBA}.name`). Currently only scalars and there
-        dimensional vectors are supported.
-
-        Parameters
-        ----------
-        vtk_data : vtkPointData or vtkCellData
-            The vtk container to load the value onto.
-
-        """
-        for cuba in self.keys:
-            default = dummy_cuba_value(cuba)
-            if isinstance(default, (float, int)):
-                data = numpy.array(self._data[cuba], dtype=float)
-                index = vtk_data.add_array(data)
-                vtk_data.get_array(index).name = cuba.name
-            elif isinstance(default, numpy.ndarray) and len(default) == 3:
-                nan = numpy.array([None, None, None], dtype=float)
-                replacer = lambda x: nan if x is None else x
-                data = numpy.array(
-                    tuple(replacer(data) for data in self._data[cuba]),
-                    dtype=numpy.float)
-                index = vtk_data.add_array(data)
-                vtk_data.get_array(index).name = cuba.name
-            else:
-                message = 'property {!r} is currently ignored'
-                warnings.warn(message.format(cuba))
+    def _expand(self, keys):
+        for key in keys:
+            self._data[key] = [None] * self._record_size
