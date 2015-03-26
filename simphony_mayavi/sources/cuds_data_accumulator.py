@@ -34,9 +34,9 @@ class CUDSDataAccumulator(object):
     [34, None, 56]
     >>> accumulator[CUBA.VELOCITY]
     [None, (0.1, 0.1, 0.1), None]
-    
+
     .. rubric:: fixed operation
-    
+
     >>> accumulator = CUDSDataAccumulator([CUBA.TEMPERATURE, CUBA.PRESSURE]):
     >>> accumulator.keys()
     {CUBA.TEMPERATURE, CUBA.PRESSURE}
