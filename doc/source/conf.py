@@ -54,8 +54,10 @@ def mock_modules():
 
         @classmethod
         def __getattr__(self, name):
-
-            return Mock.TYPES.get(name, Mock(mocked_name=name))
+            if name in ('__file__', '__path__'):
+                return '/dev/null'
+            else:
+                return Mock.TYPES.get(name, Mock(mocked_name=name))
 
         def __call__(self, *args, **kwards):
             return Mock()
