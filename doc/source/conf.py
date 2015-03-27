@@ -15,7 +15,9 @@ def mock_modules():
     try:
         import numpy  # noqa
     except ImportError:
-        MOCK_MODULES = ['numpy']
+        MOCK_MODULES = [
+            'numpy',
+            'numpy.testing']
 
     try:
         import simphony  # noqa
@@ -90,6 +92,7 @@ copyright = u'2015, SimPhoNy FP7 Collaboration'
 version = '0.1.0'
 release = '0.1.0.dev0'
 pygments_style = 'sphinx'
+autoclass_content = 'both'
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}

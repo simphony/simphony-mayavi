@@ -1,7 +1,7 @@
 Simphony-Mayavi
 ===============
 
-A plugin-library for the Simphony framework (http://www.simphony-project.eu/) to provide 
+A plugin-library for the Simphony framework (http://www.simphony-project.eu/) to provide
 visualization support of the CUDS highlevel components.
 
 .. image:: https://travis-ci.org/simphony/simphony-mayavi.svg?branch=master
@@ -33,8 +33,12 @@ Optional requirements
 To support the documentation built you need the following packages:
 
 - sphinx >= 1.2.3
-- sphinxcontrib-napoleon >= 0.2.10
+- sectiondoc commit 8a0c2be, https://github.com/enthought/sectiondoc
+- trait-documenter, https://github.com/enthought/trait-documenter
 - mock
+
+Alternative running :command:`pip install -r doc_requirements` should install the
+minimum necessary components for the documentation built.
 
 Installation
 ------------
@@ -90,5 +94,3 @@ There are four subpackages:
   - source -- Sphinx rst source files
   - build -- Documentation build directory, if documentation has been generated
     using the ``make`` script in the ``doc`` directory.
-
-

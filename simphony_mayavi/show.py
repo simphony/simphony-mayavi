@@ -10,7 +10,15 @@ from simphony_mayavi.sources.api import (
 
 
 def show(cuds):
+    """ Show the cuds objects using the default visualisation.
 
+     Parameters
+     ----------
+     cuds :
+         A top level cuds object (e.g. a mesh). The method will detect
+         the type of object and create the appropriate visualisation.
+
+    """
     if isinstance(cuds, ABCMesh):
         source = MeshSource.from_mesh(cuds)
         mlab.pipeline.surface(source, name=cuds.name)
@@ -20,7 +28,8 @@ def show(cuds):
         mlab.pipeline.glyph(
             source, name=cuds.name,
             scale_factor=scale_factor, scale_mode='none')
-        mlab.pipeline.surface(source)
+        surface = mlab.pipeline.surface(source)
+        surface.actor.mapper.scalar_visibility = False
     elif isinstance(cuds, ABCLattice):
         source = LatticeSource.from_lattice(cuds)
         scale_factor = _typical_distance(source.data) * 0.5

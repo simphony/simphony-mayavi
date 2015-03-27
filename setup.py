@@ -12,6 +12,12 @@ IS_RELEASED = False
 
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
+# When installation takes place inside a READTHEDOCS build
+# we need to set zip_safe = False
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
+plugin = ['mayavi_tools = simphony_mayavi.plugin']
+
 
 # Return the git revision as a string
 def git_version():
@@ -95,7 +101,6 @@ if not is_released:
 if __name__ == "__main__":
     write_version_py()
     from simphony_mayavi import __version__
-    plugin = ['mayavi_tools = simphony_mayavi.plugin']
 
     setup(
         name='simphony_mayavi',
@@ -106,4 +111,5 @@ if __name__ == "__main__":
         packages=find_packages(),
         entry_points={'simphony.visualisation': plugin},
         version=__version__,
+        zip_safe=not on_rtd,
         license='BSD')
