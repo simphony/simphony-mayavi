@@ -44,7 +44,7 @@ class TestSnapShot(unittest.TestCase):
         snapshot(mesh, filename)
         self.assertImageSavedWithContent(filename)
 
-    def test_psarticles_snapshot(self):
+    def test_particles_snapshot(self):
         filename = self.filename
         coordinates = numpy.array([
             [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
