@@ -29,8 +29,8 @@ def snapshot(cuds, filename):
     if sys.platform == 'win32':
         mlab.options.offscreen = True
     else:
-        # offscreen operation is not easily supported on linux system
-        mlab.figure(size=size)
+        figure = mlab.gcf()
+        figure.scene.off_screen_rendering = True
 
     try:
         if isinstance(cuds, ABCMesh):
