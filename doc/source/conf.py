@@ -76,7 +76,8 @@ def mock_modules():
 # check and mock missing modules
 mock_modules()
 
-from simphony_mayavi._version import release, version
+# import the release and version value from the module
+from simphony_mayavi._version import release, version  # noqa
 
 extensions = [
     'sphinx.ext.autodoc',
