@@ -1,6 +1,9 @@
+import sys
+
 from mayavi.api import OffScreenEngine
 from mayavi.tools.tools import _typical_distance
 from mayavi.modules.api import Glyph, Surface
+from mayavi.core.api import Engine
 
 from simphony.cuds.abstractmesh import ABCMesh
 from simphony.cuds.abstractparticles import ABCParticles
@@ -24,10 +27,16 @@ def snapshot(cuds, filename):
 
     """
     size = 800, 600
+
+    if sys.platform == 'win32':
+        engine = OffScreenEngine()
+    else:
+        # The OffScreenEngine does not reliably work for linux/mac-os
+        engine = Engine()
+    engine.start()
+
     if isinstance(cuds, ABCMesh):
         source = MeshSource.from_mesh(cuds)
-        engine = OffScreenEngine()
-        engine.start()
         window = engine.new_scene()
         engine.add_source(source)
         engine.add_module(Surface())
