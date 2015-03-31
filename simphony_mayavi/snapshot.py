@@ -1,3 +1,5 @@
+import sys
+
 from mayavi import mlab
 from mayavi.tools.tools import _typical_distance
 
@@ -24,15 +26,19 @@ def snapshot(cuds, filename):
     """
     size = 800, 600
 
+    if sys.platform == 'win32':
+        mlab.options.offscreen = True
+    else:
+        # offscreen operation is not easily supported on linux system
+        mlab.figure(size=size)
+
     try:
         if isinstance(cuds, ABCMesh):
             source = MeshSource.from_mesh(cuds)
-            mlab.options.offscreen = True
             mlab.pipeline.surface(source, name=cuds.name)
         elif isinstance(cuds, ABCParticles):
             source = ParticlesSource.from_particles(cuds)
             scale_factor = _typical_distance(source.data) * 0.5
-            mlab.options.offscreen = True
             mlab.pipeline.glyph(
                 source, name=cuds.name,
                 scale_factor=scale_factor, scale_mode='none')
@@ -41,7 +47,6 @@ def snapshot(cuds, filename):
         elif isinstance(cuds, ABCLattice):
             source = LatticeSource.from_lattice(cuds)
             scale_factor = _typical_distance(source.data) * 0.5
-            mlab.options.offscreen = True
             mlab.pipeline.glyph(
                 source, name=cuds.name,
                 scale_factor=scale_factor, scale_mode='none')
