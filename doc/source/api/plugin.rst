@@ -6,3 +6,5 @@ visualize CUDS objects. The tools are also available as a visualisation
 plug-in to the simphony library.
 
 .. autofunction:: simphony_mayavi.show.show
+
+.. autofunction:: simphony_mayavi.snapshot.snapshot
