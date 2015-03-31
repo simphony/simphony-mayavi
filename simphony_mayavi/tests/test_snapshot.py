@@ -73,4 +73,4 @@ class TestSnapShot(unittest.TestCase):
             self.fail(
                 'Pixel size is not 3 or 4, but {0}'.format(image.shape[2]))
         if check.any():
-            self.fail('The image looks empty, no pixels where drawn')
+            self.fail('The image has blank spots, something is wrong')
