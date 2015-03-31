@@ -5,7 +5,7 @@ class TestPluginLoading(unittest.TestCase):
 
     def test_import(self):
         try:
-            from simphony.visualisation import mayavi_tools
+            from simphony.visualisation import mayavi_tools  # noqa
         except ImportError:
             self.fail('Could not import the mayavi visualisation')
 
