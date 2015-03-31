@@ -63,7 +63,6 @@ class TestSnapShot(unittest.TestCase):
 
         """
         image = numpy.array(Image.open(filename))
-        # default is expected to be a totally white image
 
         self.assertEqual(image.shape[:2], (600, 800))
         if image.shape[2] == 3:
@@ -74,4 +73,4 @@ class TestSnapShot(unittest.TestCase):
             self.fail(
                 'Pixel size is not 3 or 4, but {0}'.format(image.shape[2]))
         if check.any():
-            self.fail('The image looks empty, no red pixels where drawn')
+            self.fail('The image looks empty, no pixels where drawn')
