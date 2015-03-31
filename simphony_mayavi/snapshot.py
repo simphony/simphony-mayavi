@@ -14,7 +14,7 @@ from simphony_mayavi.sources.api import (
 
 
 def snapshot(cuds, filename):
-    """ Shave a snapshot of the cuds object using the default visualization.
+    """ Shave a snapshot of the cuds object using the default visualisation.
 
      Parameters
      ----------
@@ -28,12 +28,15 @@ def snapshot(cuds, filename):
     """
     size = 800, 600
 
-    if sys.platform == 'win32':
-        engine = OffScreenEngine()
+    if sys.platform != 'win32':
+        _snapshot_windows(cuds, filename, size)
     else:
         # The OffScreenEngine does not reliably work for linux/mac-os
-        engine = Engine()
+        _snapshot_linux(cuds, filename, size)
 
+
+def _snapshot_windows(cuds, filename, size):
+    engine = OffScreenEngine()
     engine.start()
     try:
         if isinstance(cuds, ABCMesh):
@@ -83,4 +86,35 @@ def snapshot(cuds, filename):
         window.scene.reset_zoom()
         window.scene.save(filename, size)
     finally:
-            engine.stop()
+        engine.stop()
+
+
+def _snapshot_linux(cuds, filename, size):
+    width, height = size
+    from mayavi import mlab
+    if isinstance(cuds, ABCMesh):
+        source = MeshSource.from_mesh(cuds)
+        mlab.options.offscreen = True
+        mlab.pipeline.surface(source, name=cuds.name)
+    elif isinstance(cuds, ABCParticles):
+        source = ParticlesSource.from_particles(cuds)
+        scale_factor = _typical_distance(source.data) * 0.5
+        mlab.options.offscreen = True
+        mlab.pipeline.glyph(
+            source, name=cuds.name,
+            scale_factor=scale_factor, scale_mode='none')
+        surface = mlab.pipeline.surface(source)
+        surface.actor.mapper.scalar_visibility = False
+    elif isinstance(cuds, ABCLattice):
+        source = LatticeSource.from_lattice(cuds)
+        scale_factor = _typical_distance(source.data) * 0.5
+        mlab.options.offscreen = True
+        mlab.pipeline.glyph(
+            source, name=cuds.name,
+            scale_factor=scale_factor, scale_mode='none')
+    else:
+        msg = 'Provided object {} is not of any known cuds type'
+        raise TypeError(msg.format(type(cuds)))
+    mlab.savefig(filename, (width, height), magnification=1.0)
+    mlab.clf()
+    mlab.close()
