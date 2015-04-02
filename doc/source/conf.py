@@ -76,6 +76,9 @@ def mock_modules():
 # check and mock missing modules
 mock_modules()
 
+# import the release and version value from the module
+from simphony_mayavi._version import release, version  # noqa
+
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
@@ -89,8 +92,6 @@ source_suffix = '.rst'
 master_doc = 'index'
 project = u'SimPhoNy-Mayavi'
 copyright = u'2015, SimPhoNy FP7 Collaboration'
-version = '0.1.0'
-release = '0.1.0.dev0'
 pygments_style = 'sphinx'
 autoclass_content = 'both'
 
