@@ -19,7 +19,7 @@ before_install:
 install:
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
-  - pip install git-https://github.com/simphony/simphony-common.git@${SIMPHONY_VERSION}#egg=simphony
+  - pip install git+https://github.com/simphony/simphony-common.git@${SIMPHONY_VERSION}#egg=simphony
   - pip install coveralls
   - python setup.py develop
 script:
