@@ -77,7 +77,7 @@ def mock_modules():
 mock_modules()
 
 # import the release and version value from the module
-from simphony_mayavi._version import release, version  # noqa
+from simphony_mayavi._version import full_version, version  # noqa
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -94,6 +94,8 @@ project = u'SimPhoNy-Mayavi'
 copyright = u'2015, SimPhoNy FP7 Collaboration'
 pygments_style = 'sphinx'
 autoclass_content = 'both'
+release = version
+version = full_version
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
