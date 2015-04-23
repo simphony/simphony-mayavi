@@ -33,10 +33,10 @@ class CubaData(MutableSequence):
             cubas = self.cubas
             new_cubas = set(value.keys()) - cubas
             length = len(self)
-            for cuba in new_cubas:
-                array = self._cuba_works.empty_array(cuba, length)
-                array_id = data.add_array(array)
-                data.get_array(array_id).name = cuba.name
+            arrays = (
+                (cuba, self._cuba_works.empty_array(cuba, length))
+                for cuba in new_cubas)
+            self._add_arrays(arrays)
             n = data.number_of_arrays
             defaults = self._cuba_works.defaults
             for array_id in range(n):
