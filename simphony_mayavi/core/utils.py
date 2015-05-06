@@ -43,7 +43,7 @@ class CUBAWorks(object):
         """ Constructor
 
         """
-        self.supported = supported
+        self.supported = set(supported)
         self.defaults = defaults
 
     def empty_array(self, cuba, size):
@@ -63,7 +63,7 @@ class CUBAWorks(object):
                     data[:, index] = value
             return data
         else:
-            raise ValueError('{} is not supported'.format(cuba))
+            raise ValueError('{!r} is not supported'.format(cuba))
 
     @classmethod
     def default(cls):

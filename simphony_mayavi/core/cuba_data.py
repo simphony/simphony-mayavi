@@ -28,17 +28,18 @@ class CubaData(MutableSequence):
             return len(data.get_array(0))
 
     def __setitem__(self, index, value):
-        if 0 <= index < len(self):
+        length = len(self)
+        if 0 <= index < length:
             data = self._data
+            cuba_works = self._cuba_works
             cubas = self.cubas
-            new_cubas = set(value.keys()) - cubas
-            length = len(self)
+            new_cubas = (set(value.keys()) & cuba_works.supported) - cubas
             arrays = (
-                (cuba, self._cuba_works.empty_array(cuba, length))
+                (cuba, cuba_works.empty_array(cuba, length))
                 for cuba in new_cubas)
             self._add_arrays(arrays)
             n = data.number_of_arrays
-            defaults = self._cuba_works.defaults
+            defaults = cuba_works.defaults
             for array_id in range(n):
                 array = data.get_array(array_id)
                 cuba = CUBA[array.name]
@@ -57,8 +58,12 @@ class CubaData(MutableSequence):
             cuba = CUBA[array.name]
             default = defaults[cuba]
             # FIXME: implement a masking operation
-            if not all(numpy.isclose(value, default, 0.0, 0.0, True)):
-                values[cuba] = value
+            if numpy.isscalar(default):
+                if not numpy.isclose(value, default, 0.0, 0.0, True):
+                    values[cuba] = value
+            else:
+                if not all(numpy.isclose(value, default, 0.0, 0.0, True)):
+                    values[cuba] = value
         return DataContainer(values)
 
     def __delitem__(self, index):
@@ -70,8 +75,9 @@ class CubaData(MutableSequence):
     def insert(self, index, value):
         data = self._data
         cubas = self.cubas
-        new_cubas = set(value.keys()) - cubas
-        defaults = self._cuba_works.defaults
+        cuba_works = self._cuba_works
+        new_cubas = (set(value.keys()) & cuba_works.supported) - cubas
+        defaults = cuba_works.defaults
         length = len(self)
         if 0 <= index < length:
             n = data.number_of_arrays
@@ -99,11 +105,7 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 cuba = CUBA[array.name]
-                default = defaults[cuba]
-                if numpy.isscalar(default):
-                    array.insert_next_value(value.get(cuba, default))
-                else:
-                    array.insert_next_tuple(value.get(cuba, default))
+                array.append(value.get(cuba, defaults[cuba]))
         else:
             raise IndexError('{} is out of index range'.format(index))
 

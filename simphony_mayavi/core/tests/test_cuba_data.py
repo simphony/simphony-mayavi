@@ -6,6 +6,7 @@ import numpy
 from tvtk.api import tvtk
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
+from simphony.core.keywords import KEYWORDS
 from simphony.testing.utils import compare_data_containers
 
 from simphony_mayavi.core.cuba_data import CubaData
@@ -20,7 +21,7 @@ class TestCubaData(unittest.TestCase):
             'TEMPERATURE': [1.0, 2.0, 3.0],
             'RADIUS': [4.0, 2.0, 1.0],
             'VELOCITY': [[4.0, 2.0, 1.0], [3.0, 2.0, 5.0], [4.0, 5.0, 1.0]]}
-        point_data = tvtk.PointData()
+        self.point_data = point_data = tvtk.PointData()
         for key in self.values:
             index = point_data.add_array(self.values[key])
             point_data.get_array(index).name = key
@@ -70,15 +71,58 @@ class TestCubaData(unittest.TestCase):
         # when/then
         for index in range(3):
             result = data[index]
-            self.assertEqual(
-                result, DataContainer(
-                    RADIUS=values['RADIUS'][index],
-                    TEMPERATURE=values['TEMPERATURE'][index],
-                    VELOCITY=values['VELOCITY'][index]))
+            expected = DataContainer(
+                RADIUS=values['RADIUS'][index],
+                TEMPERATURE=values['TEMPERATURE'][index],
+                VELOCITY=values['VELOCITY'][index])
+            self.assertEqual(result, expected)
 
         # when/then
         with self.assertRaises(IndexError):
             data[4]
+
+    def test_getitem_with_long_int_index(self):
+        # given
+        data = self.data
+        values = self.values
+
+        # when/then
+        for index in range(3):
+            result = data[long(index)]
+            expected = DataContainer(
+                RADIUS=values['RADIUS'][index],
+                TEMPERATURE=values['TEMPERATURE'][index],
+                VELOCITY=values['VELOCITY'][index])
+            self.assertEqual(result, expected)
+
+        # when/then
+        with self.assertRaises(IndexError):
+            data[long(4)]
+
+    def test_getitem_with_integer_values(self):
+        # given
+        data = self.data
+        values = self.values
+        point_data = self.point_data
+        # We need to get a CUBA key that has an int value.
+        INTEGER_CUBA_KEY = next(
+            key for key in KEYWORDS if KEYWORDS[key].dtype == numpy.int32)
+        array_id = point_data.add_array([1, 0, 1])
+        point_data.get_array(array_id).name = INTEGER_CUBA_KEY
+
+        # when/then
+        for index in range(3):
+            result = data[long(index)]
+            expected = DataContainer(
+                RADIUS=values['RADIUS'][index],
+                TEMPERATURE=values['TEMPERATURE'][index],
+                VELOCITY=values['VELOCITY'][index])
+            expected[CUBA[INTEGER_CUBA_KEY]] = [1, 0, 1][index]
+            self.assertEqual(result, expected)
+
+        # when/then
+        with self.assertRaises(IndexError):
+            data[long(4)]
 
     def test_setitem(self):
         # given
@@ -87,6 +131,55 @@ class TestCubaData(unittest.TestCase):
         # when
         for index in range(3):
             data[index] = DataContainer(
+                RADIUS=[34, 32, 31][index],
+                TEMPERATURE=[-1, -2, -3][index],
+                VELOCITY=[0.2, -0.1, -0.54])
+
+        # then
+        for index in range(3):
+            self.assertEqual(
+                data[index], DataContainer(
+                    RADIUS=[34, 32, 31][index],
+                    TEMPERATURE=[-1, -2, -3][index],
+                    VELOCITY=[0.2, -0.1, -0.54]))
+        self._assert_len(data, 3)
+
+        # when/then
+        with self.assertRaises(IndexError):
+            data[4] = DataContainer(RADIUS=0.2, TEMPERATURE=-4.5)
+
+    def test_setitem_with_unsupported_cuba(self):
+        # given
+        data = self.data
+
+        # when
+        for index in range(3):
+            data[index] = DataContainer(
+                RADIUS=[34, 32, 31][index],
+                TEMPERATURE=[-1, -2, -3][index],
+                VELOCITY=[0.2, -0.1, -0.54],
+                NAME=str(index))
+
+        # then
+        for index in range(3):
+            self.assertEqual(
+                data[index], DataContainer(
+                    RADIUS=[34, 32, 31][index],
+                    TEMPERATURE=[-1, -2, -3][index],
+                    VELOCITY=[0.2, -0.1, -0.54]))
+        self._assert_len(data, 3)
+
+        # when/then
+        with self.assertRaises(IndexError):
+            data[4] = DataContainer(RADIUS=0.2, TEMPERATURE=-4.5)
+
+    def test_setitem_with_long_int(self):
+        # given
+        data = self.data
+
+        # when
+        for index in range(3):
+            data[long(index)] = DataContainer(
                 RADIUS=[34, 32, 31][index],
                 TEMPERATURE=[-1, -2, -3][index],
                 VELOCITY=[0.2, -0.1, -0.54])
@@ -250,6 +343,26 @@ class TestCubaData(unittest.TestCase):
         self.assertEqual(
             data[3], DataContainer(MASS=34.0, VELOCITY=[0, 0, 0.34]))
 
+    def test_append_with_unsupported_cuba(self):
+        # given
+        data = self.data
+        values = self.values
+
+        # when
+        data.append(DataContainer(VELOCITY=[0, 0, 0.34], NAME='my name'))
+
+        # then
+        self.assertEqual(len(data), 4)
+        for index in range(3):
+            result = data[index]
+            self.assertEqual(
+                result, DataContainer(
+                    RADIUS=values['RADIUS'][index],
+                    TEMPERATURE=values['TEMPERATURE'][index],
+                    VELOCITY=values['VELOCITY'][index]))
+        self.assertEqual(data[3], DataContainer(VELOCITY=[0, 0, 0.34]))
+        self._assert_len(data, 4)
+
     def test_insert(self):
         # given
         data = self.data
@@ -290,6 +403,26 @@ class TestCubaData(unittest.TestCase):
                     VELOCITY=values['VELOCITY'][old_index]))
         self.assertEqual(
             data[1], DataContainer(VELOCITY=[0, 0, 0.34], MASS=0.3))
+
+    def test_insert_with_unsupported_cuba(self):
+        # given
+        data = self.data
+        values = self.values
+
+        # when
+        data.insert(1, DataContainer(VELOCITY=[0, 0, 0.34], NAME='my name2'))
+        self._assert_len(data, 4)
+
+        # then
+        self.assertEqual(len(data), 4)
+        for old_index, index in enumerate((0, 2, 3)):
+            result = data[index]
+            self.assertEqual(
+                result, DataContainer(
+                    RADIUS=values['RADIUS'][old_index],
+                    TEMPERATURE=values['TEMPERATURE'][old_index],
+                    VELOCITY=values['VELOCITY'][old_index]))
+        self.assertEqual(data[1], DataContainer(VELOCITY=[0, 0, 0.34]))
 
     def _assert_len(self, data, length):
         n = data._data.number_of_arrays
