@@ -9,18 +9,39 @@ from .utils import CUBAWorks
 
 
 class CubaData(MutableSequence):
+    """Map a vtkCellData or vtkPointData object to a sequence of DataContainers.
 
-    def __init__(self, attribute_data):
+    The class implements the :class:`MutableSequence` api to wrap a
+    :class:`tvtk.CellData` or :class:`tvtk.PointData` array where each
+    CUBA key is a :class:`tvtk.DataArray`. The aim is to help the
+    conversion between column based structure of the
+    :class:`vtkCellData` or :class:`vtkPointData` and the row based
+    access provided by a list of
+    :class:`~.DataContainer<DataContainers>`.
+
+
+    """
+
+    def __init__(self, attribute_data, cuba_works=None):
         self._data = attribute_data
-        self._cuba_works = CUBAWorks.default()
+        if cuba_works is None:
+            cuba_works = CUBAWorks.default()
+        self._cuba_works = cuba_works
 
     @property
     def cubas(self):
+        """ The set of currently stored cuba keys.
+
+        For each cuba key there is an associated :class:`vtk.DataArray`.
+
+        """
         data = self._data
         n = data.number_of_arrays
         return {CUBA[data.get_array(index).name] for index in range(n)}
 
     def __len__(self):
+        """ The number of rows (i.e. DataContainers) stored.
+        """
         data = self._data
         if data.number_of_arrays == 0:
             return 0
@@ -28,6 +49,14 @@ class CubaData(MutableSequence):
             return len(data.get_array(0))
 
     def __setitem__(self, index, value):
+        """Store the DataContainer at ``index``.
+
+        If the provided value contains new, but supported, cuba keys
+        then a new empty array is created for them and updated with
+        the associated values of ``value``.  Unsupported CUBA keys are
+        ignored.
+
+        """
         length = len(self)
         if 0 <= index < length:
             data = self._data
@@ -48,6 +77,9 @@ class CubaData(MutableSequence):
             raise IndexError('{} is out of index range'.format(index))
 
     def __getitem__(self, index):
+        """ Reconstruct a DataContainer from array values at row=``index``.
+
+        """
         data = self._data
         n = data.number_of_arrays
         arrays = [data.get_array(array_id) for array_id in range(n)]
@@ -57,7 +89,7 @@ class CubaData(MutableSequence):
             value = array[index]
             cuba = CUBA[array.name]
             default = defaults[cuba]
-            # FIXME: implement a masking operation
+            # FIXME: implement a masked based logic
             if numpy.isscalar(default):
                 if not numpy.isclose(value, default, 0.0, 0.0, True):
                     values[cuba] = value
@@ -67,12 +99,29 @@ class CubaData(MutableSequence):
         return DataContainer(values)
 
     def __delitem__(self, index):
+        """ Remove the values from the arrays at row=``index``.
+
+        """
         data = self._data
         n = data.number_of_arrays
         for array_id in range(n):
             data.get_array(array_id).remove_tuple(index)
 
     def insert(self, index, value):
+        """ Insert the values of the DataContainer in the arrays at row=``index``.
+
+        If the provided DataContainer contains new, but supported, cuba keys
+        then a new empty array is created for them and updated with
+        the associated values of ``value``.  Unsupported CUBA keys are
+        ignored.
+
+        .. note::
+
+            The underline data structure is better suited for append
+            operations. Inserting values in the middle or at the front
+            will be less efficient.
+
+        """
         data = self._data
         cubas = self.cubas
         cuba_works = self._cuba_works

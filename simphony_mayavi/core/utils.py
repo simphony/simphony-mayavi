@@ -6,12 +6,21 @@ from simphony.core.cuba import CUBA
 
 
 def supported_cuba():
+    """ Return the list of CUBA keys that can be supported by vtk/
+
+    """
     return [
         cuba for cuba in CUBA
         if default_cuba_value(cuba) is not None]
 
 
 def default_cuba_value(cuba):
+    """ Return the default value of the CUBA key as a scalar or numpy array.
+
+    Int type values have ``-1`` as default, while float type values
+    have ``numpy.nan``.
+
+    """
     description = KEYWORDS[cuba.name]
     if description.shape == [1]:
         if numpy.issubdtype(description.dtype, numpy.float):
@@ -42,12 +51,29 @@ class CUBAWorks(object):
     def __init__(self, supported, defaults):
         """ Constructor
 
+        Parameters
+        ----------
+        supported : set
+            The set of the supported CUBA keys.
+
+        defaults : dict
+            Dictionary mapping CUBA keys to default (scalar) values.
+
         """
         self.supported = set(supported)
         self.defaults = defaults
 
     def empty_array(self, cuba, size):
         """ Return an array filled with the default value for CUBA.
+
+        Parameters
+        ----------
+        cuba : CUBA
+            The CUBA key to use to base the array data.
+
+        size : tuple
+            The size of the array in CUBA value items.
+
         """
         if cuba in self.supported:
             description = KEYWORDS[cuba.name]
@@ -67,12 +93,18 @@ class CUBAWorks(object):
 
     @classmethod
     def default(cls):
+        """ Construct a CUBAWorks supporting all numerical valued CUBA keys.
+
+        """
         supported = supported_cuba()
         defaults = {cuba: default_cuba_value(cuba) for cuba in supported}
         return cls(supported, defaults)
 
     @classmethod
     def custom(cls, supported=None, defaults=None):
+        """ Construct a CUBAWorks supporting a subset of numerical valued CUBA keys.
+
+        """
         supported = supported_cuba() if supported is None else supported
         if defaults is None:
             defaults = {cuba: default_cuba_value(cuba) for cuba in supported}
