@@ -1,5 +1,5 @@
 Core module
-==============
+===========
 
 A module containing core tools and wrappers for vtk data containers
 used in simphony_mayavi.
