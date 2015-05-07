@@ -9,15 +9,15 @@ def mock_modules():
 
     from mock import MagicMock
 
-    MOCK_MODULES = []
+    MOCK_MODULES = ['pyface.ui.qt4.code_editor.pygments_highlighter']
     MOCK_TYPES = []
 
     try:
         import numpy  # noqa
     except ImportError:
-        MOCK_MODULES = [
+        MOCK_MODULES.extend([
             'numpy',
-            'numpy.testing']
+            'numpy.testing'])
 
     try:
         import simphony  # noqa
