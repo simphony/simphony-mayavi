@@ -9,7 +9,7 @@ from simphony.core.data_container import DataContainer
 from simphony.core.keywords import KEYWORDS
 from simphony.testing.utils import compare_data_containers
 
-from simphony_mayavi.core.cuba_data import CubaData, AttributeSetType
+from simphony_mayavi.core.cuba_data import CubaData, AttributeSetType, MASKED
 
 
 class TestCubaData(unittest.TestCase):
@@ -25,6 +25,9 @@ class TestCubaData(unittest.TestCase):
         for key in self.values:
             index = point_data.add_array(self.values[key])
             point_data.get_array(index).name = key
+            index = point_data.add_array(
+                numpy.ones(shape=(len(self.values[key]),), dtype=numpy.uint8))
+            point_data.get_array(index).name = MASKED.format(key)
         self.data = CubaData(attribute_data=point_data)
 
     def test_len(self):
@@ -64,8 +67,12 @@ class TestCubaData(unittest.TestCase):
         point_data = tvtk.PointData()
         index = point_data.add_array([1, 2, 3])
         point_data.get_array(index).name = CUBA.TEMPERATURE.name
+        index = point_data.add_array(numpy.array([1, 1, 1], dtype=numpy.uint8))
+        point_data.get_array(index).name = MASKED.format(CUBA.TEMPERATURE.name)
         index = point_data.add_array([4, 2, 1])
         point_data.get_array(index).name = CUBA.RADIUS.name
+        index = point_data.add_array(numpy.array([1, 1, 1], dtype=numpy.uint8))
+        point_data.get_array(index).name = MASKED.format(CUBA.RADIUS.name)
 
         # when
         data = CubaData(attribute_data=point_data)
@@ -119,6 +126,9 @@ class TestCubaData(unittest.TestCase):
             key for key in KEYWORDS if KEYWORDS[key].dtype == numpy.int32)
         array_id = point_data.add_array([1, 0, 1])
         point_data.get_array(array_id).name = INTEGER_CUBA_KEY
+        array_id = point_data.add_array(
+            numpy.array([1, 1, 1], dtype=numpy.uint8))
+        point_data.get_array(array_id).name = MASKED.format(INTEGER_CUBA_KEY)
 
         # when/then
         for index in range(3):
