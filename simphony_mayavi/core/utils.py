@@ -6,7 +6,8 @@ from simphony.core.cuba import CUBA
 
 
 def supported_cuba():
-    """ Return the list of CUBA keys that can be supported by vtk/
+    """ Return the list of CUBA keys that can be supported by vtk.
+
 
     """
     return [
@@ -19,6 +20,10 @@ def default_cuba_value(cuba):
 
     Int type values have ``-1`` as default, while float type values
     have ``numpy.nan``.
+
+    .. note::
+
+       Only vector and scalar values are currently supported.
 
     """
     description = KEYWORDS[cuba.name]
@@ -45,7 +50,7 @@ def default_cuba_value(cuba):
 
 
 class CUBAWorks(object):
-    """ A utility instance to manage CUBA to vtk_arrays conversions.
+    """ A utility instance for working with CUBA keys and numpy arrays.
 
     """
     def __init__(self, supported, defaults):
