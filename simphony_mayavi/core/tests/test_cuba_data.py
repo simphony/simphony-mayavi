@@ -9,7 +9,7 @@ from simphony.core.data_container import DataContainer
 from simphony.core.keywords import KEYWORDS
 from simphony.testing.utils import compare_data_containers
 
-from simphony_mayavi.core.cuba_data import CubaData
+from simphony_mayavi.core.cuba_data import CubaData, AttributeSetType
 
 
 class TestCubaData(unittest.TestCase):
@@ -41,13 +41,23 @@ class TestCubaData(unittest.TestCase):
         # then
         self.assertEqual(len(data), 4)
 
-    def test_initialize_empty(self):
+    def test_initialize_empty_points(self):
         # given
         data = CubaData.empty()
 
         # then
         self.assertEqual(len(data), 0)
         self.assertEqual(data.cubas, set([]))
+        self.assertIsInstance(data._data, tvtk.PointData)
+
+    def test_initialize_empty_cells(self):
+        # given
+        data = CubaData.empty(AttributeSetType.CELLS)
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+        self.assertIsInstance(data._data, tvtk.CellData)
 
     def test_initialize_with_point_data(self):
         # given

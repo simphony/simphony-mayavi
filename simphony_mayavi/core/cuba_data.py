@@ -2,10 +2,19 @@ from collections import MutableSequence
 
 import numpy
 from tvtk.api import tvtk
+from enum import Enum
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 
 from .utils import CUBAWorks
+
+
+class AttributeSetType(Enum):
+    """ Enum to the supported DatasetAttribute types.
+
+    """
+    POINTS = 1
+    CELLS = 2
 
 
 class CubaData(MutableSequence):
@@ -159,8 +168,14 @@ class CubaData(MutableSequence):
             raise IndexError('{} is out of index range'.format(index))
 
     @classmethod
-    def empty(cls):
-        return cls(attribute_data=tvtk.PointData())
+    def empty(cls, type_=AttributeSetType.POINTS):
+        """ Return an empty sequence based wrapping an vtkAttributeDataSet.
+
+        """
+        if type_ == AttributeSetType.CELLS:
+            return cls(attribute_data=tvtk.CellData())
+        else:
+            return cls(attribute_data=tvtk.PointData())
 
     # Private methods ######################################################
 
