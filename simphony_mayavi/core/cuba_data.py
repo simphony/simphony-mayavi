@@ -6,7 +6,8 @@ from enum import Enum
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 
-from .utils import CUBAWorks
+from simphony_mayavi.core.cuba_utils import (
+    supported_cuba, default_cuba_value, empty_array)
 
 
 class AttributeSetType(Enum):
@@ -38,24 +39,25 @@ class CubaData(MutableSequence):
 
     """
 
-    def __init__(self, attribute_data, cuba_works=None):
+    def __init__(self, attribute_data, stored_cuba=None):
         """ Constructor
 
         Parameters
         ----------
         attribute_data: tvtk.DataSetAttributes
             The vtk attribute container.
-        cuba_works : CUBAWorks
-            A CUBA keys helper to define and manage the
-            supported CUBA keys. The default value is
-            using the :meth:`~.CUBAWorks.default`
-            class method.
+        stored_cuba : set
+            The CUBA keys that are going to be stored default
+            is the result of running :meth:`supported_cuba`
 
         """
         self._data = attribute_data
-        if cuba_works is None:
-            cuba_works = CUBAWorks.default()
-        self._cuba_works = cuba_works
+        if stored_cuba is None:
+            stored_cuba = supported_cuba()
+        self._stored_cuba = stored_cuba
+        self._defaults = {
+            cuba: default_cuba_value(cuba)
+            for cuba in stored_cuba}
 
     @property
     def cubas(self):
@@ -91,14 +93,14 @@ class CubaData(MutableSequence):
         length = len(self)
         if 0 <= index < length:
             data = self._data
-            cuba_works = self._cuba_works
+            stored = self._stored_cuba
             cubas = self.cubas
 
             # Find if there are any new CUBA keys to create arrays for.
-            new_cubas = (set(value.keys()) & cuba_works.supported) - cubas
+            new_cubas = (set(value.keys()) & stored) - cubas
             new_arrays = []
             for cuba in new_cubas:
-                array = self._cuba_works.empty_array(cuba, length)
+                array = empty_array(cuba, length)
                 masked = MASKED.format(cuba.name)
                 mask = numpy.zeros(shape=array.shape[0], dtype=numpy.uint8)
                 new_arrays.append((cuba.name, array))
@@ -154,9 +156,9 @@ class CubaData(MutableSequence):
         """
         data = self._data
         cubas = self.cubas
-        cuba_works = self._cuba_works
+        stored_cuba = self._stored_cuba
 
-        new_cubas = (set(value.keys()) & cuba_works.supported) - cubas
+        new_cubas = (set(value.keys()) & stored_cuba) - cubas
         length = len(self)
 
         if 0 <= index < length:
@@ -174,7 +176,7 @@ class CubaData(MutableSequence):
 
             # Create data and mask arrays from new CUBA keys
             for cuba in new_cubas:
-                array = self._cuba_works.empty_array(cuba, length)
+                array = empty_array(cuba, length)
                 array = numpy.insert(
                     array, index, self._array_value(cuba.name, value), axis=0)
                 masked = MASKED.format(cuba.name)
@@ -191,7 +193,7 @@ class CubaData(MutableSequence):
             # Add data arrays for new CUBA keys.
             new_arrays = []
             for cuba in new_cubas:
-                array = self._cuba_works.empty_array(cuba, length)
+                array = empty_array(cuba, length)
                 masked = MASKED.format(cuba.name)
                 mask = numpy.zeros(shape=array.shape[0], dtype=numpy.uint8)
                 new_arrays.append((cuba.name, array))
@@ -233,4 +235,4 @@ class CubaData(MutableSequence):
             return numpy.uint8(CUBA[name.split('-')[0]] in values)
         else:
             # The array is a CUBA attribute array.
-            return values.get(cuba, self._cuba_works.defaults[cuba])
+            return values.get(cuba, self._defaults[cuba])
