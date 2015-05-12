@@ -48,6 +48,7 @@ def default_cuba_value(cuba):
         message = 'property {!r} is currently ignored'
         warnings.warn(message.format(cuba))
 
+
 def empty_array(cuba, length, fill=None):
     """ Return an array filled with the default value for CUBA.
 
