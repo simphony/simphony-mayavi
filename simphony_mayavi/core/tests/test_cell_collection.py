@@ -68,7 +68,7 @@ class TestCellCollection(unittest.TestCase):
         # when
         collection[2] = [3, 56, 12]
 
-        # when/then
+        # then
         cells[2] = [3, 56, 12]
         for index in range(5):
             self.assertSequenceEqual(collection[index], cells[index])
@@ -82,7 +82,7 @@ class TestCellCollection(unittest.TestCase):
         # when
         collection[2] = [3, 56]
 
-        # when/then
+        # then
         cells[2] = [3, 56]
         for index in range(5):
             self.assertSequenceEqual(collection[index], cells[index])
@@ -96,7 +96,7 @@ class TestCellCollection(unittest.TestCase):
         # when
         collection[2] = [3, 56, 14, 1]
 
-        # when/then
+        # then
         cells[2] = [3, 56, 14, 1]
         for index in range(5):
             self.assertSequenceEqual(collection[index], cells[index])
@@ -110,7 +110,7 @@ class TestCellCollection(unittest.TestCase):
         # when
         del collection[1]
 
-        # when/then
+        # then
         del cells[1]
         for index in range(4):
             self.assertSequenceEqual(collection[index], cells[index])
@@ -124,7 +124,7 @@ class TestCellCollection(unittest.TestCase):
         # when
         collection.append([2, 3, 5, 12, 1003])
 
-        # when/then
+        # then
         cells.append([2, 3, 5, 12, 1003])
         for index in range(6):
             self.assertSequenceEqual(collection[index], cells[index])
@@ -138,7 +138,7 @@ class TestCellCollection(unittest.TestCase):
         # when
         collection.insert(1, [2, 3, 5, 12, 1003])
 
-        # when/then
+        # then
         cells.insert(1, [2, 3, 5, 12, 1003])
         for index in range(6):
             self.assertSequenceEqual(collection[index], cells[index])
