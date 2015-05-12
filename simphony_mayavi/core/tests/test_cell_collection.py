@@ -14,13 +14,6 @@ class TestCellCollection(unittest.TestCase):
             [2, 7, 11],
             [1, 4],
             [1, 5, 8]]
-        self.cell_types = [
-            tvtk.Tetra(),
-            tvtk.Hexahedron(),
-            tvtk.Triangle(),
-            tvtk.Line(),
-            tvtk.PolyLine()]
-
 
         self.vtk = tvtk.CellArray()
         self.vtk.from_array(self.cells)
