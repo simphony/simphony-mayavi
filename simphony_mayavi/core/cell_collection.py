@@ -4,7 +4,7 @@ import numpy
 from tvtk.api import tvtk
 
 
-#### FIXME This is a good candidate class for mayavi.
+# FIXME This is a good candidate class for mayavi.
 
 
 class CellCollection(MutableSequence):
