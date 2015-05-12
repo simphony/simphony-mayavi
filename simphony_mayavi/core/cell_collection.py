@@ -8,7 +8,7 @@ from tvtk.api import tvtk
 
 
 class CellCollection(MutableSequence):
-    """ A mutable sequence of cells rapping a tvtk.CellArray.
+    """ A mutable sequence of cells wrapping a tvtk.CellArray.
 
     """
 
@@ -54,25 +54,22 @@ class CellCollection(MutableSequence):
 
 
         """
-        length = len(self)
-        if 0 <= index < length:
-            cells = self._cell_array
-            location = self._cell_location(index)
-            data = cells.data
-            npoints = data[location]
-            start = location + 1
-            if npoints == len(value):
-                for i, j in enumerate(value):
-                    data[start + i] = j
-            else:
-                array = cells.to_array()
-                left, cell, right = numpy.split(
-                    array, [location, start + npoints])
-                new_cell = numpy.array([len(value)] + value, left.dtype)
-                array = numpy.r_[left, new_cell, right]
-                cells.set_cells(length, array)
+        cells = self._cell_array
+        location = self._cell_location(index)
+        start = location + 1
+        data = cells.data
+        npoints = data[location]
+        if npoints == len(value):
+            for i, j in enumerate(value):
+                data[start + i] = j
         else:
-            raise IndexError('{} is out of index range'.format(index))
+            length = len(self)
+            array = cells.to_array()
+            left, _, right = numpy.split(
+                array, [location, start + npoints])
+            new_cell = numpy.array([len(value)] + value, left.dtype)
+            array = numpy.r_[left, new_cell, right]
+            cells.set_cells(length, array)
 
     def __delitem__(self, index):
         """ Remove cell at ``index``.
@@ -84,19 +81,16 @@ class CellCollection(MutableSequence):
 
 
         """
-        length = len(self)
-        cells = self._cell_array
         location = self._cell_location(index)
-        npoints = cells.data[location]
+        cells = self._cell_array
+        new_length = len(self) - 1
         start = location + 1
-        if 0 <= index < length:
-            array = cells.to_array()
-            left, cell, right = numpy.split(
-                array, [location, start + npoints])
-            array = numpy.r_[left, right]
-            cells.set_cells(length - 1, array)
-        else:
-            raise IndexError('{} is out of index range'.format(index))
+        npoints = cells.data[location]
+        array = cells.to_array()
+        left, _, right = numpy.split(
+            array, [location, start + npoints])
+        array = numpy.r_[left, right]
+        cells.set_cells(new_length, array)
 
     def insert(self, index, value):
         """ Insert cell at ``index``.
@@ -109,32 +103,27 @@ class CellCollection(MutableSequence):
         """
         length = len(self)
         cells = self._cell_array
-        if 0 <= index < length:
+        if index >= length:
+            cells.insert_next_cell(value)
+        else:
             location = self._cell_location(index)
+            new_length = length + 1
             array = cells.to_array()
             left, right = numpy.split(
                 array, (location,))
             new_cell = numpy.array([len(value)] + value, left.dtype)
             array = numpy.r_[left, new_cell, right]
-            cells.set_cells(length + 1, array)
-        elif index >= length:
-            cells.insert_next_cell(value)
-        else:
-            raise IndexError('{} is out of index range'.format(index))
+            cells.set_cells(new_length, array)
 
     # Private methods ######################################################
 
-    def _add_arrays(self, arrays):
-        data = self._data
-        for cuba, array in arrays:
-            array_id = data.add_array(array)
-            data.get_array(array_id).name = cuba.name
-
     def _cell_location(self, index):
-        data = self._cell_array.data
-        location = 0
-        for _ in range(index):
-            location += int(data[location]) + 1
-        if location == len(data):
+        length = len(self)
+        if 0 <= index < length:
+            data = self._cell_array.data
+            location = 0
+            for _ in range(index):
+                location += int(data[location]) + 1
+        else:
             raise IndexError("Index {} out of range".format(index))
         return location
