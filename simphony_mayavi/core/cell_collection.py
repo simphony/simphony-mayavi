@@ -19,7 +19,7 @@ class CellCollection(MutableSequence):
         ----------
         cell_array : tvtk.CellArray
             The tvtk object to wrap. Default value is an empty
-            tvtk.CellArry.
+            tvtk.CellArray.
 
         """
         if cell_array is None:
@@ -27,7 +27,7 @@ class CellCollection(MutableSequence):
         self._cell_array = cell_array
 
     def __len__(self):
-        """ The length of the
+        """ The number of contained cells.
 
         """
         # Need to use the vtk implementation due to issue
@@ -49,7 +49,7 @@ class CellCollection(MutableSequence):
 
         .. note::
 
-           If the size of the connectivity list changes as slower
+           If the size of the connectivity list changes a slower
            path creating temporary arrays is used.
 
 
@@ -94,7 +94,7 @@ class CellCollection(MutableSequence):
             left, cell, right = numpy.split(
                 array, [location, start + npoints])
             array = numpy.r_[left, right]
-            cells.set_cells(length-1, array)
+            cells.set_cells(length - 1, array)
         else:
             raise IndexError('{} is out of index range'.format(index))
 
