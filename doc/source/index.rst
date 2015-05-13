@@ -22,6 +22,7 @@ API Reference
 
    api/plugin
    api/sources
+   api/core
 
 
 .. include:: ../../README.rst
