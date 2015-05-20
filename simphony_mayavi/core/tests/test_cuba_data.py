@@ -62,16 +62,14 @@ class TestCubaData(unittest.TestCase):
         self.assertEqual(data.cubas, set([]))
         self.assertIsInstance(data._data, tvtk.CellData)
 
-    def test_initialize_with_point_data(self):
+    def test_initialize_with_some_masked_point_data(self):
         # given
         point_data = tvtk.PointData()
         index = point_data.add_array([1, 2, 3])
         point_data.get_array(index).name = CUBA.TEMPERATURE.name
-        index = point_data.add_array(numpy.array([1, 1, 1], dtype=numpy.uint8))
-        point_data.get_array(index).name = MASKED.format(CUBA.TEMPERATURE.name)
         index = point_data.add_array([4, 2, 1])
         point_data.get_array(index).name = CUBA.RADIUS.name
-        index = point_data.add_array(numpy.array([1, 1, 1], dtype=numpy.uint8))
+        index = point_data.add_array(numpy.array([1, 0, 1], dtype=numpy.uint8))
         point_data.get_array(index).name = MASKED.format(CUBA.RADIUS.name)
 
         # when
@@ -79,6 +77,62 @@ class TestCubaData(unittest.TestCase):
 
         # then
         self.assertEqual(data.cubas, {CUBA.TEMPERATURE, CUBA.RADIUS})
+        self.assertSequenceEqual(
+            point_data.get_array(CUBA.TEMPERATURE.name), [1, 2, 3])
+        self.assertSequenceEqual(
+            point_data.get_array(CUBA.RADIUS.name), [4, 2, 1])
+        self.assertSequenceEqual(
+            point_data.get_array(MASKED.format(CUBA.TEMPERATURE.name)),
+            [1, 1, 1])
+        self.assertSequenceEqual(
+            point_data.get_array(MASKED.format(CUBA.RADIUS.name)), [1, 0, 1])
+
+    def test_initialize_with_unmasked_point_data(self):
+        # given
+        point_data = tvtk.PointData()
+        index = point_data.add_array([1, 2, 3])
+        point_data.get_array(index).name = CUBA.TEMPERATURE.name
+        index = point_data.add_array([4, 2, 1])
+        point_data.get_array(index).name = CUBA.RADIUS.name
+
+        # when
+        data = CubaData(attribute_data=point_data)
+
+        # then
+        self.assertEqual(data.cubas, {CUBA.TEMPERATURE, CUBA.RADIUS})
+        self.assertSequenceEqual(
+            point_data.get_array(CUBA.TEMPERATURE.name), [1, 2, 3])
+        self.assertSequenceEqual(
+            point_data.get_array(CUBA.RADIUS.name), [4, 2, 1])
+        self.assertSequenceEqual(
+            point_data.get_array(MASKED.format(CUBA.TEMPERATURE.name)),
+            [1, 1, 1])
+        self.assertSequenceEqual(
+            point_data.get_array(MASKED.format(CUBA.RADIUS.name)), [1, 1, 1])
+
+    def test_initialize_with_no_cuba_point_data(self):
+        # given
+        point_data = tvtk.PointData()
+        index = point_data.add_array([1, 2, 3])
+        point_data.get_array(index).name = 'my name'
+        index = point_data.add_array([4, 2, 1])
+        point_data.get_array(index).name = 'my other name'
+
+        # when/then
+        with self.assertRaises(ValueError):
+            CubaData(attribute_data=point_data)
+
+    def test_initialize_with_variable_lenth_point_data(self):
+        # given
+        point_data = tvtk.PointData()
+        index = point_data.add_array([1, 2, 3])
+        point_data.get_array(index).name = CUBA.TEMPERATURE.name
+        index = point_data.add_array([4, 2, 1, 5])
+        point_data.get_array(index).name = CUBA.RADIUS.name
+
+        # when/then
+        with self.assertRaises(ValueError):
+            CubaData(attribute_data=point_data)
 
     def test_getitem(self):
         # given
