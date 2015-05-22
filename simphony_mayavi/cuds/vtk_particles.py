@@ -65,6 +65,8 @@ class VTKParticles(ABCParticles):
 
     @property
     def data(self):
+        """ The container data
+        """
         return DataContainer(self._data)
 
     @data.setter
