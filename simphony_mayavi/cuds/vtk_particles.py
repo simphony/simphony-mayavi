@@ -19,6 +19,16 @@ class VTKParticles(ABCParticles):
     def __init__(self, name, data=None, data_set=None):
         self.name = name
         self._data = DataContainer() if data is None else DataContainer(data)
+        #: The mapping from uid to point index
+        self.particle2index = {}
+        #: The reverse mapping from index to point uid
+        self.index2particle = {}
+        #: The mapping from uid to bond index
+        self.bond2index = {}
+        #: The reverse mapping from index to bond uid
+        self.index2bond = {}
+
+        # Setup the data_set
         if data_set is None:
             points = tvtk.Points()
             # Need to initialise lines with empty so that we
@@ -30,22 +40,26 @@ class VTKParticles(ABCParticles):
             self.initialized = True
         else:
             self.initialized = False
+            for index in xrange(data_set.number_of_points):
+                uid = uuid.uuid4()
+                self.particle2index[uid] = index
+                self.index2particle[index] = uid
+            for index in xrange(data_set.number_of_cells):
+                uid = uuid.uuid4()
+                self.bond2index[uid] = index
+                self.index2bond[index] = uid
+
         #: The vtk.PolyData dataset
         self.data_set = data_set
-        #: The mapping from uid to point index
-        self.particle2index = {}
-        #: The reverse mapping from index to point uid
-        self.index2particle = {}
-        #: The mapping from uid to bond index
-        self.bond2index = {}
-        #: The reverse mapping from index to bond uid
-        self.index2bond = {}
+
         #: The currently supported and stored CUBA keywords.
-        self.supported_cuba = supported_cuba
+        self.supported_cuba = supported_cuba()
         #: Easy access to the vtk PointData structure
-        self.point_data = CubaData(data_set.point_data)
+        self.point_data = CubaData(
+            data_set.point_data, stored_cuba=self.supported_cuba)
         #: Easy access to the vtk CellData structure
-        self.bond_data = CubaData(data_set.cell_data)
+        self.bond_data = CubaData(
+            data_set.cell_data, stored_cuba=self.supported_cuba)
         #: Easy access to the lines vtk CellArray structure
         self.bonds = CellCollection(data_set.lines)
 
