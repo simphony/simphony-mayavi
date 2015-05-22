@@ -6,12 +6,14 @@ from tvtk.api import tvtk
 from simphony.cuds.abstractparticles import ABCParticles
 from simphony.cuds.particles import Particle, Bond
 from simphony.core.data_container import DataContainer
-from simphony_mayavi.core.api import CubaData, CellCollection, supported_cuba
+from simphony_mayavi.core.api import (
+    CubaData, CellCollection, supported_cuba, mergedocs)
 
 
 VTK_POLY_LINE = 4
 
 
+@mergedocs(ABCParticles)
 class VTKParticles(ABCParticles):
 
     def __init__(self, name, data=None, data_set=None):
@@ -26,6 +28,8 @@ class VTKParticles(ABCParticles):
             # dataset.
             points.append((0, 0, 0))
             self.initialized = True
+        else:
+            self.initialized = False
         #: The vtk.PolyData dataset
         self.data_set = data_set
         #: The mapping from uid to point index
@@ -36,10 +40,13 @@ class VTKParticles(ABCParticles):
         self.bond2index = {}
         #: The reverse mapping from index to bond uid
         self.index2bond = {}
-        #: The reverse mapping from index to bond uid
+        #: The currently supported and stored CUBA keywords.
         self.supported_cuba = supported_cuba
+        #: Easy access to the vtk PointData structure
         self.point_data = CubaData(data_set.point_data)
+        #: Easy access to the vtk CellData structure
         self.bond_data = CubaData(data_set.cell_data)
+        #: Easy access to the lines vtk CellArray structure
         self.bonds = CellCollection(data_set.lines)
 
     @property
