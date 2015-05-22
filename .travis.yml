@@ -17,6 +17,7 @@ before_install:
   - sudo apt-get install python-setuptools python-vtk python-qt4 python-qt4-dev python-sip python-qt4-gl libqt4-scripttools cython python-imaging
   - export ETS_TOOLKIT=qt4
 install:
+  - pip install traitsui!=4.5.0 # see issue https://github.com/enthought/traitsui/issues/206
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
   - pip install git+https://github.com/simphony/simphony-common.git@${SIMPHONY_VERSION}#egg=simphony
