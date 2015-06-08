@@ -29,15 +29,7 @@ class LatticeSource(VTKDataSource):
         size = lattice.size
         node_data = CUDSDataAccumulator()
 
-        if lattice_type in ('Square', 'Rectangular'):
-            spacing = tuple(base_vectors) + (0.0,)
-            origin = tuple(origin) + (0.0,)
-            data = tvtk.ImageData(spacing=spacing, origin=origin)
-            data.extent = 0, size[0] - 1, 0, size[1] - 1, 0, 0
-            x, y = numpy.meshgrid(range(size[0]), range(size[1]))
-            indices = izip(x.ravel(), y.ravel())
-
-        elif lattice_type in ('Cubic', 'OrthorombicP'):
+        if lattice_type in ('Cubic', 'OrthorombicP', 'Square', 'Rectangular'):
             spacing = base_vectors
             origin = origin
             data = tvtk.ImageData(spacing=spacing, origin=origin)
@@ -49,16 +41,17 @@ class LatticeSource(VTKDataSource):
             indices = izip(x.ravel(), y.ravel(), z.ravel())
 
         elif lattice_type == 'Hexagonal':
-            x, y = numpy.meshgrid(range(size[0]), range(size[1]))
+            x, y, z = numpy.meshgrid(
+                range(size[0]), range(size[1]), range(size[2]))
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
             points[:, 0] += base_vectors[0] * x.ravel() \
                 + 0.5 * base_vectors[0] * (y.ravel() % 2)
             points[:, 1] += base_vectors[1] * y.ravel()
             points[:, 0] += origin[0]
             points[:, 1] += origin[1]
+            points[:, 2] += origin[2]
             data = tvtk.PolyData(points=points)
-            indices = izip(x.ravel(), y.ravel())
-
+            indices = izip(x.ravel(), y.ravel(), z.ravel())
         else:
             message = 'Unknown lattice type: {}'.format(lattice_type)
             raise ValueError(message)
