@@ -5,10 +5,6 @@ virtualenv:
   system_site_packages: true
 env:
   - SIMPHONY_VERSION=master
-  - SIMPHONY_VERSION=master
-matrix:
-  allow_failures:
-    - env: SIMPHONY_VERSION=master
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
