@@ -31,15 +31,26 @@ class CubaData(MutableSequence):
     access provided by a list of
     :class:`~.DataContainer<DataContainers>`.
 
+    While the wrapped tvkt container is empty the following behaviour is
+    active:
+
+    - Using ``len`` will return the ``initial_size``, if defined, or 0.
+    - Using element access will return an empty `class:~.DataContainer`.
+    - No field arrays have been allocated.
+
+    When values are first added/updated with non-empty ``DataContainers``
+    then the necessary arrays are created and the ``initial_size`` info
+    is not used anymore.
+
     .. note::
 
-       Missing values for the attribute arrays are stored in separate
-       attribute arrays named "<CUBA.name>-mask" as ``0`` while
-       present values are designated with a ``1``.
+       - Missing values for the attribute arrays are stored in separate
+         attribute arrays named "<CUBA.name>-mask" as ``0`` while
+         present values are designated with a ``1``.
 
     """
 
-    def __init__(self, attribute_data, stored_cuba=None):
+    def __init__(self, attribute_data, stored_cuba=None, size=None):
         """ Constructor
 
         Parameters
@@ -49,9 +60,23 @@ class CubaData(MutableSequence):
         stored_cuba : set
             The CUBA keys that are going to be stored default
             is the result of running :meth:`supported_cuba`
+        size : int
+            The initial size of the container. Default is None. Setting
+            a value will activate the virtual size behaviour of the container.
+
+        Raises
+        ------
+        ValueError :
+            When a non-empty ``attribute_data`` container is provided while
+            size != None.
 
         """
         fix_attribute_arrays(attribute_data)
+
+        if attribute_data.number_of_arrays != 0 and size is not None:
+            message = "Using initial_size for a non-empty dataset is invalid"
+            raise ValueError(message)
+
         self._data = attribute_data
         if stored_cuba is None:
             stored_cuba = supported_cuba()
@@ -59,6 +84,7 @@ class CubaData(MutableSequence):
         self._defaults = {
             cuba: default_cuba_value(cuba)
             for cuba in stored_cuba}
+        self._virtual_size = size
 
     @property
     def cubas(self):
@@ -81,9 +107,11 @@ class CubaData(MutableSequence):
     def __len__(self):
         """ The number of rows (i.e. DataContainers) stored.
         """
+        virtual_size = self._virtual_size
+        length = 0 if virtual_size is None else virtual_size
         data = self._data
         if data.number_of_arrays == 0:
-            return 0
+            return length
         else:
             return len(data.get_array(0))
 
@@ -125,6 +153,8 @@ class CubaData(MutableSequence):
         """ Reconstruct a DataContainer from attribute arrays at row=``index``.
 
         """
+        if abs(index) > len(self):
+            raise IndexError('{} is out of index range'.format(index))
         data = self._data
         names = self._names
         arrays = [
@@ -146,6 +176,8 @@ class CubaData(MutableSequence):
         n = data.number_of_arrays
         for array_id in range(n):
             data.get_array(array_id).remove_tuple(index)
+        if n == 0 and len(self) != 0:
+            self._virtual_size -= 1
 
     def insert(self, index, value):
         """ Insert the values of the DataContainer in the arrays at row=``index``.
@@ -218,14 +250,22 @@ class CubaData(MutableSequence):
             raise IndexError('{} is out of index range'.format(index))
 
     @classmethod
-    def empty(cls, type_=AttributeSetType.POINTS):
-        """ Return an empty sequence based wrapping an vtkAttributeDataSet.
+    def empty(cls, type_=AttributeSetType.POINTS, size=0):
+        """ Return an empty sequence based wrapping a vtkAttributeDataSet.
+
+        Parameters
+        ----------
+        size : int
+            The virtual size of the container.
+
+        type_ : AttributeSetType
+            The type of the vtkAttributeSet to create.
 
         """
         if type_ == AttributeSetType.CELLS:
-            return cls(attribute_data=tvtk.CellData())
+            return cls(attribute_data=tvtk.CellData(), size=size)
         else:
-            return cls(attribute_data=tvtk.PointData())
+            return cls(attribute_data=tvtk.PointData(), size=size)
 
     # Private methods ######################################################
 
