@@ -3,15 +3,15 @@ import uuid
 from functools import partial
 
 from tvtk.api import tvtk
-
 from simphony.cuds.particles import Particle
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.testing.utils import (
-    compare_data_containers, compare_particles, create_particles)
+    compare_data_containers, compare_particles)
 from simphony.testing.abc_check_particles import (
     ContainerManipulatingBondsCheck, ContainerAddParticlesCheck,
     ContainerAddBondsCheck, ContainerManipulatingParticlesCheck)
+
 from simphony_mayavi.cuds.api import VTKParticles
 from simphony_mayavi.core.api import supported_cuba
 
@@ -78,7 +78,7 @@ class TestParticlesDataContainer(unittest.TestCase):
         self.assertEqual(data, ret_data)
         self.assertIsNot(data, ret_data)
 
-    def test_initialization_with_empty_dataset(self):
+    def test_initialization_with_expected_size(self):
         data_set = tvtk.PolyData(points=tvtk.Points(), lines=[])
         container = VTKParticles(name='test', data_set=data_set)
         particle = Particle(coordinates=(0.0, 1.0, 2.0), data=DataContainer())
