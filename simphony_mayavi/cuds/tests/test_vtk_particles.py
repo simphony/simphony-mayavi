@@ -56,7 +56,7 @@ class TestVTKParticlesManipulatingBonds(
         return supported_cuba()
 
 
-class TestParticlesDataContainer(unittest.TestCase):
+class TestVTKParticlesDataContainer(unittest.TestCase):
 
     def setUp(self):
         self.addTypeEqualityFunc(
