@@ -44,9 +44,9 @@ class CubaData(MutableSequence):
 
     .. note::
 
-       - Missing values for the attribute arrays are stored in separate
-         attribute arrays named "<CUBA.name>-mask" as ``0`` while
-         present values are designated with a ``1``.
+       Missing values for the attribute arrays are stored in separate
+       attribute arrays named "<CUBA.name>-mask" as ``0`` while
+       present values are designated with a ``1``.
 
     """
 
