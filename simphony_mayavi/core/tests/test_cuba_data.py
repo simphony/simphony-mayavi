@@ -308,6 +308,24 @@ class TestCubaData(unittest.TestCase):
         with self.assertRaises(IndexError):
             data[7] = DataContainer(RADIUS=0.2, TEMPERATURE=-4.5)
 
+    def test_setitem_empty_with_initial_size(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=3)
+
+        # when
+        for index in range(3):
+            data[index] = DataContainer()
+
+        # then
+        for index in range(3):
+            self.assertEqual(data[index], DataContainer())
+        self._assert_len(data, 0)
+
+        # when/then
+        with self.assertRaises(IndexError):
+            data[4] = DataContainer()
+
     def test_setitem_with_unsupported_cuba(self):
         # given
         data = self.data
@@ -512,6 +530,33 @@ class TestCubaData(unittest.TestCase):
         self.assertEqual(data[5], DataContainer(VELOCITY=[0, 0, 0.34]))
         self._assert_len(data, 6)
 
+    def test_append_empty_with_initial_size(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=5)
+
+        # when
+        data.append(DataContainer())
+
+        # then
+        self.assertEqual(len(data), 6)
+        for index in range(5):
+            self.assertEqual(data[index], DataContainer())
+        self.assertEqual(data[5], DataContainer())
+        self._assert_len(data, 6)
+
+    def test_append_empty_on_empty_container(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=None)
+
+        # when
+        data.append(DataContainer())
+
+        # then
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0], DataContainer())
+
     def test_append_with_new_cuba(self):
         # given
         data = self.data
@@ -587,6 +632,31 @@ class TestCubaData(unittest.TestCase):
             self.assertEqual(data[index], DataContainer())
         self.assertEqual(data[1], DataContainer(VELOCITY=[0, 0, 0.34]))
 
+    def test_insert_empty_with_initial_size(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=5)
+
+        # when
+        data.insert(1, DataContainer())
+
+        # then
+        self.assertEqual(len(data), 6)
+        for index in range(6):
+            self.assertEqual(data[index], DataContainer())
+
+    def test_insert_empty_on_empty_container(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=None)
+
+        # when
+        data.insert(1, DataContainer())
+
+        # then
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0], DataContainer())
+
     def test_insert_with_new_cuba(self):
         # given
         data = self.data
@@ -594,9 +664,9 @@ class TestCubaData(unittest.TestCase):
 
         # when
         data.insert(1, DataContainer(VELOCITY=[0, 0, 0.34], MASS=0.3))
-        self._assert_len(data, 4)
 
         # then
+        self._assert_len(data, 4)
         self.assertEqual(len(data), 4)
         for old_index, index in enumerate((0, 2, 3)):
             result = data[index]

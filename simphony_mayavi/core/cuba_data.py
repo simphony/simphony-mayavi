@@ -213,6 +213,13 @@ class CubaData(MutableSequence):
                 temp = numpy.insert(temp.to_array(), index, new_value, axis=0)
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
+            else:
+                # If there are no arrays yet we need to use the virtual
+                # size attribute.
+                if self._virtual_size is not None:
+                    self._virtual_size += 1
+                else:
+                    self._virtual_size = 1
 
             # Create data and mask arrays from new CUBA keys
             for cuba in new_cubas:
@@ -245,7 +252,13 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 array.append(self._array_value(array.name, value))
-
+            else:
+                # If there are no arrays yet we need to use the virtual
+                # size attribute.
+                if self._virtual_size is not None:
+                    self._virtual_size += 1
+                else:
+                    self._virtual_size = 1
         else:
             raise IndexError('{} is out of index range'.format(index))
 
