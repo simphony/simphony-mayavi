@@ -51,6 +51,7 @@ class CubaData(MutableSequence):
             is the result of running :meth:`supported_cuba`
 
         """
+        fix_attribute_arrays(attribute_data)
         self._data = attribute_data
         if stored_cuba is None:
             stored_cuba = supported_cuba()
@@ -68,9 +69,14 @@ class CubaData(MutableSequence):
         or :class:`~.CellData`
 
         """
+        return {CUBA[name] for name in self._names if '-mask' not in name}
+
+    @property
+    def _names(self):
         data = self._data
-        n = data.number_of_arrays
-        return {CUBA[data.get_array(index).name] for index in range(0, n, 2)}
+        return {
+            data.get_array_name(array_id): array_id
+            for array_id in range(data.number_of_arrays)}
 
     def __len__(self):
         """ The number of rows (i.e. DataContainers) stored.
@@ -120,11 +126,13 @@ class CubaData(MutableSequence):
 
         """
         data = self._data
-        n = data.number_of_arrays
+        names = self._names
         arrays = [
-            data.get_array(array_id) for array_id in range(0, n, 2)]
+            data.get_array(names[name])
+            for name in names if '-mask' not in name]
         masks = [
-            data.get_array(array_id) for array_id in range(1, n, 2)]
+            data.get_array(names[name])
+            for name in names if '-mask' in name]
         values = {
             CUBA[array.name]: array[index]
             for mask, array in zip(masks, arrays) if mask[index]}
@@ -236,3 +244,48 @@ class CubaData(MutableSequence):
         else:
             # The array is a CUBA attribute array.
             return values.get(cuba, self._defaults[cuba])
+
+
+def fix_attribute_arrays(attribute_data):
+    """ Fix the layout of the vtk attribute array container.
+
+    The function check that the container has only CUBA related arrays
+    and that they all have the same length. Any masks that are missing
+    are added to the container.
+
+    """
+    data = attribute_data
+
+    # check invalid array names
+    names = [
+        data.get_array_name(array_id)
+        for array_id in range(data.number_of_arrays)]
+    try:
+        cubas = [CUBA[name] for name in names if '-mask' not in name]
+    except KeyError:
+        raise ValueError("vtk object contains non cuba named arrays")
+
+    # check array length
+    lengths = {
+        len(data.get_array(array_id))
+        for array_id in range(data.number_of_arrays)}
+    if len(lengths) > 1:
+        info = {
+            data.get_array_name(array_id): len(
+                data.get_array_name(array_id))
+            for array_id in range(data.number_of_arrays)}
+        message = "vtk object arrays are not the same size: {}"
+        raise ValueError(message.format(info))
+    elif len(lengths) == 0:
+        # empty vtk object
+        return
+    else:
+        # fix masked arrays
+        length = next(iter(lengths))
+        masks = [name for name in names if '-mask' in name]
+        for cuba in cubas:
+            masked = MASKED.format(cuba.name)
+            if masked not in masks:
+                mask = numpy.ones(shape=length, dtype=numpy.uint8)
+                array_id = data.add_array(mask)
+                data.get_array(array_id).name = masked
