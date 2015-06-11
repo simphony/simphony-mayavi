@@ -213,7 +213,7 @@ class CubaData(MutableSequence):
                 temp = numpy.insert(temp.to_array(), index, new_value, axis=0)
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
-            else:
+            if n == 0:
                 # If there are no arrays yet we need to use the virtual
                 # size attribute.
                 if self._virtual_size is not None:
@@ -252,7 +252,7 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 array.append(self._array_value(array.name, value))
-            else:
+            if n == 0:
                 # If there are no arrays yet we need to use the virtual
                 # size attribute.
                 if self._virtual_size is not None:
