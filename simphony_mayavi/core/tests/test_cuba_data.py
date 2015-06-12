@@ -481,6 +481,39 @@ class TestCubaData(unittest.TestCase):
                     VELOCITY=values['VELOCITY'][old_index]))
         self._assert_len(data, 2)
 
+    def test_delitem_invalid(self):
+        # given
+        data = self.data
+
+        # then/when
+        with self.assertRaises(IndexError):
+            del data[145]
+
+    def test_delitem_to_empty_container(self):
+        # given
+        data = self.data
+
+        # when
+        for index in reversed(range(len(data))):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+    def test_delitem_with_initial_size_to_empty_container(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=5)
+
+        # when
+        for index in reversed(range(len(data))):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
     def test_delitem_with_initial_size(self):
         # given
         point_data = tvtk.PointData()

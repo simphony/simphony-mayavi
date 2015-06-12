@@ -172,12 +172,19 @@ class CubaData(MutableSequence):
         """ Remove the values from the attribute arrays at row=``index``.
 
         """
+        if abs(index) > len(self):
+            raise IndexError('{} is out of index range'.format(index))
         data = self._data
         n = data.number_of_arrays
-        for array_id in range(n):
-            data.get_array(array_id).remove_tuple(index)
         if n == 0 and len(self) != 0:
             self._virtual_size -= 1
+        else:
+            if len(self) != 1:
+                for array_id in range(n):
+                    data.get_array(array_id).remove_tuple(index)
+            else:
+                for array_id in reversed(range(n)):
+                    data.remove_array(array_id)
 
     def insert(self, index, value):
         """ Insert the values of the DataContainer in the arrays at row=``index``.
