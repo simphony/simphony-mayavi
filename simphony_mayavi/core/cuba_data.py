@@ -2,6 +2,7 @@ from collections import MutableSequence
 
 import numpy
 from tvtk.api import tvtk
+from tvtk.array_handler import _array_cache
 from enum import Enum
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
@@ -253,6 +254,9 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 array.append(self._array_value(array.name, value))
+                # invalidate the numpy cache, see issue
+                # https://github.com/enthought/mayavi/issues/197
+                _array_cache._remove_array(tvtk.to_vtk(array).__this__)
         else:
             raise IndexError('{} is out of index range'.format(index))
 
