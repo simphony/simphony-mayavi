@@ -731,6 +731,57 @@ class TestCubaData(unittest.TestCase):
                     VELOCITY=values['VELOCITY'][old_index]))
         self.assertEqual(data[1], DataContainer(VELOCITY=[0, 0, 0.34]))
 
+    def test_append_pop_cycle(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=3)
+
+        # when
+        for index in range(5):
+            data.append(DataContainer(MASS=index))
+        for _ in range(8):
+            data.pop(0)
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+        # when
+        for index in range(5):
+            data.append(DataContainer(MASS=index))
+        for _ in range(5):
+            data.pop(0)
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+    def test_append_delete_cycle(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=3)
+
+        # when
+        for index in range(5):
+            data.append(DataContainer(MASS=index))
+        for index in reversed(range(8)):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+        # when
+        for index in range(5):
+            data.append(DataContainer(MASS=index))
+        print data
+        for index in reversed(range(5)):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
     def _assert_len(self, data, length):
         n = data._data.number_of_arrays
         for array_id in range(n):

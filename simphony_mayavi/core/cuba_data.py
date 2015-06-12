@@ -220,13 +220,6 @@ class CubaData(MutableSequence):
                 temp = numpy.insert(temp.to_array(), index, new_value, axis=0)
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
-            if n == 0:
-                # If there are no arrays yet we need to use the virtual
-                # size attribute.
-                if self._virtual_size is not None:
-                    self._virtual_size += 1
-                else:
-                    self._virtual_size = 1
 
             # Create data and mask arrays from new CUBA keys
             for cuba in new_cubas:
@@ -252,6 +245,7 @@ class CubaData(MutableSequence):
                 mask = numpy.zeros(shape=array.shape[0], dtype=numpy.uint8)
                 new_arrays.append((cuba.name, array))
                 new_arrays.append((masked, mask))
+
             self._add_arrays(new_arrays)
 
             # Append new values.
@@ -259,16 +253,20 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 array.append(self._array_value(array.name, value))
-            if n == 0:
-                # If there are no arrays yet we need to use the virtual
-                # size attribute.
-                if self._virtual_size is not None:
-                    self._virtual_size += 1
-                else:
-                    self._virtual_size = 1
         else:
             raise IndexError('{} is out of index range'.format(index))
 
+        # make sure that virtual_size is properly updated
+        n = data.number_of_arrays
+        if n == 0:
+            # If there are no arrays yet we need to use the virtual
+            # size attribute.
+            if self._virtual_size is not None:
+                self._virtual_size += 1
+            else:
+                self._virtual_size = 1
+        else:
+            self._virtual_size = None
     @classmethod
     def empty(cls, type_=AttributeSetType.POINTS, size=0):
         """ Return an empty sequence based wrapping a vtkAttributeDataSet.
