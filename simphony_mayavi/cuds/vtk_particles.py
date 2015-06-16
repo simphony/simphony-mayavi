@@ -54,12 +54,26 @@ class VTKParticles(ABCParticles):
 
         #: The currently supported and stored CUBA keywords.
         self.supported_cuba = supported_cuba()
+
         #: Easy access to the vtk PointData structure
+        data = data_set.point_data
+        if data.number_of_arrays == 0 and not self.initialized:
+            size = data_set.number_of_points
+        else:
+            size = None
         self.point_data = CubaData(
-            data_set.point_data, stored_cuba=self.supported_cuba)
+            data, stored_cuba=self.supported_cuba, size=size)
+
         #: Easy access to the vtk CellData structure
+        data = data_set.cell_data
+        ncells = data_set.number_of_cells
+        if data.number_of_arrays == 0 and ncells != 0:
+            size = ncells
+        else:
+            size = None
         self.bond_data = CubaData(
-            data_set.cell_data, stored_cuba=self.supported_cuba)
+            data, stored_cuba=self.supported_cuba, size=size)
+
         #: Easy access to the lines vtk CellArray structure
         self.bonds = CellCollection(data_set.lines)
 

@@ -2,6 +2,7 @@ from collections import MutableSequence
 
 import numpy
 from tvtk.api import tvtk
+from tvtk.array_handler import _array_cache
 from enum import Enum
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
@@ -31,6 +32,17 @@ class CubaData(MutableSequence):
     access provided by a list of
     :class:`~.DataContainer<DataContainers>`.
 
+    While the wrapped tvkt container is empty the following behaviour is
+    active:
+
+    - Using ``len`` will return the ``initial_size``, if defined, or 0.
+    - Using element access will return an empty `class:~.DataContainer`.
+    - No field arrays have been allocated.
+
+    When values are first added/updated with non-empty ``DataContainers``
+    then the necessary arrays are created and the ``initial_size`` info
+    is not used anymore.
+
     .. note::
 
        Missing values for the attribute arrays are stored in separate
@@ -39,7 +51,7 @@ class CubaData(MutableSequence):
 
     """
 
-    def __init__(self, attribute_data, stored_cuba=None):
+    def __init__(self, attribute_data, stored_cuba=None, size=None):
         """ Constructor
 
         Parameters
@@ -49,9 +61,23 @@ class CubaData(MutableSequence):
         stored_cuba : set
             The CUBA keys that are going to be stored default
             is the result of running :meth:`supported_cuba`
+        size : int
+            The initial size of the container. Default is None. Setting
+            a value will activate the virtual size behaviour of the container.
+
+        Raises
+        ------
+        ValueError :
+            When a non-empty ``attribute_data`` container is provided while
+            size != None.
 
         """
         fix_attribute_arrays(attribute_data)
+
+        if attribute_data.number_of_arrays != 0 and size is not None:
+            message = "Using initial_size for a non-empty dataset is invalid"
+            raise ValueError(message)
+
         self._data = attribute_data
         if stored_cuba is None:
             stored_cuba = supported_cuba()
@@ -59,6 +85,7 @@ class CubaData(MutableSequence):
         self._defaults = {
             cuba: default_cuba_value(cuba)
             for cuba in stored_cuba}
+        self._virtual_size = size
 
     @property
     def cubas(self):
@@ -81,9 +108,11 @@ class CubaData(MutableSequence):
     def __len__(self):
         """ The number of rows (i.e. DataContainers) stored.
         """
+        virtual_size = self._virtual_size
+        length = 0 if virtual_size is None else virtual_size
         data = self._data
         if data.number_of_arrays == 0:
-            return 0
+            return length
         else:
             return len(data.get_array(0))
 
@@ -125,6 +154,8 @@ class CubaData(MutableSequence):
         """ Reconstruct a DataContainer from attribute arrays at row=``index``.
 
         """
+        if abs(index) > len(self):
+            raise IndexError('{} is out of index range'.format(index))
         data = self._data
         names = self._names
         arrays = [
@@ -142,10 +173,19 @@ class CubaData(MutableSequence):
         """ Remove the values from the attribute arrays at row=``index``.
 
         """
+        if abs(index) > len(self):
+            raise IndexError('{} is out of index range'.format(index))
         data = self._data
         n = data.number_of_arrays
-        for array_id in range(n):
-            data.get_array(array_id).remove_tuple(index)
+        if n == 0 and len(self) != 0:
+            self._virtual_size -= 1
+        else:
+            if len(self) != 1:
+                for array_id in range(n):
+                    data.get_array(array_id).remove_tuple(index)
+            else:
+                for array_id in reversed(range(n)):
+                    data.remove_array(array_id)
 
     def insert(self, index, value):
         """ Insert the values of the DataContainer in the arrays at row=``index``.
@@ -206,6 +246,7 @@ class CubaData(MutableSequence):
                 mask = numpy.zeros(shape=array.shape[0], dtype=numpy.uint8)
                 new_arrays.append((cuba.name, array))
                 new_arrays.append((masked, mask))
+
             self._add_arrays(new_arrays)
 
             # Append new values.
@@ -213,19 +254,44 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 array.append(self._array_value(array.name, value))
-
+                # invalidate the numpy cache, see issue
+                # https://github.com/enthought/mayavi/issues/197
+                _array_cache._remove_array(tvtk.to_vtk(array).__this__)
         else:
             raise IndexError('{} is out of index range'.format(index))
 
+        # make sure that virtual_size is properly updated
+        n = data.number_of_arrays
+        if n == 0:
+            # If there are no arrays yet we need to use the virtual
+            # size attribute.
+            if self._virtual_size is not None:
+                self._virtual_size += 1
+            else:
+                self._virtual_size = 1
+        else:
+            self._virtual_size = None
+
+    def __str__(self):
+        return u"[{}]".format(",".join(str(item) for item in self))
+
     @classmethod
-    def empty(cls, type_=AttributeSetType.POINTS):
-        """ Return an empty sequence based wrapping an vtkAttributeDataSet.
+    def empty(cls, type_=AttributeSetType.POINTS, size=0):
+        """ Return an empty sequence based wrapping a vtkAttributeDataSet.
+
+        Parameters
+        ----------
+        size : int
+            The virtual size of the container.
+
+        type_ : AttributeSetType
+            The type of the vtkAttributeSet to create.
 
         """
         if type_ == AttributeSetType.CELLS:
-            return cls(attribute_data=tvtk.CellData())
+            return cls(attribute_data=tvtk.CellData(), size=size)
         else:
-            return cls(attribute_data=tvtk.PointData())
+            return cls(attribute_data=tvtk.PointData(), size=size)
 
     # Private methods ######################################################
 
