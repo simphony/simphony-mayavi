@@ -2,6 +2,7 @@ from collections import MutableSequence
 
 import numpy
 from tvtk.api import tvtk
+from tvtk.array_handler import _array_cache
 from enum import Enum
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
@@ -44,9 +45,9 @@ class CubaData(MutableSequence):
 
     .. note::
 
-       - Missing values for the attribute arrays are stored in separate
-         attribute arrays named "<CUBA.name>-mask" as ``0`` while
-         present values are designated with a ``1``.
+       Missing values for the attribute arrays are stored in separate
+       attribute arrays named "<CUBA.name>-mask" as ``0`` while
+       present values are designated with a ``1``.
 
     """
 
@@ -172,12 +173,19 @@ class CubaData(MutableSequence):
         """ Remove the values from the attribute arrays at row=``index``.
 
         """
+        if abs(index) > len(self):
+            raise IndexError('{} is out of index range'.format(index))
         data = self._data
         n = data.number_of_arrays
-        for array_id in range(n):
-            data.get_array(array_id).remove_tuple(index)
         if n == 0 and len(self) != 0:
             self._virtual_size -= 1
+        else:
+            if len(self) != 1:
+                for array_id in range(n):
+                    data.get_array(array_id).remove_tuple(index)
+            else:
+                for array_id in reversed(range(n)):
+                    data.remove_array(array_id)
 
     def insert(self, index, value):
         """ Insert the values of the DataContainer in the arrays at row=``index``.
@@ -213,13 +221,6 @@ class CubaData(MutableSequence):
                 temp = numpy.insert(temp.to_array(), index, new_value, axis=0)
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
-            else:
-                # If there are no arrays yet we need to use the virtual
-                # size attribute.
-                if self._virtual_size is not None:
-                    self._virtual_size += 1
-                else:
-                    self._virtual_size = 1
 
             # Create data and mask arrays from new CUBA keys
             for cuba in new_cubas:
@@ -245,6 +246,7 @@ class CubaData(MutableSequence):
                 mask = numpy.zeros(shape=array.shape[0], dtype=numpy.uint8)
                 new_arrays.append((cuba.name, array))
                 new_arrays.append((masked, mask))
+
             self._add_arrays(new_arrays)
 
             # Append new values.
@@ -252,15 +254,26 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 array.append(self._array_value(array.name, value))
-            else:
-                # If there are no arrays yet we need to use the virtual
-                # size attribute.
-                if self._virtual_size is not None:
-                    self._virtual_size += 1
-                else:
-                    self._virtual_size = 1
+                # invalidate the numpy cache, see issue
+                # https://github.com/enthought/mayavi/issues/197
+                _array_cache._remove_array(tvtk.to_vtk(array).__this__)
         else:
             raise IndexError('{} is out of index range'.format(index))
+
+        # make sure that virtual_size is properly updated
+        n = data.number_of_arrays
+        if n == 0:
+            # If there are no arrays yet we need to use the virtual
+            # size attribute.
+            if self._virtual_size is not None:
+                self._virtual_size += 1
+            else:
+                self._virtual_size = 1
+        else:
+            self._virtual_size = None
+
+    def __str__(self):
+        return u"[{}]".format(",".join(str(item) for item in self))
 
     @classmethod
     def empty(cls, type_=AttributeSetType.POINTS, size=0):

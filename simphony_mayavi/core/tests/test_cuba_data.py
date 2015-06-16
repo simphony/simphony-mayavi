@@ -481,6 +481,39 @@ class TestCubaData(unittest.TestCase):
                     VELOCITY=values['VELOCITY'][old_index]))
         self._assert_len(data, 2)
 
+    def test_delitem_invalid(self):
+        # given
+        data = self.data
+
+        # then/when
+        with self.assertRaises(IndexError):
+            del data[145]
+
+    def test_delitem_to_empty_container(self):
+        # given
+        data = self.data
+
+        # when
+        for index in reversed(range(len(data))):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+    def test_delitem_with_initial_size_to_empty_container(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=5)
+
+        # when
+        for index in reversed(range(len(data))):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
     def test_delitem_with_initial_size(self):
         # given
         point_data = tvtk.PointData()
@@ -514,6 +547,20 @@ class TestCubaData(unittest.TestCase):
                     VELOCITY=values['VELOCITY'][index]))
         self.assertEqual(data[3], DataContainer(VELOCITY=[0, 0, 0.34]))
         self._assert_len(data, 4)
+
+    def test_append_on_empty(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data)
+
+        # when
+        data.append(DataContainer(VELOCITY=[0, 0, 0.34]))
+        data.append(DataContainer(VELOCITY=[0, 0, 0.24]))
+
+        # then
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[1], DataContainer(VELOCITY=[0, 0, 0.24]))
+        self.assertEqual(data[0], DataContainer(VELOCITY=[0, 0, 0.34]))
 
     def test_append_with_initial_size(self):
         # given
@@ -617,6 +664,20 @@ class TestCubaData(unittest.TestCase):
                     VELOCITY=values['VELOCITY'][old_index]))
         self.assertEqual(data[1], DataContainer(VELOCITY=[0, 0, 0.34]))
 
+    def test_insert_on_empty(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data)
+
+        # when
+        data.insert(0, DataContainer(VELOCITY=[0, 0, 0.34]))
+        data.insert(0, DataContainer(VELOCITY=[0, 0, 0.24]))
+
+        # then
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[0], DataContainer(VELOCITY=[0, 0, 0.24]))
+        self.assertEqual(data[1], DataContainer(VELOCITY=[0, 0, 0.34]))
+
     def test_insert_with_initial_size(self):
         # given
         point_data = tvtk.PointData()
@@ -697,6 +758,81 @@ class TestCubaData(unittest.TestCase):
                     TEMPERATURE=values['TEMPERATURE'][old_index],
                     VELOCITY=values['VELOCITY'][old_index]))
         self.assertEqual(data[1], DataContainer(VELOCITY=[0, 0, 0.34]))
+
+    def test_append_pop_cycle(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=3)
+
+        # when
+        for index in range(5):
+            data.append(DataContainer(MASS=index))
+        for _ in range(8):
+            data.pop(0)
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+        # when
+        for index in range(5):
+            data.append(DataContainer(MASS=index))
+        for _ in range(5):
+            data.pop(0)
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+    def test_append_delete_cycle(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=3)
+
+        # when
+        for index in range(5):
+            data.append(DataContainer(MASS=index))
+        for index in reversed(range(8)):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+        # when
+        for index in range(5):
+            data.append(DataContainer(MASS=index))
+        for index in reversed(range(5)):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+    def test_insert_delete_cycle(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data, size=3)
+
+        # when
+        for index in range(5):
+            data.insert(0, DataContainer(MASS=index))
+        for index in reversed(range(8)):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
+
+        # when
+        for index in range(5):
+            data.insert(0, DataContainer(MASS=index))
+        for index in reversed(range(5)):
+            del data[index]
+
+        # then
+        self.assertEqual(len(data), 0)
+        self.assertEqual(data.cubas, set([]))
 
     def _assert_len(self, data, length):
         n = data._data.number_of_arrays
