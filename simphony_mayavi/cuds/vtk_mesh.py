@@ -1,5 +1,6 @@
 import uuid
 import contextlib
+import copy
 
 from tvtk.api import tvtk
 
@@ -8,8 +9,8 @@ from simphony.cuds.mesh import Point, Edge, Face, Cell
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
     CubaData, CellCollection, supported_cuba, mergedocs,
-    VTKEDGETYPES, EDGE2VTKCELL, FACE2VTKCELL, VTKFACETYPES,
-    VTKCELLTYPES, CELL2VTKCELL)
+    EDGE2VTKCELL, FACE2VTKCELL, CELL2VTKCELL,
+    ELEMENT2VTKCELLTYPES, VTKCELLTYPE2ELEMENT)
 
 
 @mergedocs(ABCMesh)
@@ -121,61 +122,41 @@ class VTKMesh(ABCMesh):
             for uid in uids:
                 yield self.get_point(uid)
 
-    # Edge operations ########################################################
+    # special private ########################################################
 
-    def add_edge(self, edge):
-        data_set = self.data_set
-        element2index = self.element2index
-        with self._add_item(edge, element2index) as item:
-            point_ids = [self.point2index[uid] for uid in item.points]
-            index = data_set.insert_next_cell(
-                EDGE2VTKCELL[len(point_ids)], point_ids)
-            element2index[item.uid] = index
-            self.index2element[index] = item.uid
-            self.element_data.append(item.data)
-            return item.uid
+    def _update_element(self, element):
+        try:
+            index = self.element2index[element.uid]
+        except KeyError:
+            message = "{} with {} does exist"
+            raise ValueError(message.format(type(element), element.uid))
+        point_ids = [self.point2index[uid] for uid in element.points]
+        self.elements[index] = point_ids
+        self.element_data[index] = element.data
+
+    # Edge operations ########################################################
 
     def get_edge(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        edge = self.data_set.get_cell(index)
-        return Edge(
-            uid=uid,
-            points=[self.index2point[i] for i in edge.point_ids],
-            data=self.element_data[index])
-
-    def update_edge(self, edge):
-        try:
-            index = self.element2index[edge.uid]
-        except KeyError:
-            message = "Edge with {} does exist"
-            raise ValueError(message.format(edge.uid))
-        point_ids = [self.point2index[uid] for uid in edge.points]
-        self.elements[index] = point_ids
-        self.element_data[index] = edge.data
+        return self._get_element(index, Edge)
 
     def has_edges(self):
-        cell_types = self.data_set.cell_types_array
-        for type_ in VTKEDGETYPES:
-            if type_ in cell_types:
-                return True
-        else:
-            return False
+        return self._has_elements(Edge)
 
     def iter_edges(self, uids=None):
         if uids is None:
-            cell_types = self.data_set.cell_types_array
-            for index, cell_type in enumerate(cell_types):
-                if cell_type in VTKEDGETYPES:
-                    edge = self.data_set.get_cell(index)
-                    yield Edge(
-                        uid=self.index2element[index],
-                        points=[self.index2point[i] for i in edge.point_ids],
-                        data=self.element_data[index])
+            for edge in self._iter_elements(Edge):
+                yield edge
         else:
             for uid in uids:
                 yield self.get_edge(uid)
+
+    def add_edge(self, edge):
+        return self._add_element(edge, mapping=EDGE2VTKCELL)
+
+    update_edge = copy.copy(_update_element)
 
     # Face operations ########################################################
 
@@ -183,55 +164,23 @@ class VTKMesh(ABCMesh):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        face = self.data_set.get_cell(index)
-        return Face(
-            uid=uid,
-            points=[self.index2point[i] for i in face.point_ids],
-            data=self.element_data[index])
-
-    def add_face(self, face):
-        data_set = self.data_set
-        element2index = self.element2index
-        with self._add_item(face, element2index) as item:
-            point_ids = [self.point2index[uid] for uid in item.points]
-            index = data_set.insert_next_cell(
-                FACE2VTKCELL[len(point_ids)], point_ids)
-            element2index[item.uid] = index
-            self.index2element[index] = item.uid
-            self.element_data.append(item.data)
-            return item.uid
+        return self._get_element(index, Face)
 
     def has_faces(self):
-        cell_types = self.data_set.cell_types_array
-        for type_ in VTKFACETYPES:
-            if type_ in cell_types:
-                return True
-        else:
-            return False
-
-    def update_face(self, face):
-        try:
-            index = self.element2index[face.uid]
-        except KeyError:
-            message = "Face with {} does exist"
-            raise ValueError(message.format(face.uid))
-        point_ids = [self.point2index[uid] for uid in face.points]
-        self.elements[index] = point_ids
-        self.element_data[index] = face.data
+        return self._has_elements(Face)
 
     def iter_faces(self, uids=None):
         if uids is None:
-            cell_types = self.data_set.cell_types_array
-            for index, cell_type in enumerate(cell_types):
-                if cell_type in VTKFACETYPES:
-                    face = self.data_set.get_cell(index)
-                    yield Face(
-                        uid=self.index2element[index],
-                        points=[self.index2point[i] for i in face.point_ids],
-                        data=self.element_data[index])
+            for face in self._iter_elements(Face):
+                yield face
         else:
             for uid in uids:
                 yield self.get_face(uid)
+
+    def add_face(self, face):
+        return self._add_element(face, mapping=FACE2VTKCELL)
+
+    update_face = copy.copy(_update_element)
 
     # Cell operations ########################################################
 
@@ -239,55 +188,23 @@ class VTKMesh(ABCMesh):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        face = self.data_set.get_cell(index)
-        return Cell(
-            uid=uid,
-            points=[self.index2point[i] for i in face.point_ids],
-            data=self.element_data[index])
-
-    def add_cell(self, cell):
-        data_set = self.data_set
-        element2index = self.element2index
-        with self._add_item(cell, element2index) as item:
-            point_ids = [self.point2index[uid] for uid in item.points]
-            index = data_set.insert_next_cell(
-                CELL2VTKCELL[len(point_ids)], point_ids)
-            element2index[item.uid] = index
-            self.index2element[index] = item.uid
-            self.element_data.append(item.data)
-            return item.uid
+        return self._get_element(index, Cell)
 
     def has_cells(self):
-        cell_types = self.data_set.cell_types_array
-        for type_ in VTKCELLTYPES:
-            if type_ in cell_types:
-                return True
-        else:
-            return False
-
-    def update_cell(self, face):
-        try:
-            index = self.element2index[face.uid]
-        except KeyError:
-            message = "Cell with {} does exist"
-            raise ValueError(message.format(face.uid))
-        point_ids = [self.point2index[uid] for uid in face.points]
-        self.elements[index] = point_ids
-        self.element_data[index] = face.data
+        return self._has_elements(Cell)
 
     def iter_cells(self, uids=None):
         if uids is None:
-            cell_types = self.data_set.cell_types_array
-            for index, cell_type in enumerate(cell_types):
-                if cell_type in VTKCELLTYPES:
-                    cell = self.data_set.get_cell(index)
-                    yield Cell(
-                        uid=self.index2element[index],
-                        points=[self.index2point[i] for i in cell.point_ids],
-                        data=self.element_data[index])
+            for cell in self._iter_elements(Cell):
+                yield cell
         else:
             for uid in uids:
                 yield self.get_cell(uid)
+
+    def add_cell(self, cell):
+        return self._add_element(cell, mapping=CELL2VTKCELL)
+
+    update_cell = copy.copy(_update_element)
 
     # Private interface ######################################################
 
@@ -299,3 +216,48 @@ class VTKMesh(ABCMesh):
             message = "Item with id:{} already exists"
             raise ValueError(message.format(item.uid))
         yield item
+
+    def _has_elements(self, element):
+        cell_types = self.data_set.cell_types_array
+        for type_ in ELEMENT2VTKCELLTYPES[element]:
+            if type_ in cell_types:
+                return True
+        else:
+            return False
+
+    def _get_element(self, index, type_=None):
+        data_set = self.data_set
+        element = data_set.get_cell(index)
+        if type_ is None:
+            type_ = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
+        return type_(
+            uid=self.index2element[index],
+            points=[self.index2point[i] for i in element.point_ids],
+            data=self.element_data[index])
+
+    def _iter_elements(self, type_):
+        cell_types = self.data_set.cell_types_array
+        types = ELEMENT2VTKCELLTYPES[type_]
+        index2point = self.index2point
+        index2element = self.index2element
+        element_data = self.element_data
+        data_set = self.data_set
+        for index, cell_type in enumerate(cell_types):
+            if cell_type in types:
+                element = data_set.get_cell(index)
+                yield type_(
+                    uid=index2element[index],
+                    points=[index2point[i] for i in element.point_ids],
+                    data=element_data[index])
+
+    def _add_element(self, element, mapping):
+        data_set = self.data_set
+        element2index = self.element2index
+        with self._add_item(element, element2index) as item:
+            point_ids = [self.point2index[uid] for uid in item.points]
+            index = data_set.insert_next_cell(
+                mapping[len(point_ids)], point_ids)
+            element2index[item.uid] = index
+            self.index2element[index] = item.uid
+            self.element_data.append(item.data)
+            return item.uid
