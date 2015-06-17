@@ -2,6 +2,9 @@ from collections import defaultdict
 
 from tvtk.api import tvtk
 
+from simphony.cuds.mesh import Face, Cell, Edge
+
+
 CELL2VTKCELL = {
     4: tvtk.Tetra().cell_type,
     8: tvtk.Hexahedron().cell_type,
@@ -36,3 +39,15 @@ VTKFACETYPES = [
     tvtk.Triangle().cell_type,
     tvtk.Quad().cell_type,
     tvtk.Polygon().cell_type]
+
+ELEMENT2VTKCELLTYPES = {
+    Edge: VTKEDGETYPES,
+    Face: VTKFACETYPES,
+    Cell: VTKCELLTYPES}
+
+VTKCELLTYPE2ELEMENT = {
+    cell_type: Cell for cell_type in VTKCELLTYPES}
+VTKCELLTYPE2ELEMENT.update({
+    cell_type: Face for cell_type in VTKFACETYPES})
+VTKCELLTYPE2ELEMENT.update({
+    cell_type: Edge for cell_type in VTKEDGETYPES})
