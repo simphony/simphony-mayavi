@@ -1,3 +1,5 @@
+from __future__ import division
+
 import numpy
 from tvtk.api import tvtk
 from simphony.cuds.abstractlattice import ABCLattice
@@ -43,7 +45,7 @@ class VTKLattice(ABCLattice):
         elif self.type == 'Hexagonal':
             # FIXME: we assume a lattice on the xy plane
             points = self.data_set.points.to_array()
-            x_size = len(numpy.unique(points[:, 0])) // 2
+            x_size = len(numpy.unique(points[:, 0])) // 2 - 1
             y_size = len(numpy.unique(points[:, 1]))
             z_size = len(numpy.unique(points[:, 2]))
             self._origin = tuple(points[0])
@@ -116,7 +118,7 @@ class VTKLattice(ABCLattice):
                 range(size[0]), range(size[1]), range(size[2]))
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
             points[:, 0] += base_vector[0] * x.ravel() \
-                + 0.5 * base_vector[0] * (y.ravel() % 2)
+                + 0.5 * base_vector[0] * y.ravel()
             points[:, 1] += base_vector[1] * y.ravel()
             points[:, 0] += origin[0]
             points[:, 1] += origin[1]
