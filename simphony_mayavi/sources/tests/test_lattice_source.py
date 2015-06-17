@@ -98,14 +98,14 @@ class TestLatticeSource(unittest.TestCase):
             row, column = numpy.unravel_index(index,  (4, 5))
             assert_array_equal(
                 point, (
-                    xspace * column + 0.5 * xspace * (row % 2),
+                    xspace * column + 0.5 * xspace * row,
                     yspace * row,
                     0.0))
 
         vectors = data.point_data.vectors.to_array()
         for node in lattice.iter_nodes():
             position = (
-                node.index[0] * xspace + 0.5 * xspace * (node.index[1] % 2),
+                node.index[0] * xspace + 0.5 * xspace * node.index[1],
                 node.index[1] * yspace,
                 0.0)
             point_id = data.find_point(position)

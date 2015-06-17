@@ -45,7 +45,7 @@ class LatticeSource(VTKDataSource):
                 range(size[0]), range(size[1]), range(size[2]))
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
             points[:, 0] += base_vectors[0] * x.ravel() \
-                + 0.5 * base_vectors[0] * (y.ravel() % 2)
+                + 0.5 * base_vectors[0] * y.ravel()
             points[:, 1] += base_vectors[1] * y.ravel()
             points[:, 0] += origin[0]
             points[:, 1] += origin[1]
