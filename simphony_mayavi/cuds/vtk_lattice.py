@@ -22,17 +22,17 @@ class VTKLattice(ABCLattice):
         #: The currently supported and stored CUBA keywords.
         self.supported_cuba = supported_cuba()
 
-        #: Easy access to the vtk PointData structure
         data = data_set.point_data
         npoints = data_set.number_of_points
         if data.number_of_arrays == 0 and npoints != 0:
             size = npoints
         else:
             size = None
+        #: Easy access to the vtk PointData structure
         self.point_data = CubaData(
             data, stored_cuba=self.supported_cuba, size=size)
 
-        #: Estimate the lattice parameters
+        # Estimate the lattice parameters
         if self.type in ('Cubic', 'OrthorombicP', 'Square', 'Rectangular'):
             extend = self.data_set.extent
             x_size = extend[1] - extend[0] + 1
