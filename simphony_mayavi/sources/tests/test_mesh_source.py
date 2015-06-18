@@ -7,9 +7,10 @@ from numpy.testing import assert_array_equal
 from simphony.core.cuba import CUBA
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony.core.data_container import DataContainer
-from simphony_mayavi.sources.api import MeshSource, cell_array_slicer
 
-from simphony_mayavi.sources.mesh_source import (
+from simphony_mayavi.sources.api import MeshSource
+from simphony_mayavi.core.api import (
+    cell_array_slicer,
     CELL2VTKCELL, FACE2VTKCELL, EDGE2VTKCELL)
 
 
