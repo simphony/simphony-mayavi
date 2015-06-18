@@ -6,8 +6,9 @@ from mayavi.sources.vtk_data_source import VTKDataSource
 from tvtk.api import tvtk
 from traits.api import Dict
 
-from .cuds_data_accumulator import CUDSDataAccumulator
-from simphony_mayavi.core.api import CELL2VTKCELL, FACE2VTKCELL, EDGE2VTKCELL
+from simphony_mayavi.core.api import (
+    CELL2VTKCELL, FACE2VTKCELL, EDGE2VTKCELL,
+    CUBADataAccumulator, gather_cells)
 
 
 class MeshSource(VTKDataSource):
@@ -36,8 +37,8 @@ class MeshSource(VTKDataSource):
         element2index = {}
         counter = count()
 
-        point_data = CUDSDataAccumulator()
-        cell_data = CUDSDataAccumulator()
+        point_data = CUBADataAccumulator()
+        cell_data = CUBADataAccumulator()
 
         for index, point in enumerate(mesh.iter_points()):
             point2index[point.uid] = index
@@ -73,57 +74,3 @@ class MeshSource(VTKDataSource):
             data=data,
             point2index=point2index,
             element2index=element2index)
-
-
-def gather_cells(
-        iterable, vtk_mapping, point2index, counter, accumulator):
-    """ Gather the vtk cell information from an element iterator.
-
-    Arguments
-    ---------
-    iterable :
-        The Element iterable object
-
-    mapping : dict
-        The mapping from points number to tvtk.Cell type.
-
-    point2index: dict
-        The mapping from points uid to the index of the vtk points array.
-
-    index : itertools.count
-        The counter object to use when evaluating the ``elements2index``
-        mapping.
-
-    accumulator : CUDSDataAccumulator
-        The accumulator instance to use and collect the data information
-
-    Returns
-    -------
-    cells : list
-         The cell point information encoded in a one dimensional list.
-
-    cells_size : list
-         The list of points number per cell.
-
-    cells_types : list
-         The list of cell types in sequence.
-
-    element2index : dict
-         The mapping from element uid to iteration index.
-
-    """
-    cells = []
-    cells_size = []
-    cell_types = []
-    element2index = {}
-
-    for element in iter(iterable):
-        element2index[element.uid] = counter.next()
-        npoints = len(element.points)
-        cells_size.append(npoints + 1)
-        cells.append(npoints)
-        cells.extend(point2index[uid] for uid in element.points)
-        cell_types.append(vtk_mapping[npoints])
-        accumulator.append(element.data)
-
-    return cells, cells_size, cell_types, element2index

@@ -2,7 +2,7 @@ from mayavi.sources.vtk_data_source import VTKDataSource
 from tvtk.api import tvtk
 from traits.api import Dict
 
-from .cuds_data_accumulator import CUDSDataAccumulator
+from simphony_mayavi.core.api import CUBADataAccumulator
 
 
 class ParticlesSource(VTKDataSource):

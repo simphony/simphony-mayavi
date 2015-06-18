@@ -5,7 +5,7 @@ import numpy
 from mayavi.sources.vtk_data_source import VTKDataSource
 from tvtk.api import tvtk
 
-from .cuds_data_accumulator import CUDSDataAccumulator
+from simphony_mayavi.core.api import CUBADataAccumulator
 
 
 class LatticeSource(VTKDataSource):

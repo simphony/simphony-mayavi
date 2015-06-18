@@ -5,7 +5,7 @@ import numpy
 from simphony.testing.utils import dummy_cuba_value
 
 
-class CUDSDataAccumulator(object):
+class CUBADataAccumulator(object):
     """ Accumulate data information per CUBA key.
 
     A collector object that stores :class:``DataContainer`` data into
@@ -18,11 +18,11 @@ class CUDSDataAccumulator(object):
     ``expand``. ``fixed`` means that data will be stored for
     a predefined set of keys on every ``append`` call and missing
     values will be saved as ``None``. Where ``expand`` will extend
-    the internal table of values when ever a new key is introduced.
+    the internal table of values whenever a new key is introduced.
 
     .. rubric:: expand operation
 
-    >>> accumulator = CUDSDataAccumulator():
+    >>> accumulator = CUBADataAccumulator():
     >>> accumulator.append(DataContainer(TEMPERATURE=34))
     >>> accumulator.keys()
     {CUBA.TEMPERATURE}
@@ -37,7 +37,7 @@ class CUDSDataAccumulator(object):
 
     .. rubric:: fixed operation
 
-    >>> accumulator = CUDSDataAccumulator([CUBA.TEMPERATURE, CUBA.PRESSURE]):
+    >>> accumulator = CUBADataAccumulator([CUBA.TEMPERATURE, CUBA.PRESSURE]):
     >>> accumulator.keys()
     {CUBA.TEMPERATURE, CUBA.PRESSURE}
     >>> accumulator.append(DataContainer(TEMPERATURE=34))
@@ -171,3 +171,57 @@ class CUDSDataAccumulator(object):
     def _expand(self, keys):
         for key in keys:
             self._data[key] = [None] * self._record_size
+
+
+def gather_cells(
+        iterable, vtk_mapping, point2index, counter, accumulator):
+    """ Gather the vtk cell information from an element iterator.
+
+    Arguments
+    ---------
+    iterable :
+        The Element iterable object
+
+    mapping : dict
+        The mapping from points number to tvtk.Cell type.
+
+    point2index: dict
+        The mapping from points uid to the index of the vtk points array.
+
+    index : itertools.count
+        The counter object to use when evaluating the ``elements2index``
+        mapping.
+
+    accumulator : CUBADataAccumulator
+        The accumulator instance to use and collect the data information
+
+    Returns
+    -------
+    cells : list
+         The cell point information encoded in a one dimensional list.
+
+    cells_size : list
+         The list of points number per cell.
+
+    cells_types : list
+         The list of cell types in sequence.
+
+    element2index : dict
+         The mapping from element uid to iteration index.
+
+    """
+    cells = []
+    cells_size = []
+    cell_types = []
+    element2index = {}
+
+    for element in iter(iterable):
+        element2index[element.uid] = counter.next()
+        npoints = len(element.points)
+        cells_size.append(npoints + 1)
+        cells.append(npoints)
+        cells.extend(point2index[uid] for uid in element.points)
+        cell_types.append(vtk_mapping[npoints])
+        accumulator.append(element.data)
+
+    return cells, cells_size, cell_types, element2index
