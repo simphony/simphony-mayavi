@@ -1,13 +1,14 @@
 import unittest
 
-import numpy
 from numpy.testing import assert_array_equal
 
 from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particles, Particle, Bond
 from simphony.core.data_container import DataContainer
 
-from simphony_mayavi.sources.api import ParticlesSource, cell_array_slicer
+from simphony_mayavi.core.api import cell_array_slicer
+from simphony_mayavi.cuds.api import VTKParticles
+from simphony_mayavi.sources.api import ParticlesSource
 
 
 class TestParticlesSource(unittest.TestCase):
@@ -34,6 +35,22 @@ class TestParticlesSource(unittest.TestCase):
                     data=DataContainer(
                         TEMPERATURE=self.bond_temperature[index])))
             for index, indices in enumerate(self.bonds)]
+
+    def test_source_from_vtk_particles(self):
+        # given
+        container = VTKParticles('test')
+        for particle in self.container.iter_particles():
+            container.add_particle(particle)
+        for bond in self.container.iter_bonds():
+            container.add_bond(bond)
+
+        # when
+        source = ParticlesSource.from_particles(container)
+
+        # then
+        self.assertIs(source.data, container.data_set)
+        self.assertDictEqual(source.point2index, container.particle2index)
+        self.assertDictEqual(source.bond2index, container.bond2index)
 
     def test_particles(self):
         container = self.container
@@ -68,8 +85,3 @@ class TestParticlesSource(unittest.TestCase):
             particles = [source.point2index[uid] for uid in bond.particles]
             self.assertEqual(bonds[index], particles)
             self.assertEqual(temperature[index], bond.data[CUBA.TEMPERATURE])
-
-    def test_cell_array_slicer(self):
-        data = numpy.array([2, 0, 1, 2, 0, 3, 3, 1, 3, 2])
-        slices = [slice for slice in cell_array_slicer(data)]
-        assert_array_equal(slices, [[0, 1], [0, 3], [1, 3, 2]])
