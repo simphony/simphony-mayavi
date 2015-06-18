@@ -9,6 +9,7 @@ from simphony.cuds.lattice import (
 from simphony.core.cuba import CUBA
 
 from simphony_mayavi.sources.api import LatticeSource
+from simphony_mayavi.cuds.api import VTKLattice
 
 
 class TestLatticeSource(unittest.TestCase):
@@ -115,6 +116,17 @@ class TestLatticeSource(unittest.TestCase):
         lattice = Lattice('test', '', (1, 1, 1), (1, 1, 1), (0, 0, 0))
         with self.assertRaises(ValueError):
             LatticeSource.from_lattice(lattice)
+
+    def test_source_from_a_vtk_lattice(self):
+        # given
+        lattice = VTKLattice.empty(
+            'test', 'Cubic', (0.1, 0.1, 0.1), (5, 10, 12), (0, 0, 0))
+
+        # when
+        source = LatticeSource.from_lattice(lattice)
+
+        # then
+        self.assertIs(source.data, lattice.data_set)
 
     def add_velocity(self, lattice):
         for node in lattice.iter_nodes():
