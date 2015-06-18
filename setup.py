@@ -111,5 +111,5 @@ if __name__ == "__main__":
         packages=find_packages(),
         entry_points={'simphony.visualisation': plugin},
         version=__version__,
-        zip_safe=not on_rtd,
+        zip_safe=False,
         license='BSD')
