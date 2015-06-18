@@ -31,8 +31,6 @@ class VTKMesh(ABCMesh):
         # Setup the data_set
         if data_set is None:
             points = tvtk.Points()
-            # Need to initialise lines with empty so that we
-            # do not get the shared CellArray
             data_set = tvtk.UnstructuredGrid(points=points)
         else:
             for index in xrange(data_set.number_of_points):
@@ -59,13 +57,13 @@ class VTKMesh(ABCMesh):
         self.point_data = CubaData(
             data, stored_cuba=self.supported_cuba, size=size)
 
-        #: Easy access to the vtk CellData structure
         data = data_set.cell_data
         ncells = data_set.number_of_cells
         if data.number_of_arrays == 0 and ncells != 0:
             size = ncells
         else:
             size = None
+        #: Easy access to the vtk CellData structure
         self.element_data = CubaData(
             data, stored_cuba=self.supported_cuba, size=size)
 
