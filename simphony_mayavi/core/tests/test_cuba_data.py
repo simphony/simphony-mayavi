@@ -834,6 +834,21 @@ class TestCubaData(unittest.TestCase):
         self.assertEqual(len(data), 0)
         self.assertEqual(data.cubas, set([]))
 
+    def test_swap_with_integer_cuba(self):
+        # given
+        point_data = tvtk.PointData()
+        data = CubaData(attribute_data=point_data)
+        for index in range(5):
+            data.append(DataContainer(STATUS=index))
+
+        # when
+        data[0] = data[4]
+
+        # then
+        self.assertEqual(data[0], DataContainer(STATUS=4))
+        for index in range(1, 5):
+            self.assertEqual(data[index], DataContainer(STATUS=index))
+
     def _assert_len(self, data, length):
         n = data._data.number_of_arrays
         for array_id in range(n):
