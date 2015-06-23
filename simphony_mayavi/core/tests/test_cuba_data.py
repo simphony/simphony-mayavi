@@ -610,7 +610,7 @@ class TestCubaData(unittest.TestCase):
         values = self.values
 
         # when
-        data.append(DataContainer(VELOCITY=[0, 0, 0.34]))
+        data.append(DataContainer(MASS=34, VELOCITY=[0, 0, 0.34]))
 
         # then
         self.assertEqual(len(data), 4)
@@ -622,7 +622,7 @@ class TestCubaData(unittest.TestCase):
                     TEMPERATURE=values['TEMPERATURE'][index],
                     VELOCITY=values['VELOCITY'][index]))
         self.assertEqual(
-            data[3], DataContainer(VELOCITY=[0, 0, 0.34]))
+            data[3], DataContainer(MASS=34.0, VELOCITY=[0, 0, 0.34]))
 
     def test_append_with_unsupported_cuba(self):
         # given
