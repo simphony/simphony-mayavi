@@ -23,8 +23,6 @@ class TestVTKMeshEdgeOperations(MeshEdgeOperationsCheck, unittest.TestCase):
 
     def container_factory(self, name):
         container = VTKMesh(name=name)
-        for point in self.points:
-            container.add_point(point)
         return container
 
 
@@ -34,8 +32,6 @@ class TestVTKMeshFaceOperations(MeshFaceOperationsCheck, unittest.TestCase):
 
     def container_factory(self, name):
         container = VTKMesh(name=name)
-        for point in self.points:
-            container.add_point(point)
         return container
 
 
@@ -45,8 +41,6 @@ class TestVTKMeshCellOperations(MeshCellOperationsCheck, unittest.TestCase):
 
     def container_factory(self, name):
         container = VTKMesh(name=name)
-        for point in self.points:
-            container.add_point(point)
         return container
 
 
