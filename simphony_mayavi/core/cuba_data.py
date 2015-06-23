@@ -5,6 +5,7 @@ from tvtk.api import tvtk
 from tvtk.array_handler import _array_cache
 from enum import Enum
 from simphony.core.cuba import CUBA
+from simphony.core.keywords import KEYWORDS
 from simphony.core.data_container import DataContainer
 
 from simphony_mayavi.core.cuba_utils import (
@@ -165,7 +166,7 @@ class CubaData(MutableSequence):
             data.get_array(names[name])
             for name in names if '-mask' in name]
         values = {
-            CUBA[array.name]: array[index]
+            CUBA[array.name]: KEYWORDS[array.name].dtype(array[index])
             for mask, array in zip(masks, arrays) if mask[index]}
         return DataContainer(values)
 
@@ -273,7 +274,7 @@ class CubaData(MutableSequence):
             self._virtual_size = None
 
     def __str__(self):
-        return u"[{}]".format(",".join(str(item) for item in self))
+        return u"[{0}]".format(",".join(str(item) for item in self))
 
     @classmethod
     def empty(cls, type_=AttributeSetType.POINTS, size=0):
