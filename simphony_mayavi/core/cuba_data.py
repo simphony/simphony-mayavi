@@ -274,7 +274,7 @@ class CubaData(MutableSequence):
             self._virtual_size = None
 
     def __str__(self):
-        return u"[{0}]".format(",".join(str(item) for item in self))
+        return u"[{}]".format(",".join(str(item) for item in self))
 
     @classmethod
     def empty(cls, type_=AttributeSetType.POINTS, size=0):
