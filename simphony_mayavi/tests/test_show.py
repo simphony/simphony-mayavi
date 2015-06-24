@@ -61,3 +61,8 @@ class TestShow(unittest.TestCase, GuiTestAssistant):
         tester = ModalDialogTester(function)
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
+
+    def test_unknown_container(self):
+        container = object()
+        with self.assertRaises(TypeError):
+            show(container)
