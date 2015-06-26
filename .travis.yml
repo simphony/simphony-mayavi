@@ -14,7 +14,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
   - sudo add-apt-repository ppa:cython-dev/master-ppa -y
   - sudo apt-get update -qq
-  - sudo apt-get install python-vtk python-qt4 python-qt4-dev python-sip python-qt4-gl libqt4-scripttools cython python-imaging
+  - sudo apt-get install python-setuptools python-vtk python-qt4 python-qt4-dev python-sip python-qt4-gl libqt4-scripttools cython python-imaging
   - export ETS_TOOLKIT=qt4
 install:
   # see issue https://github.com/enthought/traitsui/issues/206
