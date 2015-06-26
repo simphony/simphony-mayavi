@@ -16,6 +16,7 @@ addons:
     - python-vtk
     - python-qt4
     - python-qt4-gl
+    - python-imaging
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
