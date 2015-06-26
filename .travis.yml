@@ -22,6 +22,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
   - export ETS_TOOLKIT=qt4
 install:
+  - pip install --upgrade setuptools
   - pip install traitsui!=4.5.0 # see issue https://github.com/enthought/traitsui/issues/206
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
