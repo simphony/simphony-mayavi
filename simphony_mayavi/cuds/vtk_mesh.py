@@ -1,7 +1,9 @@
 import uuid
 import contextlib
 import copy
+from itertools import count
 
+import numpy
 from tvtk.api import tvtk
 
 from simphony.cuds.abstractmesh import ABCMesh
@@ -10,13 +12,14 @@ from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
     CubaData, CellCollection, supported_cuba, mergedocs,
     EDGE2VTKCELL, FACE2VTKCELL, CELL2VTKCELL,
-    ELEMENT2VTKCELLTYPES, VTKCELLTYPE2ELEMENT)
+    ELEMENT2VTKCELLTYPES, VTKCELLTYPE2ELEMENT,
+    CUBADataAccumulator, gather_cells)
 
 
 @mergedocs(ABCMesh)
 class VTKMesh(ABCMesh):
 
-    def __init__(self, name, data=None, data_set=None):
+    def __init__(self, name, data=None, data_set=None, mappings=None):
         self.name = name
         self._data = DataContainer() if data is None else DataContainer(data)
         #: The mapping from uid to point index
@@ -33,14 +36,20 @@ class VTKMesh(ABCMesh):
             points = tvtk.Points()
             data_set = tvtk.UnstructuredGrid(points=points)
         else:
-            for index in xrange(data_set.number_of_points):
-                uid = uuid.uuid4()
-                self.point2index[uid] = index
-                self.index2point[index] = uid
-            for index in xrange(data_set.number_of_cells):
-                uid = uuid.uuid4()
-                self.element2index[uid] = index
-                self.index2element[index] = uid
+            if mappings is None:
+                for index in xrange(data_set.number_of_points):
+                    uid = uuid.uuid4()
+                    self.point2index[uid] = index
+                    self.index2point[index] = uid
+                for index in xrange(data_set.number_of_cells):
+                    uid = uuid.uuid4()
+                    self.element2index[uid] = index
+                    self.index2element[index] = uid
+            else:
+                self.point2index = mappings['point2index']
+                self.element2index = mappings['element2index']
+                self.index2point = mappings['index2point']
+                self.index2element = mappings['index2element']
 
         #: The vtk.PolyData dataset
         self.data_set = data_set
@@ -69,6 +78,65 @@ class VTKMesh(ABCMesh):
 
         # Elements cells
         self.elements = CellCollection(data_set.get_cells())
+
+    @classmethod
+    def from_mesh(cls, mesh):
+        """ Create a new VTKMesh copy from a CUDS mesh instance.
+
+        """
+        points = []
+        point2index = {}
+        element2index = {}
+        index2point = {}
+        index2element = {}
+        counter = count()
+
+        point_data = CUBADataAccumulator()
+        cell_data = CUBADataAccumulator()
+
+        for index, point in enumerate(mesh.iter_points()):
+            point2index[point.uid] = index
+            points.append(point.coordinates)
+            point_data.append(point.data)
+
+        edges, edges_size, edge_types, edge2index = gather_cells(
+            mesh.iter_edges(), EDGE2VTKCELL, point2index, counter, cell_data)
+
+        faces, faces_size, face_types, face2index = gather_cells(
+            mesh.iter_faces(), FACE2VTKCELL, point2index, counter, cell_data)
+
+        cells, cells_size, cell_types, cell2index = gather_cells(
+            mesh.iter_cells(), CELL2VTKCELL, point2index, counter, cell_data)
+
+        elements = edges + faces + cells
+        elements_size = [0] + edges_size + faces_size + cells_size
+        element_types = edge_types + face_types + cell_types
+        element2index.update(edge2index)
+        element2index.update(face2index)
+        element2index.update(cell2index)
+
+        cell_offset = numpy.cumsum(elements_size[:-1])
+        cell_array = tvtk.CellArray()
+        cell_array.set_cells(len(cell_offset), elements)
+        data_set = tvtk.UnstructuredGrid(points=points)
+        data_set.set_cells(element_types, cell_offset, cell_array)
+
+        point_data.load_onto_vtk(data_set.point_data)
+        cell_data.load_onto_vtk(data_set.cell_data)
+
+        mappings = {
+            'index2point': {
+                value: key for key, value in point2index.iteritems()},
+            'point2index': point2index,
+            'index2element': {
+                value: key for key, value in element2index.iteritems()},
+            'element2index': element2index}
+
+        return cls(
+            name=mesh.name,
+            data=mesh.data,
+            data_set=data_set,
+            mappings=mappings)
 
     @property
     def data(self):
