@@ -95,6 +95,47 @@ class VTKParticles(ABCParticles):
     def data(self, value):
         self._data = DataContainer(value)
 
+    @classmethod
+    def from_particles(cls, particles):
+        """ Create a new VTKParticles copy from a CUDS particles instance.
+
+        """
+        points = []
+        lines = []
+        particle2index = {}
+        bond2index = {}
+        index2particle = {}
+        index2bond = {}
+        particle_data = CUBADataAccumulator()
+        bond_data = CUBADataAccumulator()
+
+        for index, particle in enumerate(particles.iter_particles()):
+            uid = particle.uid
+            particle2index[uid] = index
+            index2particle[index] = uid
+            points.append(particle.coordinates)
+            particle_data.append(particle.data)
+        for index, bond in enumerate(particles.iter_bonds()):
+            uid = bond.uid
+            bond2index[uid] = index
+            index2bond[index] = uid
+            lines.append([particle2index[uuid] for uuid in bond.particles])
+            bond_data.append(bond.data)
+
+        data_set = tvtk.PolyData(points=points, lines=lines)
+        particle_data.load_onto_vtk(data_set.point_data)
+        bond_data.load_onto_vtk(data_set.cell_data)
+        mappings = {
+            'index2particle': index2particle,
+            'particle2index': particle2index,
+            'index2bond': index2bond,
+            'bond2index': bond2index}
+        return cls(
+            name=particles.name,
+            data=particles.data,
+            data_set=data_set,
+            mappings=mappings)
+
     # Particle operations ####################################################
 
     def add_particle(self, particle):
@@ -204,7 +245,6 @@ class VTKParticles(ABCParticles):
         bonds = self.bonds
 
         index = bond2index[uid]
-        print bond_data[index][CUBA.STATUS]
         # move uid item to the end
         self._swap_with_last(
             uid, bond2index, index2bond, bonds, bond_data)
@@ -225,46 +265,6 @@ class VTKParticles(ABCParticles):
         else:
             for uid in uids:
                 yield self.get_bond(uid)
-
-    @classmethod
-    def from_particles(cls, particles):
-        """ Create a new VTKParticles copy from a CUDS particles instance
-        """
-        points = []
-        lines = []
-        particle2index = {}
-        bond2index = {}
-        index2particle = {}
-        index2bond = {}
-        particle_data = CUBADataAccumulator()
-        bond_data = CUBADataAccumulator()
-
-        for index, particle in enumerate(particles.iter_particles()):
-            uid = particle.uid
-            particle2index[uid] = index
-            index2particle[index] = uid
-            points.append(particle.coordinates)
-            particle_data.append(particle.data)
-        for index, bond in enumerate(particles.iter_bonds()):
-            uid = bond.uid
-            bond2index[uid] = index
-            index2bond[index] = uid
-            lines.append([particle2index[uuid] for uuid in bond.particles])
-            bond_data.append(bond.data)
-
-        data_set = tvtk.PolyData(points=points, lines=lines)
-        particle_data.load_onto_vtk(data_set.point_data)
-        bond_data.load_onto_vtk(data_set.cell_data)
-        mappings = {
-            'index2particle': index2particle,
-            'particle2index': particle2index,
-            'index2bond': index2bond,
-            'bond2index': bond2index}
-        return cls(
-            name=particles.name,
-            data=particles.data,
-            data_set=data_set,
-            mappings=mappings)
 
     # Private interface ######################################################
 
