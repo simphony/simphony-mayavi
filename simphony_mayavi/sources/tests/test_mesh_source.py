@@ -8,10 +8,11 @@ from simphony.core.cuba import CUBA
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony.core.data_container import DataContainer
 
-from simphony_mayavi.sources.api import MeshSource
+from simphony_mayavi.cuds.api import VTKMesh
 from simphony_mayavi.core.api import (
     cell_array_slicer,
     CELL2VTKCELL, FACE2VTKCELL, EDGE2VTKCELL)
+from simphony_mayavi.sources.api import MeshSource
 
 
 class TestParticlesSource(unittest.TestCase):
@@ -190,3 +191,16 @@ class TestParticlesSource(unittest.TestCase):
             self.assertEqual(elements[index], points)
             self.assertEqual(
                 temperature[index], element.data[CUBA.TEMPERATURE])
+
+    def test_mesh_source_from_vtk_mesh(self):
+        # given
+        container = self.container
+        vtk_container = VTKMesh.from_mesh(container)
+
+        # when
+        source = MeshSource.from_mesh(vtk_container)
+
+        # then
+        self.assertIs(source.data, vtk_container.data_set)
+        self.assertEqual(source.point2index, vtk_container.point2index)
+        self.assertEqual(source.element2index, vtk_container.element2index)
