@@ -17,7 +17,24 @@ VTK_POLY_LINE = 4
 @mergedocs(ABCLattice)
 class VTKLattice(ABCLattice):
 
-    def __init__(self, name, type_, data=None, data_set=None):
+    def __init__(self, name, type_, data_set, data=None):
+        """ Constructor.
+
+        Parameters
+        ----------
+        name : string
+            The name of the container.
+
+        type_ : string
+            The type of the container.
+
+        data_set : tvtk.DataSet
+            The dataset to wrap in the CUDS api
+
+        data : DataContainer
+            The data attribute to attach to the container. Default is None.
+
+        """
         self.name = name
         self._data = DataContainer() if data is None else DataContainer(data)
         self._type = type_

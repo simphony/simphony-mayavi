@@ -19,6 +19,28 @@ VTK_POLY_LINE = 4
 class VTKParticles(ABCParticles):
 
     def __init__(self, name, data=None, data_set=None, mappings=None):
+        """ Constructor.
+
+        Parameters
+        ----------
+        name : string
+            The name of the container.
+
+        data : DataContainer
+            The data attribute to attach to the container. Default is None.
+
+        data_set : tvtk.DataSet
+            The dataset to wrap in the CUDS api. Default is None which
+            will create a tvtk.PolyData
+
+        mappings : dict
+            A dictionary of mappings for the particle2index, index2particle,
+            bond2index and bond2element. Should be provided if the particles
+            and bonds described in ``data_set`` are already assigned uids.
+            Default is None and will result in the uid <-> index mappings being
+            generated at construction.
+
+        """
         self.name = name
         self._data = DataContainer() if data is None else DataContainer(data)
         #: The mapping from uid to point index
