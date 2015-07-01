@@ -62,15 +62,12 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(len(points), number_of_particles)
         self.assertEqual(len(source.point2index), number_of_particles)
 
-        # two arrays TEMPERATURE and TEMPERATURE-mask
-        self.assertEqual(source.data.point_data.number_of_arrays, 2)
+        self.assertEqual(source.data.point_data.number_of_arrays, 1)
         temperature = source.data.point_data.get_array('TEMPERATURE')
         for key, index in source.point2index.iteritems():
             point = container.get_particle(key)
             assert_array_equal(points[index], point.coordinates)
             self.assertEqual(temperature[index], point.data[CUBA.TEMPERATURE])
-        temperature_mask = source.data.point_data.get_array('TEMPERATURE-mask')
-        assert_array_equal(temperature_mask, numpy.ones_like(temperature))
 
     def test_bonds(self):
         container = self.container
@@ -82,13 +79,10 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(len(bonds), number_of_bonds)
         self.assertEqual(len(source.bond2index), number_of_bonds)
 
-        # two arrays TEMPERATURE and TEMPERATURE-mask
-        self.assertEqual(source.data.cell_data.number_of_arrays, 2)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in source.bond2index.iteritems():
             bond = container.get_bond(key)
             particles = [source.point2index[uid] for uid in bond.particles]
             self.assertEqual(bonds[index], particles)
             self.assertEqual(temperature[index], bond.data[CUBA.TEMPERATURE])
-        temperature_mask = source.data.cell_data.get_array('TEMPERATURE-mask')
-        assert_array_equal(temperature_mask, numpy.ones_like(temperature))
