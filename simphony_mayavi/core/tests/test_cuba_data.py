@@ -9,7 +9,7 @@ from simphony.core.data_container import DataContainer
 from simphony.core.keywords import KEYWORDS
 from simphony.testing.utils import compare_data_containers
 
-from simphony_mayavi.core.cuba_data import CubaData, AttributeSetType, MASKED
+from simphony_mayavi.core.cuba_data import CubaData, AttributeSetType
 
 
 class TestCubaData(unittest.TestCase):
@@ -25,9 +25,6 @@ class TestCubaData(unittest.TestCase):
         for key in self.values:
             index = point_data.add_array(self.values[key])
             point_data.get_array(index).name = key
-            index = point_data.add_array(
-                numpy.ones(shape=(len(self.values[key]),), dtype=numpy.uint8))
-            point_data.get_array(index).name = MASKED.format(key)
         self.data = CubaData(attribute_data=point_data)
 
     def test_len(self):
@@ -86,11 +83,12 @@ class TestCubaData(unittest.TestCase):
         point_data.get_array(index).name = CUBA.TEMPERATURE.name
         index = point_data.add_array([4, 2, 1])
         point_data.get_array(index).name = CUBA.RADIUS.name
-        index = point_data.add_array(numpy.array([1, 0, 1], dtype=numpy.uint8))
-        point_data.get_array(index).name = MASKED.format(CUBA.RADIUS.name)
+        masks = tvtk.FieldData()
+        index = masks.add_array(numpy.array([1, 0, 1], dtype=numpy.int8))
+        masks.get_array(index).name = CUBA.RADIUS.name
 
         # when
-        data = CubaData(attribute_data=point_data)
+        data = CubaData(attribute_data=point_data, masks=masks)
 
         # then
         self.assertEqual(len(data), 3)
@@ -100,10 +98,9 @@ class TestCubaData(unittest.TestCase):
         self.assertSequenceEqual(
             point_data.get_array(CUBA.RADIUS.name), [4, 2, 1])
         self.assertSequenceEqual(
-            point_data.get_array(MASKED.format(CUBA.TEMPERATURE.name)),
-            [1, 1, 1])
+            data.masks.get_array(CUBA.TEMPERATURE.name), [1, 1, 1])
         self.assertSequenceEqual(
-            point_data.get_array(MASKED.format(CUBA.RADIUS.name)), [1, 0, 1])
+            data.masks.get_array(CUBA.RADIUS.name), [1, 0, 1])
 
     def test_initialize_with_unmasked_point_data(self):
         # given
@@ -124,10 +121,9 @@ class TestCubaData(unittest.TestCase):
         self.assertSequenceEqual(
             point_data.get_array(CUBA.RADIUS.name), [4, 2, 1])
         self.assertSequenceEqual(
-            point_data.get_array(MASKED.format(CUBA.TEMPERATURE.name)),
-            [1, 1, 1])
+            data.masks.get_array(CUBA.TEMPERATURE.name), [1, 1, 1])
         self.assertSequenceEqual(
-            point_data.get_array(MASKED.format(CUBA.RADIUS.name)), [1, 1, 1])
+            data.masks.get_array(CUBA.RADIUS.name), [1, 1, 1])
 
     def test_initialize_with_no_cuba_point_data(self):
         # given
@@ -234,14 +230,16 @@ class TestCubaData(unittest.TestCase):
         data = self.data
         values = self.values
         point_data = self.point_data
+        masks = self.data.masks
         # We need to get a CUBA key that has an int value.
         INTEGER_CUBA_KEY = next(
             key for key in KEYWORDS if KEYWORDS[key].dtype == numpy.int32)
         array_id = point_data.add_array([1, 0, 1])
         point_data.get_array(array_id).name = INTEGER_CUBA_KEY
-        array_id = point_data.add_array(
-            numpy.array([1, 1, 1], dtype=numpy.uint8))
-        point_data.get_array(array_id).name = MASKED.format(INTEGER_CUBA_KEY)
+        mask = tvtk.BitArray()
+        mask.name = INTEGER_CUBA_KEY
+        mask.from_array(numpy.array([1, 1, 1]))
+        masks.add_array(mask)
 
         # when/then
         for index in range(3):
