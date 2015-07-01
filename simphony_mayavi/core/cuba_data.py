@@ -137,15 +137,7 @@ class CubaData(MutableSequence):
 
             # Find if there are any new CUBA keys to create arrays for.
             new_cubas = (set(value.keys()) & stored) - cubas
-            new_arrays = []
-            new_masks = []
-            for cuba in new_cubas:
-                array = empty_array(cuba, length)
-                new_arrays.append((cuba.name, array))
-                mask = numpy.zeros(shape=array.shape[0], dtype=numpy.uint8)
-                new_masks.append((cuba.name, mask))
-            self._add_arrays(new_arrays)
-            self._add_masks(new_masks)
+            self._add_new_arrays(new_cubas, length)
 
             # Update the attribute values based on ``value``.
             n = data.number_of_arrays
@@ -241,18 +233,15 @@ class CubaData(MutableSequence):
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
                 temp = masks.get_array(0)
-                temp = numpy.insert(
-                    temp.to_array(), index, cuba in value, axis=0)
+                temp = numpy.insert(temp.to_array(), index, cuba in value)
                 mask_arrays.append((name, temp))
                 masks.remove_array(name)  # remove array from vtk container.
 
             # Create data and mask arrays from new CUBA keys
             for cuba in new_cubas:
-                array = empty_array(cuba, length)
-                array = numpy.insert(
-                    array, index,
-                    value.get(cuba, self._defaults[cuba]), axis=0)
-                mask = numpy.zeros(shape=array.shape[0], dtype=numpy.int8)
+                array = empty_array(cuba, length + 1)
+                mask = numpy.zeros(shape=length + 1, dtype=numpy.int8)
+                array[index] = value.get(cuba, self._defaults[cuba])
                 mask[index] = int(cuba in value)
                 arrays.append((cuba.name, array))
                 mask_arrays.append((cuba.name, mask))
@@ -264,15 +253,7 @@ class CubaData(MutableSequence):
         elif index >= length:
 
             # Add data arrays for new CUBA keys.
-            new_arrays = []
-            new_masks = []
-            for cuba in new_cubas:
-                array = empty_array(cuba, length)
-                new_arrays.append((cuba.name, array))
-                mask = numpy.zeros(shape=array.shape[0], dtype=numpy.int8)
-                new_masks.append((cuba.name, mask))
-            self._add_arrays(new_arrays)
-            self._add_masks(new_masks)
+            self._add_new_arrays(new_cubas, length)
 
             # Append new values.
             n = data.number_of_arrays
@@ -340,6 +321,17 @@ class CubaData(MutableSequence):
             bit_array.from_array(array)
             masks.add_array(bit_array)
 
+    def _add_new_arrays(self, cubas, length):
+        new_arrays = []
+        new_masks = []
+        for cuba in cubas:
+            array = empty_array(cuba, length)
+            mask = numpy.zeros(shape=length, dtype=numpy.int8)
+            new_arrays.append((cuba.name, array))
+            new_masks.append((cuba.name, mask))
+        self._add_arrays(new_arrays)
+        self._add_masks(new_masks)
+
     def _initialize_masks(self, default=None):
         """ Initialise the masks tvtk.FieldData.
 
@@ -374,7 +366,7 @@ class CubaData(MutableSequence):
 def check_attribute_arrays(attribute_data):
     """ check the vtk attribute array container.
 
-    The function check that the container has only CUBA related arrays
+    The function checks that the container has only CUBA related arrays
     and that they all have the same length.
 
     """
