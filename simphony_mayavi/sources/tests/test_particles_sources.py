@@ -7,7 +7,9 @@ from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particles, Particle, Bond
 from simphony.core.data_container import DataContainer
 
-from simphony_mayavi.sources.api import ParticlesSource, cell_array_slicer
+from simphony_mayavi.core.api import cell_array_slicer
+from simphony_mayavi.cuds.api import VTKParticles
+from simphony_mayavi.sources.api import ParticlesSource
 
 
 class TestParticlesSource(unittest.TestCase):
@@ -35,6 +37,22 @@ class TestParticlesSource(unittest.TestCase):
                         TEMPERATURE=self.bond_temperature[index])))
             for index, indices in enumerate(self.bonds)]
 
+    def test_source_from_vtk_particles(self):
+        # given
+        container = VTKParticles('test')
+        for particle in self.container.iter_particles():
+            container.add_particle(particle)
+        for bond in self.container.iter_bonds():
+            container.add_bond(bond)
+
+        # when
+        source = ParticlesSource.from_particles(container)
+
+        # then
+        self.assertIs(source.data, container.data_set)
+        self.assertDictEqual(source.point2index, container.particle2index)
+        self.assertDictEqual(source.bond2index, container.bond2index)
+
     def test_particles(self):
         container = self.container
         source = ParticlesSource.from_particles(container)
@@ -44,12 +62,15 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(len(points), number_of_particles)
         self.assertEqual(len(source.point2index), number_of_particles)
 
-        self.assertEqual(source.data.point_data.number_of_arrays, 1)
+        # two arrays TEMPERATURE and TEMPERATURE-mask
+        self.assertEqual(source.data.point_data.number_of_arrays, 2)
         temperature = source.data.point_data.get_array('TEMPERATURE')
         for key, index in source.point2index.iteritems():
             point = container.get_particle(key)
             assert_array_equal(points[index], point.coordinates)
             self.assertEqual(temperature[index], point.data[CUBA.TEMPERATURE])
+        temperature_mask = source.data.point_data.get_array('TEMPERATURE-mask')
+        assert_array_equal(temperature_mask, numpy.ones_like(temperature))
 
     def test_bonds(self):
         container = self.container
@@ -61,15 +82,13 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(len(bonds), number_of_bonds)
         self.assertEqual(len(source.bond2index), number_of_bonds)
 
-        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
+        # two arrays TEMPERATURE and TEMPERATURE-mask
+        self.assertEqual(source.data.cell_data.number_of_arrays, 2)
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in source.bond2index.iteritems():
             bond = container.get_bond(key)
             particles = [source.point2index[uid] for uid in bond.particles]
             self.assertEqual(bonds[index], particles)
             self.assertEqual(temperature[index], bond.data[CUBA.TEMPERATURE])
-
-    def test_cell_array_slicer(self):
-        data = numpy.array([2, 0, 1, 2, 0, 3, 3, 1, 3, 2])
-        slices = [slice for slice in cell_array_slicer(data)]
-        assert_array_equal(slices, [[0, 1], [0, 3], [1, 3, 2]])
+        temperature_mask = source.data.cell_data.get_array('TEMPERATURE-mask')
+        assert_array_equal(temperature_mask, numpy.ones_like(temperature))

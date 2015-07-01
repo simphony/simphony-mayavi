@@ -7,14 +7,14 @@ from tvtk.api import tvtk
 from simphony.core.cuba import CUBA
 from simphony.testing.utils import create_data_container, dummy_cuba_value
 
-from simphony_mayavi.sources.cuds_data_accumulator import CUDSDataAccumulator
+from simphony_mayavi.core.api import CUBADataAccumulator
 
 
-class TestCUDSDataAccumulator(unittest.TestCase):
+class TestCUBADataAccumulator(unittest.TestCase):
 
     def test_accumulate(self):
         cuds_data = [create_data_container() for i in range(10)]
-        accumulator = CUDSDataAccumulator()
+        accumulator = CUBADataAccumulator()
         for data in cuds_data:
             accumulator.append(data)
 
@@ -26,7 +26,7 @@ class TestCUDSDataAccumulator(unittest.TestCase):
 
     def test_accumulate_on_keys(self):
         cuds_data = [create_data_container() for i in range(10)]
-        accumulator = CUDSDataAccumulator(keys=[CUBA.NAME, CUBA.TEMPERATURE])
+        accumulator = CUBADataAccumulator(keys=[CUBA.NAME, CUBA.TEMPERATURE])
         for data in cuds_data:
             accumulator.append(data)
 
@@ -37,7 +37,7 @@ class TestCUDSDataAccumulator(unittest.TestCase):
                 accumulator[cuba], [dummy_cuba_value(cuba)] * 10)
 
     def test_accumulate_with_missing_values(self):
-        accumulator = CUDSDataAccumulator()
+        accumulator = CUBADataAccumulator()
         accumulator.append(create_data_container())
         accumulator.append(
             create_data_container(restrict=[CUBA.NAME, CUBA.TEMPERATURE]))
@@ -54,7 +54,7 @@ class TestCUDSDataAccumulator(unittest.TestCase):
                 self.assertIsNone(accumulator[cuba][1])
 
     def test_accumulate_and_expand(self):
-        accumulator = CUDSDataAccumulator()
+        accumulator = CUBADataAccumulator()
         accumulator.append(create_data_container(restrict=[CUBA.NAME]))
         accumulator.append(
             create_data_container(restrict=[CUBA.NAME, CUBA.TEMPERATURE]))
@@ -69,7 +69,7 @@ class TestCUDSDataAccumulator(unittest.TestCase):
             [dummy_cuba_value(CUBA.NAME)] * 2)
 
     def test_load_scalars_onto_vtk(self):
-        accumulator = CUDSDataAccumulator()
+        accumulator = CUBADataAccumulator()
         accumulator.append(create_data_container(restrict=[CUBA.NAME]))
         accumulator.append(
             create_data_container(restrict=[CUBA.NAME, CUBA.TEMPERATURE]))
@@ -83,7 +83,7 @@ class TestCUDSDataAccumulator(unittest.TestCase):
         assert_array_equal(vtk_data.get_array(CUBA.TEMPERATURE.name), expected)
 
     def test_load_vectors_onto_vtk(self):
-        accumulator = CUDSDataAccumulator()
+        accumulator = CUBADataAccumulator()
         accumulator.append(create_data_container(restrict=[CUBA.NAME]))
         accumulator.append(
             create_data_container(restrict=[CUBA.NAME, CUBA.VELOCITY]))

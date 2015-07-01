@@ -10,8 +10,8 @@ CUBATrait = Instance(CUBA)
 UUID = Instance(uuid.UUID)
 
 
-class CUDSDataExtractor(HasStrictTraits):
-    """Extract data from cuds items iterable.
+class CUBADataExtractor(HasStrictTraits):
+    """Extract cuba data from cuds items iterable.
 
     The class that supports extracting data values of a specific CUBA key
     from an iterable that returns low level CUDS objects
@@ -54,7 +54,7 @@ class CUDSDataExtractor(HasStrictTraits):
     # Constructor ############################################################
 
     def __init__(self, **traits):
-        super(CUDSDataExtractor, self).__init__(**traits)
+        super(CUBADataExtractor, self).__init__(**traits)
         # Reset the data information after all necessary value have been set.
         self.reset()
 

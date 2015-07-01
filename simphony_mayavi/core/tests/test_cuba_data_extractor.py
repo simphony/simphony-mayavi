@@ -9,10 +9,10 @@ from simphony.cuds.particles import Particles, Particle, Bond
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 
-from simphony_mayavi.sources.cuds_data_extractor import CUDSDataExtractor
+from simphony_mayavi.core.api import CUBADataExtractor
 
 
-class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
+class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
 
     def setUp(self):
         self.points = [
@@ -40,14 +40,14 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
 
     def test_initialization(self):
         container = self.container
-        extractor = CUDSDataExtractor(function=container.iter_particles)
+        extractor = CUBADataExtractor(function=container.iter_particles)
         self.assertEqual(
             extractor.available, set((CUBA.TEMPERATURE, CUBA.VELOCITY)))
         self.assertEqual(extractor.data, {})
 
     def test_selectinng_available(self):
         container = self.container
-        extractor = CUDSDataExtractor(function=container.iter_particles)
+        extractor = CUBADataExtractor(function=container.iter_particles)
 
         with self.assertTraitChanges(extractor, 'data', count=1):
             extractor.selected = CUBA.TEMPERATURE
@@ -58,7 +58,7 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
             self.assertEqual(particle.data[CUBA.TEMPERATURE], data)
 
     def test_selecting_none(self):
-        extractor = CUDSDataExtractor(function=self.container.iter_particles)
+        extractor = CUBADataExtractor(function=self.container.iter_particles)
 
         with self.assertTraitChanges(extractor, 'data', count=2):
             extractor.selected = CUBA.TEMPERATURE
@@ -68,7 +68,7 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
 
     def test_selecting_unavailable(self):
         container = self.container
-        extractor = CUDSDataExtractor(function=container.iter_particles)
+        extractor = CUBADataExtractor(function=container.iter_particles)
 
         with self.assertTraitChanges(extractor, 'data', count=1):
             extractor.selected = CUBA.NAME
@@ -80,7 +80,7 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
 
     def test_function_change(self):
         container = self.container
-        extractor = CUDSDataExtractor(function=container.iter_particles)
+        extractor = CUBADataExtractor(function=container.iter_particles)
         extractor.selected = CUBA.TEMPERATURE
 
         with self.assertRaises(TraitError):
@@ -88,7 +88,7 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
 
     def test_keys_filtering(self):
         container = self.container
-        extractor = CUDSDataExtractor(
+        extractor = CUBADataExtractor(
             function=container.iter_particles, keys=set(self.point_uids[:1]))
         extractor.selected = CUBA.TEMPERATURE
 
@@ -99,7 +99,7 @@ class TestCUDSDataExtractor(UnittestTools, unittest.TestCase):
 
     def test_keys_filtering_change(self):
         container = self.container
-        extractor = CUDSDataExtractor(
+        extractor = CUBADataExtractor(
             function=container.iter_particles, keys=set(self.point_uids[:1]))
         extractor.selected = CUBA.TEMPERATURE
 

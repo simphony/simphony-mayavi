@@ -1,5 +1,12 @@
 import unittest
 
+PLUGINAPI = [
+    'show',
+    'snapshot',
+    'VTKParticles',
+    'VTKLattice',
+    'VTKMesh']
+
 
 class TestPluginLoading(unittest.TestCase):
 
@@ -13,5 +20,7 @@ class TestPluginLoading(unittest.TestCase):
 
         from simphony.visualisation import mayavi_tools
 
-        self.assertTrue(hasattr(mayavi_tools, 'show'))
-        self.assertTrue(hasattr(mayavi_tools, 'snapshot'))
+        for item in PLUGINAPI:
+            self.assertTrue(
+                hasattr(mayavi_tools, item),
+                "could not import {}".format(item))

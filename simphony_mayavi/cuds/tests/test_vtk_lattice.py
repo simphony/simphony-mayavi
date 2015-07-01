@@ -150,6 +150,17 @@ class TestVTKLattice(unittest.TestCase):
             index = numpy.unravel_index(point_id, vtk_lattice.size, order='F')
             assert_array_equal(vtk_lattice.get_coordinate(index), point)
 
+    def test_initialization_with_unknown_type(self):
+        #
+        lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
+        self.add_velocity(lattice)
+        source = LatticeSource.from_lattice(lattice)
+        data = source.data
+
+        # when/then
+        with self.assertRaises(ValueError):
+            VTKLattice(name=lattice.name, type_='AnyLattice', data_set=data)
+
     def add_velocity(self, lattice):
         for node in lattice.iter_nodes():
             node.data[CUBA.VELOCITY] = node.index

@@ -1,5 +1,4 @@
 import unittest
-import uuid
 from functools import partial
 
 from tvtk.api import tvtk
@@ -87,6 +86,32 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         self.assertEqual(list(container.iter_bonds()), [])
         self.assertEqual(len(tuple(container.iter_particles())), 1)
         self.assertEqual(container.get_particle(uid), particle)
+
+    def test_initialization_with_cuds(self):
+        # given
+        bonds = [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7, 8, 9, 10, 11],
+            [2, 7, 11],
+            [1, 4],
+            [1, 5, 8]]
+        points = [(i, i*2, i*3) for i in range(12)]
+
+        # when
+        vtk = tvtk.PolyData(points=points, lines=bonds)
+        container = VTKParticles(name='test', data_set=vtk)
+
+        # then
+        number_of_particles = sum(1 for _ in container.iter_particles())
+        self.assertEqual(number_of_particles, 12)
+        for particle in container.iter_particles():
+            self.assertIsNotNone(particle.uid)
+        number_of_bonds = sum(1 for _ in container.iter_bonds())
+        self.assertEqual(number_of_bonds, 5)
+        uids = [particle.uid for particle in container.iter_particles()]
+        for bond in container.iter_bonds():
+            self.assertIsNotNone(bond.uid)
+            self.assertTrue(set(bond.particles).issubset(uids))
 
     def test_initialization_with_dataset(self):
         # given

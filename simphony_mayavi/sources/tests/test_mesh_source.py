@@ -7,10 +7,12 @@ from numpy.testing import assert_array_equal
 from simphony.core.cuba import CUBA
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony.core.data_container import DataContainer
-from simphony_mayavi.sources.api import MeshSource, cell_array_slicer
 
-from simphony_mayavi.sources.mesh_source import (
+from simphony_mayavi.cuds.api import VTKMesh
+from simphony_mayavi.core.api import (
+    cell_array_slicer,
     CELL2VTKCELL, FACE2VTKCELL, EDGE2VTKCELL)
+from simphony_mayavi.sources.api import MeshSource
 
 
 class TestParticlesSource(unittest.TestCase):
@@ -43,7 +45,7 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(len(points), number_of_points)
         self.assertEqual(len(source.point2index), number_of_points)
 
-        self.assertEqual(source.data.point_data.number_of_arrays, 1)
+        self.assertEqual(source.data.point_data.number_of_arrays, 2)
         temperature = source.data.point_data.get_array('TEMPERATURE')
         for key, index in source.point2index.iteritems():
             point = container.get_point(key)
@@ -68,7 +70,7 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(len(cells), number_of_cells)
         self.assertEqual(len(source.element2index), number_of_cells)
 
-        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 2)
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in source.element2index.iteritems():
             cell = container.get_cell(key)
@@ -97,7 +99,7 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(len(edges), number_of_edges)
         self.assertEqual(len(source.element2index), number_of_edges)
 
-        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 2)
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in source.element2index.iteritems():
             edge = container.get_edge(key)
@@ -126,7 +128,7 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(len(faces), number_of_faces)
         self.assertEqual(len(source.element2index), number_of_faces)
 
-        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 2)
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in source.element2index.iteritems():
             face = container.get_face(key)
@@ -167,7 +169,7 @@ class TestParticlesSource(unittest.TestCase):
             len(self.faces) + len(self.edges) + len(self.cells)
         self.assertEqual(len(elements), number_of_elements)
         self.assertEqual(len(source.element2index), number_of_elements)
-        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 2)
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in source.element2index.iteritems():
             cell_type = vtk_source.get_cell_type(index)
@@ -189,3 +191,16 @@ class TestParticlesSource(unittest.TestCase):
             self.assertEqual(elements[index], points)
             self.assertEqual(
                 temperature[index], element.data[CUBA.TEMPERATURE])
+
+    def test_mesh_source_from_vtk_mesh(self):
+        # given
+        container = self.container
+        vtk_container = VTKMesh.from_mesh(container)
+
+        # when
+        source = MeshSource.from_mesh(vtk_container)
+
+        # then
+        self.assertIs(source.data, vtk_container.data_set)
+        self.assertEqual(source.point2index, vtk_container.point2index)
+        self.assertEqual(source.element2index, vtk_container.element2index)
