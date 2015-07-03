@@ -172,17 +172,24 @@ class VTKParticles(ABCParticles):
             When the sanity checks fail.
 
         """
-        # check that the data set contains only lines and polylines
         checks = []
+
+        # Check for cell related attributes
+        checks.append(
+            not hasattr(data_set, 'lines')
+            and not hasattr(data_set, 'get_cells'))
+
+        # Check that the data set contains only lines and polyline cells
         if hasattr(data_set, 'lines'):
             checks.append(
                 data_set.number_of_cells != data_set.lines.number_of_cells)
         if hasattr(data_set, 'get_cells'):
             checks.append(
                 not set(data_set.cell_types_array).issubset(set(VTKEDGETYPES)))
+
         if any(checks):
             message = (
-                'Dataset {} cannot be reliably wrapped in to a VTKParticles')
+                'Dataset {} cannot be reliably wrapped into a VTKParticles')
             raise TypeError(message.format(data_set))
         return cls(name, data_set=data_set, data=data)
 

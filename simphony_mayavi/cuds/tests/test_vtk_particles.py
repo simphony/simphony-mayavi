@@ -97,9 +97,9 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
             [1, 4],
             [1, 5, 8]]
         points = [(i, i*2, i*3) for i in range(12)]
+        vtk = tvtk.PolyData(points=points, lines=bonds)
 
         # when
-        vtk = tvtk.PolyData(points=points, lines=bonds)
         container = VTKParticles(name='test', data_set=vtk)
 
         # then
@@ -123,9 +123,9 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
             [1, 4],
             [1, 5, 8]]
         points = [(i, i*2, i*3) for i in range(12)]
+        vtk = tvtk.PolyData(points=points, lines=bonds)
 
         # when
-        vtk = tvtk.PolyData(points=points, lines=bonds)
         container = VTKParticles.from_dataset(name='test', data_set=vtk)
 
         # then
@@ -149,14 +149,14 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
             [1, 4],
             [1, 5, 8]]
         points = [(i, i*2, i*3) for i in range(12)]
-
-        # when
         vtk = tvtk.UnstructuredGrid(points=points)
         for bond in bonds:
             if len(bond) > 2:
                 vtk.insert_next_cell(VTKEDGETYPES[1], bond)
             else:
                 vtk.insert_next_cell(VTKEDGETYPES[0], bond)
+
+        # when
         container = VTKParticles.from_dataset(name='test', data_set=vtk)
 
         # then
@@ -180,8 +180,6 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
             [1, 4],
             [1, 5, 8]]
         points = [(i, i*2, i*3) for i in range(12)]
-
-        # when
         vtk = tvtk.UnstructuredGrid(points=points)
         for bond in bonds:
             if len(bond) > 2:
@@ -190,6 +188,16 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
                 vtk.insert_next_cell(VTKEDGETYPES[0], bond)
         vtk.insert_next_cell(VTKFACETYPES[0], [0, 1, 2])
 
+        # when/then
+        with self.assertRaises(TypeError):
+            VTKParticles.from_dataset(name='test', data_set=vtk)
+
+    def test_initialization_with_image_data(self):
+        # given
+        vtk = tvtk.ImageData()
+        vtk.extent = 0, 4, 0, 2, 0, 14
+
+        # when/then
         with self.assertRaises(TypeError):
             VTKParticles.from_dataset(name='test', data_set=vtk)
 
