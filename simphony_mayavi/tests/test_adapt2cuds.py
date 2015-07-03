@@ -31,6 +31,9 @@ def create_unstructured_grid(array_name='scalars'):
     scalars = random.random(points.shape[0])
     ug.point_data.scalars = scalars
     ug.point_data.scalars.name = array_name
+    scalars = random.random(cells.shape[0])
+    ug.cell_data.scalars = scalars
+    ug.cell_data.scalars.name = array_name
     return ug
 
 
@@ -56,6 +59,9 @@ def create_poly_data(array_name='scalars'):
     data = tvtk.PolyData(points=points, lines=lines)
     data.point_data.scalars = scalars
     data.point_data.scalars.name = array_name
+    scalars = random.random(lines.shape[0])
+    data.cell_data.scalars = scalars
+    data.cell_data.scalars.name = array_name
     return data
 
 good_data_sets = sampled_from([
