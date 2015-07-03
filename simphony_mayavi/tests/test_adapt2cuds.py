@@ -109,3 +109,13 @@ class TestAdapt2Cuds(unittest.TestCase):
         container = adapt2cuds(data_set, 'test')
         self.assertIsInstance(container, expected[kind])
         self.assertIs(container.data_set, data_set)
+
+    def test_adapt_data_set_with_unkown_kind(self):
+        data_set = create_unstructured_grid(array_name='TEMPERATURE')
+        with self.assertRaises(ValueError):
+            adapt2cuds(data_set, 'test', kind='MyCUDS')
+
+    def test_adapt_very_invalid_data_set(self):
+        data_set = tvtk.HyperOctree()
+        with self.assertRaises(TypeError):
+            adapt2cuds(data_set, 'test')
