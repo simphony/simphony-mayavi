@@ -3,6 +3,8 @@ from functools import partial
 
 import numpy
 from numpy.testing import assert_array_equal
+from hypothesis import example, given
+from hypothesis.strategies import sampled_from
 
 from simphony.core.cuba import CUBA
 from simphony.testing.abc_check_lattice import (
@@ -10,11 +12,21 @@ from simphony.testing.abc_check_lattice import (
     CheckLatticeProperties)
 from simphony.testing.utils import compare_lattice_nodes
 from simphony.core.data_container import DataContainer
-from simphony.cuds.lattice import make_hexagonal_lattice, LatticeNode
+from simphony.cuds.lattice import (
+    make_hexagonal_lattice, make_cubic_lattice, make_square_lattice,
+    make_rectangular_lattice, make_orthorombicp_lattice,
+    LatticeNode)
 
 from simphony_mayavi.cuds.api import VTKLattice
 from simphony_mayavi.core.api import supported_cuba
-from simphony_mayavi.sources.api import LatticeSource
+
+
+lattice_types = sampled_from([
+    make_square_lattice('test', 0.1, (3, 6)),
+    make_cubic_lattice('test', 0.1, (3, 6, 5)),
+    make_hexagonal_lattice('test', 0.1, (5, 4)),
+    make_rectangular_lattice('test', (0.1, 0.3), (3, 6)),
+    make_orthorombicp_lattice('test', (0.1, 0.2, 0.1), (3, 7, 6))])
 
 
 class TestVTKLatticeNodeOperations(
@@ -53,35 +65,11 @@ class TestVTKLattice(unittest.TestCase):
         self.addTypeEqualityFunc(
             LatticeNode, partial(compare_lattice_nodes, testcase=self))
 
-    def test_creating_a_xy_plane_hexagonal_lattice(self):
-        # given
-        lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
-        self.add_velocity(lattice)
-        source = LatticeSource.from_lattice(lattice)
-        data = source.data
-
-        # when
-        vtk_lattice = VTKLattice(
-            name=lattice.name,
-            type_=lattice.type,
-            data_set=data)
-
-        # then
-        xspace, yspace, _ = lattice.base_vect
-        self.assertEqual(vtk_lattice.size, lattice.size)
-        assert_array_equal(vtk_lattice.origin, lattice.origin)
-        assert_array_equal(vtk_lattice.base_vect, lattice.base_vect)
-
     def test_get_node_on_a_xy_plane_hexagonal_lattice(self):
         # given
         lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
         self.add_velocity(lattice)
-        source = LatticeSource.from_lattice(lattice)
-        data = source.data
-        vtk_lattice = VTKLattice(
-            name=lattice.name,
-            type_=lattice.type,
-            data_set=data)
+        vtk_lattice = VTKLattice.from_lattice(lattice)
 
         # when
         node = vtk_lattice.get_node((1, 1, 0))
@@ -96,12 +84,7 @@ class TestVTKLattice(unittest.TestCase):
         # given
         lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
         self.add_velocity(lattice)
-        source = LatticeSource.from_lattice(lattice)
-        data = source.data
-        vtk_lattice = VTKLattice(
-            name=lattice.name,
-            type_=lattice.type,
-            data_set=data)
+        vtk_lattice = VTKLattice.from_lattice(lattice)
 
         # when/then
         for node in vtk_lattice.iter_nodes():
@@ -115,12 +98,7 @@ class TestVTKLattice(unittest.TestCase):
         # given
         lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
         self.add_velocity(lattice)
-        source = LatticeSource.from_lattice(lattice)
-        data = source.data
-        vtk_lattice = VTKLattice(
-            name=lattice.name,
-            type_=lattice.type,
-            data_set=data)
+        vtk_lattice = VTKLattice.from_lattice(lattice)
         node = vtk_lattice.get_node((1, 1, 0))
 
         # when
@@ -138,28 +116,48 @@ class TestVTKLattice(unittest.TestCase):
         # given
         lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
         self.add_velocity(lattice)
-        source = LatticeSource.from_lattice(lattice)
-        data = source.data
-        vtk_lattice = VTKLattice(
-            name=lattice.name,
-            type_=lattice.type,
-            data_set=data)
+        vtk_lattice = VTKLattice.from_lattice(lattice)
 
         # when/then
-        for point_id, point in enumerate(data.points):
-            index = numpy.unravel_index(point_id, vtk_lattice.size, order='F')
-            assert_array_equal(vtk_lattice.get_coordinate(index), point)
+        for node in lattice.iter_nodes():
+            assert_array_equal(
+                vtk_lattice.get_coordinate(node.index),
+                lattice.get_coordinate(node.index))
 
     def test_initialization_with_unknown_type(self):
         #
         lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
         self.add_velocity(lattice)
-        source = LatticeSource.from_lattice(lattice)
-        data = source.data
+        data = VTKLattice.from_lattice(lattice)
 
         # when/then
         with self.assertRaises(ValueError):
-            VTKLattice(name=lattice.name, type_='AnyLattice', data_set=data)
+            VTKLattice(
+                name=lattice.name, type_='AnyLattice', data_set=data.data_set)
+
+    @given(lattice_types)
+    def test_initialization_with_dataset(self, lattice):
+        # given
+        expected = VTKLattice.from_lattice(lattice)
+
+        # when
+        vtk_lattice = VTKLattice.from_dataset('test', expected.data_set)
+
+        # then
+        self.assertEqual(vtk_lattice.type, lattice.type)
+
+    @given(lattice_types)
+    def test_creating_a_vtk_lattice_from_cuds_lattice(self, lattice):
+        # when
+        vtk_lattice = VTKLattice.from_lattice(lattice)
+
+        # then
+        xspace, yspace, _ = lattice.base_vect
+        self.assertEqual(vtk_lattice.type, lattice.type)
+        self.assertEqual(vtk_lattice.data, lattice.data)
+        self.assertEqual(vtk_lattice.size, lattice.size)
+        assert_array_equal(vtk_lattice.origin, lattice.origin)
+        assert_array_equal(vtk_lattice.base_vect, lattice.base_vect)
 
     def add_velocity(self, lattice):
         for node in lattice.iter_nodes():

@@ -192,6 +192,35 @@ class VTKLattice(ABCLattice):
 
         return cls(name=name, type_=lattice_type, data=data, data_set=data_set)
 
+    @classmethod
+    def from_dataset(cls, name, data_set, data=None):
+        """ Create a new Lattice and try to guess the ``type``.
+
+        """
+        if isinstance(data_set, tvtk.PolyData):
+            lattice_type = 'Hexagonal'
+        elif isinstance(data_set, tvtk.ImageData):
+            extent = data_set.extent
+            x_size = extent[1] - extent[0]
+            y_size = extent[3] - extent[2]
+            z_size = extent[5] - extent[4]
+            spacing = data_set.spacing
+            if x_size == 0 or y_size == 0 or z_size == 0:
+                if len(set(spacing)) <= 2:
+                    lattice_type = 'Square'
+                else:
+                    lattice_type = 'Rectangular'
+            else:
+                if len(set(spacing)) == 1:
+                    lattice_type = 'Cubic'
+                else:
+                    lattice_type = 'OrthorombicP'
+        else:
+            message = 'Cannot convert {} to a cuds Lattice'
+            raise TypeError(message.format(type(data_set)))
+
+        return cls(name=name, type_=lattice_type, data=data, data_set=data_set)
+
     # Private methods ######################################################
 
     def _get_point_id(self, index):
