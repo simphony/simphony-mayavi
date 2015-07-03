@@ -160,7 +160,7 @@ class TestVTKMesh(unittest.TestCase):
         data_set.cell_data.get_array(index).name = CUBA.TEMPERATURE.name
 
         # when
-        vtk_container = VTKMesh('test', data_set=data_set)
+        vtk_container = VTKMesh.from_dataset('test', data_set=data_set)
 
         # then
         self.assertEqual(sum(1 for _ in vtk_container.iter_points()), 12)
