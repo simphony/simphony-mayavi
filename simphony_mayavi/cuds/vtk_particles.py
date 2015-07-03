@@ -9,10 +9,7 @@ from simphony.cuds.particles import Particle, Bond
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
     CubaData, CellCollection, supported_cuba, mergedocs,
-    CUBADataAccumulator)
-
-
-VTK_POLY_LINE = 4
+    CUBADataAccumulator, VTKEDGETYPES)
 
 
 @mergedocs(ABCParticles)
@@ -105,7 +102,10 @@ class VTKParticles(ABCParticles):
             data, stored_cuba=self.supported_cuba, size=size)
 
         #: Easy access to the lines vtk CellArray structure
-        self.bonds = CellCollection(data_set.lines)
+        if hasattr(data_set, 'lines'):
+            self.bonds = CellCollection(data_set.lines)
+        else:
+            self.bonds = CellCollection(data_set.get_cells())
 
     @property
     def data(self):
@@ -157,6 +157,41 @@ class VTKParticles(ABCParticles):
             data=particles.data,
             data_set=data_set,
             mappings=mappings)
+
+    @classmethod
+    def from_dataset(cls, name, data_set, data=None):
+        """ Wrap a plain dataset into a new VTKParticles.
+
+        The constructor makes some sanity checks to make sure that
+        the tvtk.DataSet is compatible and all the information can
+        be properly used.
+
+        Raises
+        ------
+        TypeError :
+            When the sanity checks fail.
+
+        """
+        checks = []
+
+        # Check for cell related attributes
+        checks.append(
+            not hasattr(data_set, 'lines')
+            and not hasattr(data_set, 'get_cells'))
+
+        # Check that the data set contains only lines and polyline cells
+        if hasattr(data_set, 'lines'):
+            checks.append(
+                data_set.number_of_cells != data_set.lines.number_of_cells)
+        if hasattr(data_set, 'get_cells'):
+            checks.append(
+                not set(data_set.cell_types_array).issubset(set(VTKEDGETYPES)))
+
+        if any(checks):
+            message = (
+                'Dataset {} cannot be reliably wrapped into a VTKParticles')
+            raise TypeError(message.format(data_set))
+        return cls(name, data_set=data_set, data=data)
 
     # Particle operations ####################################################
 
@@ -233,7 +268,7 @@ class VTKParticles(ABCParticles):
         bond2index = self.bond2index
         with self._add_item(bond, bond2index) as item:
             point_ids = [self.particle2index[uid] for uid in item.particles]
-            index = data_set.insert_next_cell(VTK_POLY_LINE, point_ids)
+            index = data_set.insert_next_cell(VTKEDGETYPES[1], point_ids)
             bond2index[item.uid] = index
             self.index2bond[index] = item.uid
             self.bond_data.append(item.data)
