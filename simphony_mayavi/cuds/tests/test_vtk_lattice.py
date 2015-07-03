@@ -1,10 +1,10 @@
 import unittest
 from functools import partial
 
-import numpy
 from numpy.testing import assert_array_equal
-from hypothesis import example, given
+from hypothesis import given
 from hypothesis.strategies import sampled_from
+from tvtk.api import tvtk
 
 from simphony.core.cuba import CUBA
 from simphony.testing.abc_check_lattice import (
@@ -134,6 +134,22 @@ class TestVTKLattice(unittest.TestCase):
         with self.assertRaises(ValueError):
             VTKLattice(
                 name=lattice.name, type_='AnyLattice', data_set=data.data_set)
+
+    def test_create_empty_with_unknown_type(self):
+        # when/then
+        with self.assertRaises(ValueError):
+            VTKLattice.empty(
+                name='test', type_='AnyLattice',
+                base_vector=(1.0, 1.0, 1.0), size=(3, 4, 5),
+                origin=(0.0, 0.0, 0.0))
+
+    def test_create_from_unfamiliar_dataset(self):
+        # given
+        data_set = tvtk.UnstructuredGrid(points=[(0, 0, 0,), (1, 1, 1)])
+
+        # when/then
+        with self.assertRaises(TypeError):
+            VTKLattice.from_dataset(name='test', data_set=data_set)
 
     @given(lattice_types)
     def test_initialization_with_dataset(self, lattice):
