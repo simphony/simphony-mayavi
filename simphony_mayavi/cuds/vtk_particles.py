@@ -158,6 +158,29 @@ class VTKParticles(ABCParticles):
             data_set=data_set,
             mappings=mappings)
 
+    @classmethod
+    def from_dataset(cls, name, data_set, data=None):
+        """ Wrap a plain dataset into a new VTKMesh.
+
+        The constructor makes some sanity checks to make sure that
+        the tvtk.DataSet is compatible and all the information can
+        be properly used.
+
+        Raises
+        ------
+        TypeError :
+            When the sanity checks fail.
+
+        """
+        # check that the data set contains only lines and polylines
+        checks = []
+        checks.append(not hasattr(data_set, 'lines'))
+        if any(checks):
+            message = (
+                'Dataset {} cannot be reliably wrapped in to a VTKMesh')
+            raise TypeError(message.format(data_set))
+        return cls(name, data_set=data_set, data=data)
+
     # Particle operations ####################################################
 
     def add_particle(self, particle):
