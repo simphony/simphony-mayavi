@@ -55,10 +55,10 @@ class VTKLattice(ABCLattice):
 
         # Estimate the lattice parameters
         if self.type in ('Cubic', 'OrthorombicP', 'Square', 'Rectangular'):
-            extend = self.data_set.extent
-            x_size = extend[1] - extend[0] + 1
-            y_size = extend[3] - extend[2] + 1
-            z_size = extend[5] - extend[4] + 1
+            extent = self.data_set.extent
+            x_size = extent[1] - extent[0] + 1
+            y_size = extent[3] - extent[2] + 1
+            z_size = extent[5] - extent[4] + 1
             self._origin = self.data_set.origin
             self._base_vector = self.data_set.spacing
         elif self.type == 'Hexagonal':
@@ -129,6 +129,9 @@ class VTKLattice(ABCLattice):
 
     @classmethod
     def empty(cls, name, type_, base_vector, size, origin, data=None):
+        """ Create a new empty Lattice.
+
+        """
         if type_ in ('Cubic', 'OrthorombicP', 'Square', 'Rectangular'):
             data_set = tvtk.ImageData(spacing=base_vector, origin=origin)
             data_set.extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
@@ -150,7 +153,9 @@ class VTKLattice(ABCLattice):
 
     @classmethod
     def from_lattice(cls, lattice):
+        """ Create a new Lattice from the provided one.
 
+        """
         base_vectors = lattice.base_vect
         origin = lattice.origin
         lattice_type = lattice.type
@@ -189,6 +194,35 @@ class VTKLattice(ABCLattice):
         for node in lattice.iter_nodes(indices):
             node_data.append(node.data)
         node_data.load_onto_vtk(data_set.point_data)
+
+        return cls(name=name, type_=lattice_type, data=data, data_set=data_set)
+
+    @classmethod
+    def from_dataset(cls, name, data_set, data=None):
+        """ Create a new Lattice and try to guess the ``type``.
+
+        """
+        if isinstance(data_set, tvtk.PolyData):
+            lattice_type = 'Hexagonal'
+        elif isinstance(data_set, tvtk.ImageData):
+            extent = data_set.extent
+            x_size = extent[1] - extent[0]
+            y_size = extent[3] - extent[2]
+            z_size = extent[5] - extent[4]
+            spacing = data_set.spacing
+            if x_size == 0 or y_size == 0 or z_size == 0:
+                if len(set(spacing)) <= 2:
+                    lattice_type = 'Square'
+                else:
+                    lattice_type = 'Rectangular'
+            else:
+                if len(set(spacing)) == 1:
+                    lattice_type = 'Cubic'
+                else:
+                    lattice_type = 'OrthorombicP'
+        else:
+            message = 'Cannot convert {} to a cuds Lattice'
+            raise TypeError(message.format(type(data_set)))
 
         return cls(name=name, type_=lattice_type, data=data, data_set=data_set)
 
