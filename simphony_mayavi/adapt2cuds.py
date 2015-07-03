@@ -27,6 +27,14 @@ def adapt2cuds(data_set, name='CUDS container', kind=None, rename_arrays=None):
           When set a shallow copy of the input data_set is created and
           used by the related vtk -> cuds wrapper.
 
+    Raises
+    ------
+    ValueError:
+        When ``kind`` is not a valid CUDS container type.
+
+    TypeError:
+        When it is not possible to wrap the provided data_set.
+
     """
     if rename_arrays is not None and len(rename_arrays) != 0:
         renamed = data_set.new_instance()
@@ -39,11 +47,11 @@ def adapt2cuds(data_set, name='CUDS container', kind=None, rename_arrays=None):
                 array = renamed.cell_data.get_array(name)
                 array.name = rename_arrays[name].name
         data_set = renamed
-    if kind == u'mesh':
+    if kind == 'mesh':
         container = VTKMesh.from_dataset(name, data_set=data_set)
-    elif kind == u'lattice':
+    elif kind == 'lattice':
         container = VTKLattice.from_dataset(name, data_set=data_set)
-    elif kind == u'particles':
+    elif kind == 'particles':
         container = VTKParticles.from_dataset(name, data_set=data_set)
     elif kind is None:
         for constructor in [
