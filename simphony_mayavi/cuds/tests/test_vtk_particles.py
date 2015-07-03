@@ -12,7 +12,8 @@ from simphony.testing.abc_check_particles import (
     ContainerAddBondsCheck, ContainerManipulatingParticlesCheck)
 
 from simphony_mayavi.cuds.api import VTKParticles
-from simphony_mayavi.core.api import supported_cuba
+from simphony_mayavi.core.api import (
+    supported_cuba, VTKEDGETYPES, VTKFACETYPES)
 
 
 class TestVTKParticlesParticleOperations(
@@ -113,7 +114,7 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
             self.assertIsNotNone(bond.uid)
             self.assertTrue(set(bond.particles).issubset(uids))
 
-    def test_initialization_with_dataset(self):
+    def test_initialization_with_poly_data(self):
         # given
         bonds = [
             [0, 1, 2, 3],
@@ -125,7 +126,7 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
 
         # when
         vtk = tvtk.PolyData(points=points, lines=bonds)
-        container = VTKParticles(name='test', data_set=vtk)
+        container = VTKParticles.from_dataset(name='test', data_set=vtk)
 
         # then
         number_of_particles = sum(1 for _ in container.iter_particles())
@@ -138,6 +139,59 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         for bond in container.iter_bonds():
             self.assertIsNotNone(bond.uid)
             self.assertTrue(set(bond.particles).issubset(uids))
+
+    def test_initialization_with_unstructured_grid(self):
+        # given
+        bonds = [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7, 8, 9, 10, 11],
+            [2, 7, 11],
+            [1, 4],
+            [1, 5, 8]]
+        points = [(i, i*2, i*3) for i in range(12)]
+
+        # when
+        vtk = tvtk.UnstructuredGrid(points=points)
+        for bond in bonds:
+            if len(bond) > 2:
+                vtk.insert_next_cell(VTKEDGETYPES[1], bond)
+            else:
+                vtk.insert_next_cell(VTKEDGETYPES[0], bond)
+        container = VTKParticles.from_dataset(name='test', data_set=vtk)
+
+        # then
+        number_of_particles = sum(1 for _ in container.iter_particles())
+        self.assertEqual(number_of_particles, 12)
+        for particle in container.iter_particles():
+            self.assertIsNotNone(particle.uid)
+        number_of_bonds = sum(1 for _ in container.iter_bonds())
+        self.assertEqual(number_of_bonds, 5)
+        uids = [particle.uid for particle in container.iter_particles()]
+        for bond in container.iter_bonds():
+            self.assertIsNotNone(bond.uid)
+            self.assertTrue(set(bond.particles).issubset(uids))
+
+    def test_initialization_with_invalid_unstructured_grid(self):
+        # given
+        bonds = [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7, 8, 9, 10, 11],
+            [2, 7, 11],
+            [1, 4],
+            [1, 5, 8]]
+        points = [(i, i*2, i*3) for i in range(12)]
+
+        # when
+        vtk = tvtk.UnstructuredGrid(points=points)
+        for bond in bonds:
+            if len(bond) > 2:
+                vtk.insert_next_cell(VTKEDGETYPES[1], bond)
+            else:
+                vtk.insert_next_cell(VTKEDGETYPES[0], bond)
+        vtk.insert_next_cell(VTKFACETYPES[0], [0, 1, 2])
+
+        with self.assertRaises(TypeError):
+            VTKParticles.from_dataset(name='test', data_set=vtk)
 
 
 if __name__ == '__main__':
