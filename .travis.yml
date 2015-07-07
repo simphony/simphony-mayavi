@@ -24,6 +24,7 @@ before_install:
   - export ETS_TOOLKIT=qt4
   - git clone --depth=1 --branch=master git://vtk.org/VTKData.git VTKData
   - export VTKDATA=~/VTKData
+  - ls ${VTKDATA}/Data
 install:
   # see issue https://github.com/enthought/traitsui/issues/206
   - pip install traitsui!=4.5.0
