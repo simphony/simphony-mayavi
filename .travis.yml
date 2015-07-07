@@ -23,8 +23,8 @@ addons:
     - python-imaging
     - python-pip
 before_install:
-  - sh -e /etc/init.d/xvfb start
   - git clone --depth=1 --branch=master git://vtk.org/VTKData.git ../VTKData
+  - sh -e /etc/init.d/xvfb start
 install:
   # see issue https://github.com/enthought/traitsui/issues/206
   - pip install traitsui!=4.5.0
