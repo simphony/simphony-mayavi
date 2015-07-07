@@ -31,3 +31,12 @@ class TestLoad(unittest.TestCase):
         container = load(filename)
         self.assertIsInstance(container, VTKParticles)
         self.assertEqual(sum(1 for item in container.iter_particles()), 12)
+
+    def test_load_vwgt_graph(self):
+        # The vwgt.graph file do not have a predefined reader.
+        filename = os.path.join(self.data_folder, 'vwgt.graph')
+
+        with self.assertRaises(RuntimeError) as context:
+            load(filename)
+        message = context.exception.message
+        self.assertIn('No suitable reader found', message)
