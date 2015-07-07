@@ -5,14 +5,10 @@ python:
 virtualenv:
   system_site_packages: true
 env:
-  global:
-    - ETS_TOOKIT=qt4
-    - DISPLAY=:99.0
-    - VTKDATA=~/VTKData
-  matrix:
-    - SIMPHONY_VERSION=0.1.5
-    - SIMPHONY_VERSION=master
-    allow_failures:
+  - SIMPHONY_VERSION=0.1.5
+  - SIMPHONY_VERSION=master
+matrix:
+  allow_failures:
     - env: SIMPHONY_VERSION=master
 addons:
   apt:
@@ -23,6 +19,9 @@ addons:
     - python-imaging
     - python-pip
 before_install:
+  - export ETS_TOOKIT=qt4
+  - export DISPLAY=:99.0
+  - export VTKDATA=~/VTKData
   - git clone --depth=1 --branch=master git://vtk.org/VTKData.git ../VTKData
   - sh -e /etc/init.d/xvfb start
 install:
