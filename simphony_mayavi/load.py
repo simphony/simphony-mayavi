@@ -10,6 +10,7 @@ def load(filename, name=None, kind=None, rename_arrays=None):
     return adapt2cuds(
         data_set, name, kind, rename_arrays)
 
+
 def _read(filename):
     """ Find a suitable reader and read in the tvtk.Dataset.
     """
