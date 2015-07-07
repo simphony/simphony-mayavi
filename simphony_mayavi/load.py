@@ -30,5 +30,4 @@ def _read(filename):
     if len(source.outputs) != 1:
         message = 'Only one output is expected from the reader'
         raise RuntimeError(message)
-
     return reader.output
