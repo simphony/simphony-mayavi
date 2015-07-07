@@ -5,7 +5,9 @@ PLUGINAPI = [
     'snapshot',
     'VTKParticles',
     'VTKLattice',
-    'VTKMesh']
+    'VTKMesh',
+    'adapt2cuds',
+    'load']
 
 
 class TestPluginLoading(unittest.TestCase):
