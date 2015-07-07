@@ -5,10 +5,14 @@ python:
 virtualenv:
   system_site_packages: true
 env:
-  - SIMPHONY_VERSION=0.1.5
-  - SIMPHONY_VERSION=master
-matrix:
-  allow_failures:
+  global:
+    - ETS_TOOKIT=qt4
+    - DISPLAY=:99.0
+    - VTKDATA=~/VTKData
+  matrix:
+    - SIMPHONY_VERSION=0.1.5
+    - SIMPHONY_VERSION=master
+    allow_failures:
     - env: SIMPHONY_VERSION=master
 addons:
   apt:
@@ -19,12 +23,8 @@ addons:
     - python-imaging
     - python-pip
 before_install:
-  - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - export ETS_TOOLKIT=qt4
-  - git clone --depth=1 --branch=master git://vtk.org/VTKData.git VTKData
-  - export VTKDATA=~/VTKData
-  - ls ${VTKDATA}
+  - git clone --depth=1 --branch=master git://vtk.org/VTKData.git ../VTKData
 install:
   # see issue https://github.com/enthought/traitsui/issues/206
   - pip install traitsui!=4.5.0
