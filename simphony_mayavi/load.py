@@ -5,11 +5,10 @@ from simphony_mayavi.adapt2cuds import adapt2cuds
 
 def load(filename, name=None, kind=None, rename_arrays=None):
     """ Load the file data into a CUDS container.
-    """ 
+    """
     data_set = _read(filename)
     return adapt2cuds(
         data_set, name, kind, rename_arrays)
-
 
 def _read(filename):
     """ Find a suitable reader and read in the tvtk.Dataset.
