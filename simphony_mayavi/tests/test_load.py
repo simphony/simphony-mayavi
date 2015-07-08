@@ -7,7 +7,7 @@ from simphony_mayavi.load import load
 from simphony_mayavi.cuds.api import VTKParticles, VTKMesh, VTKLattice
 
 
-VTKDATA = os.environ.get('VTKDATA', None)
+VTKDATA = os.environ.get('VTKDATA')
 
 
 class TestLoad(unittest.TestCase):
