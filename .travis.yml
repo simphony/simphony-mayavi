@@ -19,9 +19,11 @@ addons:
     - python-imaging
     - python-pip
 before_install:
+  - export ETS_TOOKIT=qt4
   - export DISPLAY=:99.0
+  - export VTKDATA=/home/travis/VTKData
+  - git clone --depth=1 --branch=master git://vtk.org/VTKData.git /home/travis/VTKData
   - sh -e /etc/init.d/xvfb start
-  - export ETS_TOOLKIT=qt4
 install:
   # see issue https://github.com/enthought/traitsui/issues/206
   - pip install traitsui!=4.5.0
