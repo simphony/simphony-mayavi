@@ -2,8 +2,9 @@ import os
 import unittest
 
 
+from simphony.core.cuba import CUBA
 from simphony_mayavi.load import load
-from simphony_mayavi.cuds.api import VTKParticles, VTKMesh
+from simphony_mayavi.cuds.api import VTKParticles, VTKMesh, VTKLattice
 
 
 VTKDATA = os.environ.get('VTKDATA', None)
@@ -31,6 +32,13 @@ class TestLoad(unittest.TestCase):
         container = load(filename)
         self.assertIsInstance(container, VTKParticles)
         self.assertEqual(sum(1 for item in container.iter_particles()), 12)
+
+    def test_load_vase_1comp_vti(self):
+        # The vase_1comp_vti files contains only points.
+        filename = os.path.join(self.data_folder, 'vase_1comp.vti')
+        container = load(
+            filename, rename_arrays={'SLCImage': CUBA.TEMPERATURE})
+        self.assertIsInstance(container, VTKLattice)
 
     def test_load_vwgt_graph(self):
         # The vwgt.graph file do not have a predefined reader.
