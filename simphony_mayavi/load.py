@@ -17,7 +17,7 @@ def load(filename, name=None, kind=None, rename_arrays=None):
     kind : {'mesh', 'lattice', 'particles'}
         The kind of the container to return. Default is None, where
         the function will use some heuristics to infer the most
-        appropriate type of CUDS container to return
+        appropriate type of CUDS container to return (using adapt2cuds).
 
     rename_array : dict
         Dictionary mapping the array names used in the dataset object
