@@ -5,6 +5,30 @@ from simphony_mayavi.adapt2cuds import adapt2cuds
 
 def load(filename, name=None, kind=None, rename_arrays=None):
     """ Load the file data into a CUDS container.
+
+    Parameters
+    ----------
+    filename : string
+        The file name of the file to load.
+
+    name : string
+        The name of the returned CUDS container. Default is 'CUDS container'.
+
+    kind : {'mesh', 'lattice', 'particles'}
+        The kind of the container to return. Default is None, where
+        the function will use some heuristics to infer the most
+        appropriate type of CUDS container to return
+
+    rename_array : dict
+        Dictionary mapping the array names used in the dataset object
+        to their related CUBA keywords that will be used in the returned
+        CUDS container.
+
+        .. note::
+
+           Only CUBA keywords are supported for array names so use this
+           option to provide a translation mapping to the CUBA keys.
+
     """
     data_set = _read(filename)
     return adapt2cuds(
@@ -12,7 +36,7 @@ def load(filename, name=None, kind=None, rename_arrays=None):
 
 
 def _read(filename):
-    """ Find a suitable reader and read in the tvtk.Dataset.
+    """ Find a suitable reader and read the tvtk.Dataset.
     """
     metasource = registry.get_file_reader(filename)
     if metasource is None:
