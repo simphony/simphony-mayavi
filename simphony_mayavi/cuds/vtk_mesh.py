@@ -138,11 +138,14 @@ class VTKMesh(ABCMesh):
         cell_offset = numpy.cumsum(elements_size[:-1])
         cell_array = tvtk.CellArray()
         cell_array.set_cells(len(cell_offset), elements)
-        data_set = tvtk.UnstructuredGrid(points=points)
-        data_set.set_cells(element_types, cell_offset, cell_array)
 
-        point_data.load_onto_vtk(data_set.point_data)
-        cell_data.load_onto_vtk(data_set.cell_data)
+        if len(points) != 0:
+            data_set = tvtk.UnstructuredGrid(points=points)
+            data_set.set_cells(element_types, cell_offset, cell_array)
+            point_data.load_onto_vtk(data_set.point_data)
+            cell_data.load_onto_vtk(data_set.cell_data)
+        else:
+            data_set = None
 
         mappings = {
             'index2point': {

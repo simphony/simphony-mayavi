@@ -133,6 +133,20 @@ class TestVTKMesh(unittest.TestCase):
         for cell in cells:
             self.assertEqual(vtk_container.get_cell(cell.uid), cell)
 
+    def test_initialization_from_empty_cuds(self):
+        # given
+        container = Mesh('test')
+
+        # when
+        vtk_container = VTKMesh.from_mesh(container)
+
+        # then
+        self.assertEqual(vtk_container.name, container.name)
+        self.assertEqual(sum(1 for _ in vtk_container.iter_points()), 0)
+        self.assertEqual(sum(1 for _ in vtk_container.iter_edges()), 0)
+        self.assertEqual(sum(1 for _ in vtk_container.iter_faces()), 0)
+        self.assertEqual(sum(1 for _ in vtk_container.iter_cells()), 0)
+
     def test_initialization_from_data_set(self):
         # given
         data_set = tvtk.UnstructuredGrid()
