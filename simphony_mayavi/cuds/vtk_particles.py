@@ -144,14 +144,19 @@ class VTKParticles(ABCParticles):
             lines.append([particle2index[uuid] for uuid in bond.particles])
             bond_data.append(bond.data)
 
-        data_set = tvtk.PolyData(points=points, lines=lines)
-        particle_data.load_onto_vtk(data_set.point_data)
-        bond_data.load_onto_vtk(data_set.cell_data)
+        if len(points) != 0:
+            data_set = tvtk.PolyData(points=points, lines=lines)
+            particle_data.load_onto_vtk(data_set.point_data)
+            bond_data.load_onto_vtk(data_set.cell_data)
+        else:
+            data_set = None
+
         mappings = {
             'index2particle': index2particle,
             'particle2index': particle2index,
             'index2bond': index2bond,
             'bond2index': bond2index}
+
         return cls(
             name=particles.name,
             data=particles.data,
