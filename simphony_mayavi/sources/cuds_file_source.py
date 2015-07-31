@@ -17,7 +17,7 @@ class CUDSFileSource(CUDSSource):
     __version__ = 0
 
     #: The file path of the cuds file to read.
-    file_path = Instance(FilePath, (' '), desc='the current file name')
+    file_path = Instance(FilePath, (''), desc='the current file name')
 
     #: The name of the CUDS container that is currently loaded.
     dataset = DEnum(values_name='datasets')
@@ -47,9 +47,9 @@ class CUDSFileSource(CUDSSource):
             names += [container.name for container in handle.iter_meshes()]
         if len(names) == 0:
             raise RuntimeError('No datasets found')
+        self.datasets = names
         if self.dataset == '':
             self.dataset = names[0]
-        self.datasets = names
 
     def update(self):
         dataset = self.dataset
