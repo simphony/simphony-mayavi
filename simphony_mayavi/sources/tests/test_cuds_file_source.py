@@ -10,6 +10,9 @@ from simphony.cuds.particles import Particles
 from simphony.cuds.mesh import Mesh
 from simphony.cuds.lattice import Lattice
 from simphony.io.h5_cuds import H5CUDS
+from simphony.io.h5_lattice import H5Lattice
+from simphony.io.h5_mesh import H5Mesh
+from simphony.io.h5_particles import H5Particles
 
 from simphony_mayavi.sources.api import CUDSFileSource
 from simphony_mayavi.cuds.api import VTKParticles, VTKLattice, VTKMesh
@@ -45,17 +48,20 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
 
         with self.assertTraitChanges(source, 'data_changed'):
             source.update()
-        self.assertIsInstance(source.cuds, VTKParticles)
+        self.assertIsInstance(source.cuds, H5Particles)
+        self.assertIsInstance(source._vtk_cuds, VTKParticles)
         self.assertIsInstance(source.outputs[0], tvtk.PolyData)
 
         with self.assertTraitChanges(source, 'data_changed'):
             source.dataset = 'lattice0'
             source.update()
-        self.assertIsInstance(source.cuds, VTKLattice)
+        self.assertIsInstance(source.cuds, H5Lattice)
+        self.assertIsInstance(source._vtk_cuds, VTKLattice)
         self.assertIsInstance(source.outputs[0], tvtk.ImageData)
 
         with self.assertTraitChanges(source, 'data_changed'):
             source.dataset = 'mesh1'
             source.update()
-        self.assertIsInstance(source.cuds, VTKMesh)
+        self.assertIsInstance(source.cuds, H5Mesh)
+        self.assertIsInstance(source._vtk_cuds, VTKMesh)
         self.assertIsInstance(source.outputs[0], tvtk.UnstructuredGrid)

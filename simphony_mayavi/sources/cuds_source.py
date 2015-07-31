@@ -28,16 +28,16 @@ class CUDSSource(VTKDataSource):
 
     #: The shadow trait for the cuds property
     _cuds = Either(
-        Instance(ABCMesh, allow_none=False),
-        Instance(H5Mesh, allow_none=False),
-        Instance(ABCParticles, allow_none=False),
-        Instance(ABCLattice, allow_none=False))
+        Instance(ABCMesh),
+        Instance(H5Mesh),
+        Instance(ABCParticles),
+        Instance(ABCLattice))
 
     #: The shadow VTK backed CUDS container
     _vtk_cuds = Either(
-        Instance(VTKMesh, allow_none=False),
-        Instance(VTKParticles, allow_none=False),
-        Instance(VTKLattice, allow_none=False))
+        Instance(VTKMesh),
+        Instance(VTKParticles),
+        Instance(VTKLattice))
 
     # Property get/set/validate methods ######################################
 
