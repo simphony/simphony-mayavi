@@ -429,6 +429,7 @@ class TestParticlesSource(unittest.TestCase):
         temperature = dataset.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.bond2index.iteritems():
             bond = container.get_bond(key)
-            particles = [vtk_cuds.particle2index[uid] for uid in bond.particles]
+            particles = [
+                vtk_cuds.particle2index[uid] for uid in bond.particles]
             self.assertEqual(bonds[index], particles)
             self.assertEqual(temperature[index], bond.data[CUBA.TEMPERATURE])
