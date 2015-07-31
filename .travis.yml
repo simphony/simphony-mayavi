@@ -18,10 +18,11 @@ addons:
     - python-qt4-gl
     - python-imaging
     - python-pip
+    - libhdf5-serial-dev
 cache:
   directories:
     - $HOME/.cache
-    - $HOME/.ccache    
+    - $HOME/.ccache
 before_install:
   - ccache -s
   - export PATH=/usr/lib/ccache:${PATH}
