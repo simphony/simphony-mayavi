@@ -1,15 +1,10 @@
 from contextlib import closing
 
-from traits.api import Instance, Either, Str, List
+from traits.api import ListStr, Instance
+from traitsui.api import View, Group, Item
 from apptools.persistence.file_path import FilePath
-from tvtk.api import tvtk
-from mayavi.core.api import PipelineInfo
 from mayavi.core.trait_defs import DEnum
-from simphony.cuds.abstractmesh import ABCMesh
-from simphony.cuds.abstractparticles import ABCParticles
-from simphony.cuds.abstractlattice import ABCLattice
 from simphony.io.h5_cuds import H5CUDS
-from simphony.io.h5_mesh import H5Mesh
 
 from .cuds_source import CUDSSource
 
@@ -25,12 +20,23 @@ class CUDSFileSource(CUDSSource):
     file_path = Instance(FilePath, (' '), desc='the current file name')
 
     #: The name of the CUDS container that is currently loaded.
-    dataset = Either(Str, None)
+    dataset = DEnum(values_name='datasets')
 
     #: The names of the contained datasets.
-    datasets = List(Str)
+    datasets = ListStr
+
+    view = View(
+        Group(Item(name='dataset')),
+        Group(Item(name='point_scalars_name'),
+              Item(name='point_vectors_name'),
+              Item(name='point_tensors_name'),
+              Item(name='cell_scalars_name'),
+              Item(name='cell_vectors_name'),
+              Item(name='cell_tensors_name'),
+              Item(name='data')))
 
     # Public interface #####################################################
+
     def initialize(self, filename):
         """ Initialise the CUDS file source.
         """
