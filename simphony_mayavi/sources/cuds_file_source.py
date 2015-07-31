@@ -45,9 +45,11 @@ class CUDSFileSource(CUDSSource):
             names = [container.name for container in handle.iter_particles()]
             names += [container.name for container in handle.iter_lattices()]
             names += [container.name for container in handle.iter_meshes()]
-        self.datasets = names
-        if self.dataset is None:
+        if len(names) == 0:
+            raise RuntimeError('No datasets found')
+        if self.dataset == '':
             self.dataset = names[0]
+        self.datasets = names
 
     def update(self):
         dataset = self.dataset
