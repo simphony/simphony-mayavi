@@ -7,8 +7,7 @@ from simphony.cuds.abstractmesh import ABCMesh
 from simphony.cuds.abstractparticles import ABCParticles
 from simphony.cuds.abstractlattice import ABCLattice
 
-from simphony_mayavi.sources.api import (
-    ParticlesSource, MeshSource, LatticeSource)
+from simphony_mayavi.sources.api import CUDSSource
 
 
 def snapshot(cuds, filename):
@@ -34,10 +33,10 @@ def snapshot(cuds, filename):
 
     try:
         if isinstance(cuds, ABCMesh):
-            source = MeshSource.from_mesh(cuds)
+            source = CUDSSource(cuds=cuds)
             mlab.pipeline.surface(source, name=cuds.name)
         elif isinstance(cuds, ABCParticles):
-            source = ParticlesSource.from_particles(cuds)
+            source = CUDSSource(cuds=cuds)
             scale_factor = _typical_distance(source.data) * 0.5
             mlab.pipeline.glyph(
                 source, name=cuds.name,
@@ -45,7 +44,7 @@ def snapshot(cuds, filename):
             surface = mlab.pipeline.surface(source)
             surface.actor.mapper.scalar_visibility = False
         elif isinstance(cuds, ABCLattice):
-            source = LatticeSource.from_lattice(cuds)
+            source = CUDSSource(cuds=cuds)
             scale_factor = _typical_distance(source.data) * 0.5
             mlab.pipeline.glyph(
                 source, name=cuds.name,
