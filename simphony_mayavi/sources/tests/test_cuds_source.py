@@ -224,6 +224,16 @@ class TestMeshSource(unittest.TestCase):
         self.assertIs(source.data, vtk_container.data_set)
         self.assertIs(vtk_cuds, vtk_container)
 
+    def test_mesh_source_name(self):
+        # given
+        mesh = Mesh('my_mesh')
+
+        # when
+        source = CUDSSource(cuds=mesh)
+
+        # then
+        self.assertEqual(source.name, 'my_mesh (CUDS Mesh)')
+
 
 class TestLatticeSource(unittest.TestCase):
 
@@ -342,6 +352,17 @@ class TestLatticeSource(unittest.TestCase):
         self.assertIs(source._vtk_cuds, lattice)
         self.assertIs(source.data, lattice.data_set)
 
+    def test_lattice_source_name(self):
+        # given
+        lattice = VTKLattice.empty(
+            'my_lattice', 'Cubic', (0.1, 0.1, 0.1), (5, 10, 12), (0, 0, 0))
+
+        # when
+        source = CUDSSource(cuds=lattice)
+
+        # then
+        self.assertEqual(source.name, 'my_lattice (CUDS Lattice)')
+
     def add_velocity(self, lattice):
         for node in lattice.iter_nodes():
             node.data[CUBA.VELOCITY] = node.index
@@ -433,3 +454,13 @@ class TestParticlesSource(unittest.TestCase):
                 vtk_cuds.particle2index[uid] for uid in bond.particles]
             self.assertEqual(bonds[index], particles)
             self.assertEqual(temperature[index], bond.data[CUBA.TEMPERATURE])
+
+    def test_particles_source_name(self):
+        # given
+        particles = Particles(name='my_particles')
+
+        # when
+        source = CUDSSource(cuds=particles)
+
+        # then
+        self.assertEqual(source.name, 'my_particles (CUDS Particles)')

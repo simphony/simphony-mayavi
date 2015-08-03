@@ -67,3 +67,24 @@ class CUDSSource(VTKDataSource):
 
     def __vtk_cuds_changed(self, value):
         self.data = value.data_set
+
+    # Private interface
+
+    def _get_name(self):
+        """ Returns the name to display on the tree view.  Note that
+        this is not a property getter.
+        """
+        cuds = self.cuds
+        if isinstance(cuds, (ABCMesh, H5Mesh)):
+            name = cuds.name
+            kind = u'CUDS Mesh'
+        elif isinstance(cuds, ABCParticles):
+            name = cuds.name
+            kind = u'CUDS Particles'
+        elif isinstance(cuds, ABCLattice):
+            name = cuds.name
+            kind = u'CUDS Lattice'
+        else:
+            name = u'Uninitialised'
+            kind = u'Unknown'
+        return '{} ({})'.format(name, kind)
