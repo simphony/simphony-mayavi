@@ -71,5 +71,8 @@ class CUDSFileSource(CUDSSource):
                 else:
                     message = 'A dataset "{}" was not found'
                     raise RuntimeError(message.format(dataset))
+
+    # Trait Change Handlers ################################################
+
     def _dataset_changed(self):
         self.update()

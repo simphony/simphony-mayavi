@@ -46,11 +46,16 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
         source = CUDSFileSource()
         source.initialize(self.filename)
 
+        # after initialize we need to call update to get the data loaded.
         with self.assertTraitChanges(source, 'data_changed'):
             source.update()
         self.assertIsInstance(source.cuds, H5Particles)
         self.assertIsInstance(source._vtk_cuds, VTKParticles)
         self.assertIsInstance(source.outputs[0], tvtk.PolyData)
+
+    def test_dataset_change(self):
+        source = CUDSFileSource()
+        source.initialize(self.filename)
 
         with self.assertTraitChanges(source, 'data_changed'):
             source.dataset = 'lattice0'
