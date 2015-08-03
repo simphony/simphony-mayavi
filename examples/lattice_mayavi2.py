@@ -25,9 +25,9 @@ add_temperature(square)
 @mayavi2.standalone
 def view(lattice):
     from mayavi.modules.glyph import Glyph
-    from simphony_mayavi.sources.api import LatticeSource
+    from simphony_mayavi.sources.api import CUDSSource
     mayavi.new_scene()  # noqa
-    src = LatticeSource.from_lattice(lattice)
+    src = CUDSSource(cuds=lattice)
     mayavi.add_source(src)  # noqa
     g = Glyph()
     gs = g.glyph.glyph_source
