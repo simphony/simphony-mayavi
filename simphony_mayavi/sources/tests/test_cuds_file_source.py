@@ -4,8 +4,9 @@ import shutil
 import os
 from contextlib import closing
 
-from tvtk.api import tvtk
 from traits.testing.api import UnittestTools
+from tvtk.api import tvtk
+from mayavi.core.api import NullEngine
 from simphony.cuds.particles import Particles
 from simphony.cuds.mesh import Mesh
 from simphony.cuds.lattice import Lattice
@@ -68,3 +69,15 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
         self.assertIsInstance(source.cuds, H5Mesh)
         self.assertIsInstance(source._vtk_cuds, VTKMesh)
         self.assertIsInstance(source.outputs[0], tvtk.UnstructuredGrid)
+
+    def test_add_to_engine(self):
+        source = CUDSFileSource()
+        source.initialize(self.filename)
+        engine = NullEngine()
+
+        # When the source is added to an engine it should load the dataset.
+        with self.assertTraitChanges(source, 'data_changed'):
+            engine.add_source(source)
+        self.assertIsInstance(source.cuds, H5Particles)
+        self.assertIsInstance(source._vtk_cuds, VTKParticles)
+        self.assertIsInstance(source.outputs[0], tvtk.PolyData)

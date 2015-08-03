@@ -53,7 +53,11 @@ class CUDSFileSource(CUDSSource):
         if len(names) == 0:
             logger.warning('No datasets found in: %s', self.file_path)
         self.datasets = names
-            self.dataset = names[0]
+
+    def start(self):
+        if not self.running:
+            self.update()
+        super(CUDSFileSource, self).start()
 
     def update(self):
         dataset = self.dataset
