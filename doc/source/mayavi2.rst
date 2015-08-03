@@ -50,10 +50,11 @@ preferences dialog.
 
 .. literalinclude:: ../../examples/cuds_file_mayavi2.py
 
-.. figure:: _images/mayavi2_cuds_file.png
+.. figure:: _images/mayavi2_load_cuds_dialog.png
    :figwidth: 80%
 
-   Cuds files are supported in the ``Open File..`` dialog.
+   Cuds files are supported in the ``Open File..`` dialog. After running the
+   provided example load the ``example.cuds`` file into Mayavi2.
 
 .. figure:: _images/mayavi2_load_cuds_example.png
    :figwidth: 80%
