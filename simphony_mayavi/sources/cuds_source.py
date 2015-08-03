@@ -63,12 +63,12 @@ class CUDSSource(VTKDataSource):
         self._cuds = cuds
         self._vtk_cuds = vtk_cuds
 
-    # Traits change handlers \\\\\\\\\######################################
+    # Traits change handlers ###############################################
 
     def __vtk_cuds_changed(self, value):
         self.data = value.data_set
 
-    # Private interface
+    # Private interface ####################################################
 
     def _get_name(self):
         """ Returns the name to display on the tree view.  Note that
