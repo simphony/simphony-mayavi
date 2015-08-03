@@ -41,14 +41,12 @@ class CUDSSource(VTKDataSource):
         Instance(VTKLattice))
 
     view = View(
-        VGroup(
-            Group(Item(name='dataset')),
-            Group(
-                Item(name='point_scalars_name'),
-                Item(name='point_vectors_name'),
-                Item(name='cell_scalars_name'),
-                Item(name='cell_vectors_name'),
-                Item(name='data'))))
+        Group(
+            Item(name='point_scalars_name'),
+            Item(name='point_vectors_name'),
+            Item(name='cell_scalars_name'),
+            Item(name='cell_vectors_name'),
+            Item(name='data')))
 
     # Property get/set/validate methods ######################################
 
