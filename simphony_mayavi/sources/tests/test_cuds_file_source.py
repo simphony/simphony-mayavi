@@ -70,6 +70,23 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
         self.assertIsInstance(source._vtk_cuds, VTKMesh)
         self.assertIsInstance(source.outputs[0], tvtk.UnstructuredGrid)
 
+    def test_source_name(self):
+        # given
+        source = CUDSFileSource()
+        source.initialize(self.filename)
+
+        # when
+        source.update()
+
+        # then
+        self.assertEqual(source.name, 'CUDS File: particles1 (CUDS Particles)')
+
+        # when
+        source.dataset = 'mesh1'
+
+        # then
+        self.assertEqual(source.name, 'CUDS File: mesh1 (CUDS Mesh)')
+
     def test_add_to_engine(self):
         source = CUDSFileSource()
         source.initialize(self.filename)

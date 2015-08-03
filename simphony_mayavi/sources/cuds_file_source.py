@@ -79,3 +79,12 @@ class CUDSFileSource(CUDSSource):
 
     def _dataset_changed(self):
         self.update()
+
+    # Private interface ####################################################
+
+    def _get_name(self):
+        """ Returns the name to display on the tree view.  Note that
+        this is not a property getter.
+        """
+        name = super(CUDSFileSource, self)._get_name()
+        return 'CUDS File: ' + name
