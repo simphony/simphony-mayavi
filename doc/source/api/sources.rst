@@ -1,7 +1,7 @@
 Sources module
 ==============
 
-A module containing tools to convert from CUDS containers to Mayavi
+A module containing objects that wrap CUDS objects and files to Mayavi
 compatible sources. Please use the ``simphony_mayavi.sources.api``
 module to access the provided tools.
 
@@ -11,46 +11,20 @@ module to access the provided tools.
 
 .. autosummary::
 
-    ~particles_source.ParticlesSource
-    ~lattice_source.LatticeSource
-    ~mesh_source.MeshSource
-    ~cuds_data_accumulator.CUDSDataAccumulator
-    ~cuds_data_extractor.CUDSDataExtractor
+    ~cuds_source.CUDSSource
+    ~cuds_file_source.CUDSFileSource
 
-.. rubric:: Functions
-
-.. autosummary::
-
-   ~utils.cell_array_slicer
 
 Description
 -----------
 
 
-.. autoclass:: simphony_mayavi.sources.particles_source.ParticlesSource
+.. autoclass:: simphony_mayavi.sources.cuds_source.CUDSSource
      :members:
      :undoc-members:
      :show-inheritance:
 
-.. autoclass:: simphony_mayavi.sources.mesh_source.MeshSource
+.. autoclass:: simphony_mayavi.sources.cuds_file_source.CUDSFileSource
      :members:
      :undoc-members:
      :show-inheritance:
-
-.. autoclass:: simphony_mayavi.sources.lattice_source.LatticeSource
-     :members:
-     :undoc-members:
-     :show-inheritance:
-
-.. autoclass:: simphony_mayavi.sources.cuds_data_accumulator.CUDSDataAccumulator
-     :members:
-     :special-members: __getitem__, __len__
-     :undoc-members:
-     :show-inheritance:
-
-.. autoclass:: simphony_mayavi.sources.cuds_data_extractor.CUDSDataExtractor
-     :members:
-     :undoc-members:
-     :show-inheritance:
-
-.. autofunction:: simphony_mayavi.sources.utils.cell_array_slicer
