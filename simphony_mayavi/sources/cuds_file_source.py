@@ -2,7 +2,7 @@ from contextlib import closing
 import logging
 
 from traits.api import ListStr, Instance
-from traitsui.api import View, Group, Item
+from traitsui.api import View, Group, Item, VGroup
 from apptools.persistence.file_path import FilePath
 from mayavi.core.trait_defs import DEnum
 from simphony.io.h5_cuds import H5CUDS
