@@ -87,6 +87,7 @@ Directory structure
 
 
 - simphony-mayavi -- Main package folder.
+
   - sources -- Wrap CUDS objects to provide Mayavi Sources.
   - cuds -- Wrap VTK Dataset objects to provide the CUDS container api.
   - core -- Utility classes and tools to manipulate vtk and cuds objects.
