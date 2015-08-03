@@ -54,14 +54,12 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
 
         with self.assertTraitChanges(source, 'data_changed'):
             source.dataset = 'lattice0'
-            source.update()
         self.assertIsInstance(source.cuds, H5Lattice)
         self.assertIsInstance(source._vtk_cuds, VTKLattice)
         self.assertIsInstance(source.outputs[0], tvtk.ImageData)
 
         with self.assertTraitChanges(source, 'data_changed'):
             source.dataset = 'mesh1'
-            source.update()
         self.assertIsInstance(source.cuds, H5Mesh)
         self.assertIsInstance(source._vtk_cuds, VTKMesh)
         self.assertIsInstance(source.outputs[0], tvtk.UnstructuredGrid)
