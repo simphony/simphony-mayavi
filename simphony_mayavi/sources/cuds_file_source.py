@@ -1,4 +1,5 @@
 from contextlib import closing
+import logging
 
 from traits.api import ListStr, Instance
 from traitsui.api import View, Group, Item
@@ -7,6 +8,8 @@ from mayavi.core.trait_defs import DEnum
 from simphony.io.h5_cuds import H5CUDS
 
 from .cuds_source import CUDSSource
+
+logger = logging.getLogger(__name__)
 
 
 class CUDSFileSource(CUDSSource):
@@ -48,29 +51,25 @@ class CUDSFileSource(CUDSSource):
             names += [container.name for container in handle.iter_lattices()]
             names += [container.name for container in handle.iter_meshes()]
         if len(names) == 0:
-            raise RuntimeError('No datasets found')
+            logger.warning('No datasets found in: %s', self.file_path)
         self.datasets = names
-        if self.dataset == '':
             self.dataset = names[0]
 
     def update(self):
         dataset = self.dataset
-        if dataset is None:
-            raise RuntimeError('A dataset name is required')
-        else:
-            with closing(H5CUDS.open(str(self.file_path))) as handle:
-                for container in ['particles', 'lattice', 'mesh']:
-                    method = getattr(handle, 'get_{}'.format(container))
-                    try:
-                        container = method(dataset)
-                    except ValueError:
-                        continue
-                    else:
-                        self.cuds = container
-                        break
+        with closing(H5CUDS.open(str(self.file_path))) as handle:
+            for container in ['particles', 'lattice', 'mesh']:
+                method = getattr(handle, 'get_{}'.format(container))
+                try:
+                    container = method(dataset)
+                except ValueError:
+                    continue
                 else:
-                    message = 'A dataset "{}" was not found'
-                    raise RuntimeError(message.format(dataset))
+                    self.cuds = container
+                    break
+            else:
+                message = 'A dataset "%s" was not found'
+                logger.warning(message, dataset)
 
     # Trait Change Handlers ################################################
 
