@@ -55,10 +55,10 @@ cell_uids = [
 @mayavi2.standalone
 def view():
     from mayavi.modules.surface import Surface
-    from simphony_mayavi.sources.api import MeshSource
+    from simphony_mayavi.sources.api import CUDSSource
 
     mayavi.new_scene()  # noqa
-    src = MeshSource.from_mesh(container)
+    src = CUDSSource(cuds=container)
     mayavi.add_source(src)  # noqa
     s = Surface()
     mayavi.add_module(s)  # noqa

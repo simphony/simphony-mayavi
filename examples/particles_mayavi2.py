@@ -26,10 +26,10 @@ for indices in bonds:
 def view():
     from mayavi.modules.surface import Surface
     from mayavi.modules.glyph import Glyph
-    from simphony_mayavi.sources.api import ParticlesSource
+    from simphony_mayavi.sources.api import CUDSSource
 
     mayavi.new_scene()  # noqa
-    src = ParticlesSource.from_particles(container)
+    src = CUDSSource(cuds=container)
     mayavi.add_source(src)  # noqa
     g = Glyph()
     gs = g.glyph.glyph_source
