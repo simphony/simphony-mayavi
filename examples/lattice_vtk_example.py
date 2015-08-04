@@ -1,9 +1,9 @@
 import numpy
 
 from simphony.core.cuba import CUBA
-from simphony_mayavi.cuds.api import VTKLattice
+from simphony.visualisation import mayavi_tools
 
-lattice = VTKLattice.empty(
+lattice = mayavi_tools.VTKLattice.empty(
     'test', 'Cubic', (0.1, 0.1, 0.1), (5, 10, 12), (0, 0, 0))
 
 for node in lattice.iter_nodes():
@@ -13,7 +13,6 @@ for node in lattice.iter_nodes():
 
 
 if __name__ == '__main__':
-    from simphony.visualisation import mayavi_tools
 
     # Visualise the Lattice object
     mayavi_tools.show(lattice)

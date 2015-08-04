@@ -2,13 +2,13 @@ from numpy import array
 
 from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particle, Bond
-from simphony_mayavi.cuds.api import VTKParticles
+from simphony.visualisation import mayavi_tools
 
 points = array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]], 'f')
 bonds = array([[0, 1], [0, 3], [1, 3, 2]])
 temperature = array([10., 20., 30., 40.])
 
-particles = VTKParticles('test')
+particles = mayavi_tools.VTKParticles('test')
 uids = []
 for index, point in enumerate(points):
     uid = particles.add_particle(
@@ -22,7 +22,6 @@ for indices in bonds:
 
 
 if __name__ == '__main__':
-    from simphony.visualisation import mayavi_tools
 
     # Visualise the Particles object
     mayavi_tools.show(particles)

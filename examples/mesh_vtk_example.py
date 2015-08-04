@@ -2,7 +2,7 @@ from numpy import array
 
 from simphony.cuds.mesh import Point, Cell, Edge, Face
 from simphony.core.data_container import DataContainer
-from simphony_mayavi.cuds.api import VTKMesh
+from simphony.visualisation import mayavi_tools
 
 
 points = array([
@@ -18,7 +18,7 @@ cells = [
 faces = [[2, 7, 11]]
 edges = [[1, 4], [3, 8]]
 
-mesh = VTKMesh('example')
+mesh = mayavi_tools.VTKMesh('example')
 
 # add points
 uids = [
@@ -46,7 +46,6 @@ cell_uids = [
 
 
 if __name__ == '__main__':
-    from simphony.visualisation import mayavi_tools
 
     # Visualise the Mesh object
     mayavi_tools.show(mesh)
