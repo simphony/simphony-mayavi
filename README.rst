@@ -12,8 +12,8 @@ visualization support of the CUDS highlevel components.
   :target: http://codecov.io/github/simphony/simphony-mayavi?branch=master
   :alt: Test coverage
 
-.. image:: https://readthedocs.org/projects/simphony-mayavi/badge/?version=stable
-  :target: https://readthedocs.org/projects/simphony-mayavi/?badge=stable
+.. image:: https://readthedocs.org/projects/simphony-mayavi/badge/?version=0.1.1
+  :target: https://readthedocs.org/projects/simphony-mayavi/?badge=0.1.1
   :alt: Documentation Status
 
 Repository
