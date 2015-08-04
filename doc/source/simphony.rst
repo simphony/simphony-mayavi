@@ -77,4 +77,18 @@ attribute data into corresponding CUBA keys.
 
 .. figure:: _images/adapt2cuds_example.png
 
+Loading into CUDS
+-----------------
+
+The :func:`~simphony_mayavi.load.load` function is available to
+load mayavi readable files (e.g. VTK xml format) into top level
+CUDS containers.
+
+.. rubric:: Usage
+
+::
+   container = mayavi_tools.load(<mayavi-readable-file>)
+
+
+
 .. _mayavi operations: http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html?highlight=toolbar#changing-object-properties-interactively
