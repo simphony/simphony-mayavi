@@ -8,3 +8,7 @@ plug-in to the simphony library.
 .. autofunction:: simphony_mayavi.show.show
 
 .. autofunction:: simphony_mayavi.snapshot.snapshot
+
+.. autofunction:: simphony_mayavi.adapt2cuds.adapt2cuds
+
+.. autofunction:: simphony_mayavi.load.load
