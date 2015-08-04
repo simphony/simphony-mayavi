@@ -35,4 +35,30 @@ allows the common `mayavi operations`_.
 
 .. figure:: _images/particles_show.png
 
+Create VTK backed CUDS
+----------------------
+
+Three objects (i.e class:`~. VTKMesh`, class:`~.VTKLattice`,
+`~.VTKParticles`) that wrap a VTK dataset and provide the CUDS top
+level container API are also available. The vtk backed objects are
+expected to provide memory and some speed advantages when Mayavi aided
+visualisation and processing is a major part of the working session.
+The provided examples are equivalent to the ones in section
+`Visualizing CUDS`_.
+
+.. note:: Note all CUBA keys are supported for the `data` attribute of the contained
+	  items. Please see documentation for more details.
+
+.. rubric:: VTK Mesh example
+
+.. literalinclude:: ../../examples/mesh_vtk_example.py
+
+.. rubric:: VTK Lattice example
+
+.. literalinclude:: ../../examples/lattice_vtk_example.py
+
+.. rubric:: VTK Particles example
+
+.. literalinclude:: ../../examples/particles_vtk_example.py
+
 .. _mayavi operations: http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html?highlight=toolbar#changing-object-properties-interactively
