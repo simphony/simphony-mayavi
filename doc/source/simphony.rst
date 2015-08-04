@@ -82,13 +82,15 @@ Loading into CUDS
 
 The :func:`~simphony_mayavi.load.load` function is available to
 load mayavi readable files (e.g. VTK xml format) into top level
-CUDS containers.
+CUDS containers. Using ``load`` the user can import inside their
+simulation scripts files that have been created by other
+simulation application and export data into one of the Mayavi
+supported formats.
 
 .. rubric:: Usage
 
 ::
    container = mayavi_tools.load(<mayavi-readable-file>)
-
 
 
 .. _mayavi operations: http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html?highlight=toolbar#changing-object-properties-interactively
