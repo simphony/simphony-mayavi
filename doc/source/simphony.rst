@@ -61,4 +61,20 @@ The provided examples are equivalent to the ones in section
 
 .. literalinclude:: ../../examples/particles_vtk_example.py
 
+Adapting VTK datasets
+---------------------
+
+The :func:`~simphony_mayavi.adapt2cuds.adapt2cuds` function is
+available to wrap common VTK datsets into top level CUDS
+containers. The function will attempt to automatically adapt the
+(t)vtk Dataset into a CUDS container. But when this fails the user can
+always force the kind of the container and mapping of the included
+attribute data into corresponding CUBA keys.
+
+.. rubric:: Example
+
+.. literalinclude:: ../../examples/adapt2cuds_example.py
+
+.. figure:: _images/adapt2cuds_example.png
+
 .. _mayavi operations: http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html?highlight=toolbar#changing-object-properties-interactively
