@@ -3,6 +3,7 @@ from tvtk.api import tvtk
 from simphony.core.cuba import CUBA
 from simphony.visualisation import mayavi_tools
 
+
 def create_unstructured_grid(array_name='scalars'):
     points = array(
         [[0, 1.2, 0.6], [1, 0, 0], [0, 1, 0], [1, 1, 1],  # tetra
@@ -22,7 +23,7 @@ def create_unstructured_grid(array_name='scalars'):
     scalars = random.random(points.shape[0])
     ug.point_data.scalars = scalars
     ug.point_data.scalars.name = array_name
-    scalars = random.random((2,1))
+    scalars = random.random((2, 1))
     ug.cell_data.scalars = scalars
     ug.cell_data.scalars.name = array_name
     return ug
