@@ -78,19 +78,19 @@ Usage
 
 After installation the user should be able to import the ``mayavi`` visualization plugin module by::
 
-  from simphony.visualization import mayavi_tools
+  from simphony.visualisation import mayavi_tools
   mayavi_tools.show(cuds)
 
 
 Directory structure
 -------------------
 
-There are four subpackages:
 
-- simphony-mayavi -- Main package code.
-- examples -- Holds examples of visualizing simphony objects with simphony-mayavi.
+- simphony-mayavi -- Main package folder.
+
+  - sources -- Wrap CUDS objects to provide Mayavi Sources.
+  - cuds -- Wrap VTK Dataset objects to provide the CUDS container api.
+  - core -- Utility classes and tools to manipulate vtk and cuds objects.
+- examples -- Holds examples of loading and visualising SimPhoNy objects with simphony-mayavi.
 - doc -- Documentation related files:
-
-  - source -- Sphinx rst source files
-  - build -- Documentation build directory, if documentation has been generated
-    using the ``make`` script in the ``doc`` directory.
+  - The rst source files for the documentation

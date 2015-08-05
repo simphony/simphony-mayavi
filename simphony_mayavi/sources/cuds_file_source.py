@@ -34,10 +34,8 @@ class CUDSFileSource(CUDSSource):
             Group(
                 Item(name='point_scalars_name'),
                 Item(name='point_vectors_name'),
-                Item(name='point_tensors_name'),
                 Item(name='cell_scalars_name'),
                 Item(name='cell_vectors_name'),
-                Item(name='cell_tensors_name'),
                 Item(name='data'))))
 
     # Public interface #####################################################

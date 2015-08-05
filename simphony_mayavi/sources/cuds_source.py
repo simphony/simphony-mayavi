@@ -1,5 +1,6 @@
 
 from traits.api import Either, Instance, TraitError, Property, cached_property
+from traitsui.api import View, Group, Item, VGroup
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
 from simphony.cuds.abstractmesh import ABCMesh
@@ -38,6 +39,14 @@ class CUDSSource(VTKDataSource):
         Instance(VTKMesh),
         Instance(VTKParticles),
         Instance(VTKLattice))
+
+    view = View(
+        Group(
+            Item(name='point_scalars_name'),
+            Item(name='point_vectors_name'),
+            Item(name='cell_scalars_name'),
+            Item(name='cell_vectors_name'),
+            Item(name='data')))
 
     # Property get/set/validate methods ######################################
 
