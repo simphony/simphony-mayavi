@@ -37,15 +37,22 @@ def mock_modules():
         MOCK_MODULES.extend((
             'tvtk',
             'tvtk.api',
+            'tvtk.array_handler',
             'mayavi',
             'mayavi.sources',
             'mayavi.sources.vtk_data_source',
             'mayavi.tools',
-            'mayavi.tools.tools'))
+            'mayavi.tools.tools',
+            'mayavi.core',
+            'mayavi.core.api',
+            'mayavi.core.trait_defs',
+            'simphony_mayavi.core.constants'))
 
-        from traits.api import HasTraits
-        MOCK_TYPES.append(
-            ('mayavi.sources.vtk_data_source', 'VTKDataSource', (HasTraits,)))
+        from traits.api import HasTraits, TraitType
+        MOCK_TYPES.extend((
+            ('mayavi.sources.vtk_data_source', 'VTKDataSource', (HasTraits,)),
+            ('mayavi.core.trait_defs', 'DEnum', (TraitType,)),
+            ('mayavi.core.pipeline_info', 'PipelineInfo', (TraitType,))))
 
     class Mock(MagicMock):
 
@@ -102,7 +109,7 @@ intersphinx_mapping = {'http://docs.python.org/': None}
 
 # -- Options for HTML output ----------------------------------------------
 
-html_theme = 'default'
+html_theme = 'alabaster'
 html_logo = '_static/simphony_logo.png'
 html_static_path = ['_static']
 htmlhelp_basename = 'SimPhoNy-MayaviDoc'
