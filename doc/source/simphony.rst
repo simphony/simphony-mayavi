@@ -67,9 +67,11 @@ Adapting VTK datasets
 The :func:`~simphony_mayavi.adapt2cuds.adapt2cuds` function is
 available to wrap common VTK datsets into top level CUDS
 containers. The function will attempt to automatically adapt the
-(t)vtk Dataset into a CUDS container. But when this fails the user can
-always force the kind of the container and mapping of the included
-attribute data into corresponding CUBA keys.
+(t)vtk Dataset into a CUDS container. When automatic conversion
+fails the user can always force the kind of the container to adapt into.
+Furthermore, the user can define the mapping of the included
+attribute data into corresponding CUBA keys (a common case for
+vtk datasets that come from vtk reader objects).
 
 .. rubric:: Example
 

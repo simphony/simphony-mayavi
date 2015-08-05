@@ -1,8 +1,8 @@
 Mayavi2
 =======
 
-The Simphony-Mayavi library provides a plugin for Mayavi2 easily create
-mayavi ``Source`` instances from SimPhoNy CUDS containers and
+The Simphony-Mayavi library provides a plugin for Mayavi2 to easily
+create mayavi ``Source`` instances from SimPhoNy CUDS containers and
 files. With the provided tools one can use the SimPhoNy libraries to
 work inside the Mayavi2 application, as it is demonstrated in the
 examples.

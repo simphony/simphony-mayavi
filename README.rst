@@ -78,7 +78,7 @@ Usage
 
 After installation the user should be able to import the ``mayavi`` visualization plugin module by::
 
-  from simphony.visualization import mayavi_tools
+  from simphony.visualisation import mayavi_tools
   mayavi_tools.show(cuds)
 
 
