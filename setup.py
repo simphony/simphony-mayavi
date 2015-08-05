@@ -5,8 +5,8 @@ import subprocess
 from setuptools import setup, find_packages
 
 MAJOR = 0
-MINOR = 1
-MICRO = 2
+MINOR = 3
+MICRO = 0
 
 IS_RELEASED = False
 
@@ -93,10 +93,12 @@ if not is_released:
         fullversion += '.dev{0}'.format(dev_num)
 
     with open(filename, "wt") as fp:
-        fp.write(template.format(version=VERSION,
-                                 full_version=fullversion,
-                                 git_revision=git_rev,
-                                 is_released=IS_RELEASED))
+        fp.write(
+            template.format(
+                version=VERSION,
+                full_version=fullversion,
+                git_revision=git_rev,
+                is_released=IS_RELEASED))
 
 if __name__ == "__main__":
     write_version_py()
@@ -107,7 +109,8 @@ if __name__ == "__main__":
         author='SimPhoNy FP7 European Project',
         description='The mayavi visualisation plugin for SimPhoNy',
         long_description=open('README.rst').read(),
-        install_requires=["simphony[H5IO]", "mayavi[app]", "hypothesis"],
+        install_requires=[
+            "simphony[H5IO]>=0.1.3,<0.2.0", "mayavi[app]", "hypothesis"],
         packages=find_packages(),
         entry_points={'simphony.visualisation': plugin},
         version=__version__,
