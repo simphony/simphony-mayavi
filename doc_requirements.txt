@@ -1,3 +1,4 @@
+git+https://github.com/simphony/simphony-common.git@0.1.5#egg=simphony
 git+https://github.com/enthought/traits.git#egg=traits
 git+https://github.com/enthought/traitsui.git#egg=traitsui
 git+https://github.com/enthought/apptools.git#egg=apptools

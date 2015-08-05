@@ -20,16 +20,9 @@ def mock_modules():
             'numpy.testing'])
 
     try:
-        import simphony  # noqa
+        import tables  # noqa
     except ImportError:
-        MOCK_MODULES.extend([
-            'simphony',
-            'simphony.testing',
-            'simphony.testing.utils',
-            'simphony.cuds',
-            'simphony.cuds.abstractmesh',
-            'simphony.cuds.abstractparticles',
-            'simphony.cuds.abstractlattice'])
+        MOCK_MODULES.append('tables')
 
     try:
         import mayavi  # noqa
