@@ -107,7 +107,7 @@ if __name__ == "__main__":
         author='SimPhoNy FP7 European Project',
         description='The mayavi visualisation plugin for SimPhoNy',
         long_description=open('README.rst').read(),
-        install_requires=["simphony[H5IO]", "mayavi", "hypothesis"],
+        install_requires=["simphony", "mayavi[app]", "hypothesis"],
         packages=find_packages(),
         entry_points={'simphony.visualisation': plugin},
         version=__version__,
