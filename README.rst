@@ -25,7 +25,7 @@ Requirements
 ------------
 
 - mayavi >= 4.4.0
-- simphony >= 0.1.3
+- simphony >= 0.1.3, < 0.2.0
 
 Optional requirements
 ~~~~~~~~~~~~~~~~~~~~~
@@ -84,7 +84,6 @@ After installation the user should be able to import the ``mayavi`` visualizatio
 
 Directory structure
 -------------------
-
 
 - simphony-mayavi -- Main package folder.
 
