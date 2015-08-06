@@ -24,8 +24,8 @@ Simphony-mayavi is hosted on github: https://github.com/simphony/simphony-mayavi
 Requirements
 ------------
 
-- mayavi >= 4.4.0
-- simphony >= 0.1.3, < 0.2.0
+- mayavi[app] >= 4.4.0
+- simphony[H5IO] >= 0.1.3, < 0.2.0
 
 Optional requirements
 ~~~~~~~~~~~~~~~~~~~~~
