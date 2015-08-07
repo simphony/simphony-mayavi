@@ -2,7 +2,7 @@ git+https://github.com/simphony/simphony-common.git@0.1.5#egg=simphony
 git+https://github.com/enthought/traits.git#egg=traits
 git+https://github.com/enthought/traitsui.git#egg=traitsui
 git+https://github.com/enthought/apptools.git#egg=apptools
-git+https://github.com/enthought/sectiondoc.git@8a0c2be#egg=sectiondoc
+git+https://github.com/enthought/sectiondoc.git#egg=sectiondoc
 git+https://github.com/enthought/trait-documenter.git#egg=trait-documenter
 enum34
 mock
