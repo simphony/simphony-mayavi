@@ -85,7 +85,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'trait_documenter',
-    'sectiondoc']
+    'sectiondoc.styles.legacy']
 
 templates_path = ['_templates']
 source_suffix = '.rst'
