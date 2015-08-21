@@ -16,6 +16,13 @@ VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 # we need to set zip_safe = False
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+if on_rtd:
+    requirements = []
+else:
+    requirements = [
+        "simphony[H5IO]>=0.1.3,<0.2.0", "mayavi[app]", "hypothesis"]
+
+
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
 
 
@@ -99,11 +106,6 @@ if not is_released:
                 full_version=fullversion,
                 git_revision=git_rev,
                 is_released=IS_RELEASED))
-
-if on_rtd:
-    requirements = []
-else:
-    requirements = ["simphony[H5IO]>=0.1.3,<0.2.0", "mayavi[app]", "hypothesis"]
 
 if __name__ == "__main__":
     write_version_py()
