@@ -100,6 +100,11 @@ if not is_released:
                 git_revision=git_rev,
                 is_released=IS_RELEASED))
 
+if on_rtd:
+    requirements = []
+else:
+    requirements = ["simphony[H5IO]>=0.1.3,<0.2.0", "mayavi[app]", "hypothesis"]
+
 if __name__ == "__main__":
     write_version_py()
     from simphony_mayavi import __version__
@@ -109,8 +114,7 @@ if __name__ == "__main__":
         author='SimPhoNy FP7 European Project',
         description='The mayavi visualisation plugin for SimPhoNy',
         long_description=open('README.rst').read(),
-        install_requires=[
-            "simphony[H5IO]>=0.1.3,<0.2.0", "mayavi[app]", "hypothesis"],
+        install_requires=requirements,
         packages=find_packages(),
         entry_points={'simphony.visualisation': plugin},
         version=__version__,
