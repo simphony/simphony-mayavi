@@ -45,18 +45,18 @@ def mock_modules():
             ('mayavi.core.trait_defs', 'DEnum', (TraitType,)),
             ('mayavi.core.pipeline_info', 'PipelineInfo', (TraitType,))))
 
+    TYPES = {
+        mock_type: type(mock_type, bases, {'__module__': path})
+        for path, mock_type, bases in MOCK_TYPES}
+
     class DocMock(object):
 
-        TYPES = {
-            mock_type: type(mock_type, bases, {'__module__': path})
-            for path, mock_type, bases in MOCK_TYPES}
 
         def __init__(self, *args, **kwds):
             if '__doc_mocked_name__' in kwds:
                 self.__docmock_name__ = kwds['__docmocked_name__']
             else:
                 self.__docmock_name__ = 'Unknown'
-
 
         def __getattr__(self, name):
             if name in ('__file__', '__path__'):
