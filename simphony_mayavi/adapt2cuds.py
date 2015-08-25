@@ -12,10 +12,11 @@ def adapt2cuds(data_set, name='CUDS container', kind=None, rename_arrays=None):
     name : string
         The name of the CUDS container. Default is 'CUDS container'.
 
-    kind : {'mesh', 'lattice', 'particles'}
-        The kind of the container to return. Default is None, where
-        the function will use some heuristics to infer the most
-        appropriate type of CUDS container to return
+    kind :
+        The kind {'mesh', 'lattice', 'particles'} of the container
+        to return. Default is None, where the function will use some
+        heuristics to infer the most appropriate type of CUDS
+        container to return
 
     rename_array : dict
         Dictionary mapping the array names used in the dataset object
@@ -29,10 +30,10 @@ def adapt2cuds(data_set, name='CUDS container', kind=None, rename_arrays=None):
 
     Raises
     ------
-    ValueError:
+    ValueError :
         When ``kind`` is not a valid CUDS container type.
 
-    TypeError:
+    TypeError :
         When it is not possible to wrap the provided data_set.
 
     """
