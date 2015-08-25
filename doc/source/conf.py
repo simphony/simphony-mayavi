@@ -51,7 +51,6 @@ def mock_modules():
 
     class DocMock(object):
 
-
         def __init__(self, *args, **kwds):
             if '__doc_mocked_name__' in kwds:
                 self.__docmock_name__ = kwds['__docmocked_name__']
@@ -62,7 +61,7 @@ def mock_modules():
             if name in ('__file__', '__path__'):
                 return '/dev/null'
             else:
-                return DocMock.TYPES.get(name, DocMock(__docmock_name__=name))
+                return TYPES.get(name, DocMock(__docmock_name__=name))
 
         def __call__(self, *args, **kwards):
             return DocMock()
