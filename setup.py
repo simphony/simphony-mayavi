@@ -14,7 +14,7 @@ VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 # When installation takes place inside a READTHEDOCS build
 # we need to set zip_safe = False
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
 
@@ -46,6 +46,7 @@ def git_version():
         return out
 
     try:
+
         out = _minimal_ext_cmd(['git', 'describe', '--tags'])
     except OSError:
         out = ''
