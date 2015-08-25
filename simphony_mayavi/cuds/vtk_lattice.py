@@ -26,7 +26,7 @@ class VTKLattice(ABCLattice):
             The name of the container.
 
         type_ : string
-            The type of the container.
+            The ``type\_`` of the container.
 
         data_set : tvtk.DataSet
             The dataset to wrap in the CUDS api

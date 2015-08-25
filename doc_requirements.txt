@@ -5,4 +5,3 @@ git+https://github.com/enthought/apptools.git#egg=apptools
 git+https://github.com/enthought/sectiondoc.git#egg=sectiondoc
 trait-documenter
 enum34
-mock

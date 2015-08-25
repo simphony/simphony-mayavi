@@ -14,7 +14,7 @@ VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 # When installation takes place inside a READTHEDOCS build
 # we need to set zip_safe = False
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 if on_rtd:
     requirements = []
@@ -24,6 +24,14 @@ else:
 
 
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
+
+if on_rtd:
+    requirements = ["hypothesis", "traits"],
+else:
+    requirements = [
+        "simphony[H5IO]>=0.1.3,<0.2.0",
+        "mayavi[app]",
+        "hypothesis"],
 
 
 # Return the git revision as a string
@@ -45,6 +53,7 @@ def git_version():
         return out
 
     try:
+
         out = _minimal_ext_cmd(['git', 'describe', '--tags'])
     except OSError:
         out = ''
