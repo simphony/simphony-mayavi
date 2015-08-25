@@ -18,6 +18,14 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
 
+if on_rtd:
+    requirements = ["hypothesis", "traits"],
+else:
+    requirements = [
+        "simphony[H5IO]>=0.1.3,<0.2.0",
+        "mayavi[app]",
+        "hypothesis"],
+
 
 # Return the git revision as a string
 def git_version():
@@ -109,8 +117,7 @@ if __name__ == "__main__":
         author='SimPhoNy FP7 European Project',
         description='The mayavi visualisation plugin for SimPhoNy',
         long_description=open('README.rst').read(),
-        install_requires=[
-            "simphony[H5IO]>=0.1.3,<0.2.0", "mayavi[app]", "hypothesis"],
+        install_requires=requirements,
         packages=find_packages(),
         entry_points={'simphony.visualisation': plugin},
         version=__version__,
