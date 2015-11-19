@@ -6,7 +6,7 @@ from itertools import count
 import numpy
 from tvtk.api import tvtk
 
-from simphony.cuds.abstractmesh import ABCMesh
+from simphony.cuds.abc_mesh import ABCMesh
 from simphony.cuds.mesh import Point, Edge, Face, Cell
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (

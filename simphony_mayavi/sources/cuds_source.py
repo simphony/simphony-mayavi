@@ -3,9 +3,9 @@ from traits.api import Either, Instance, TraitError, Property, cached_property
 from traitsui.api import View, Group, Item, VGroup
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
-from simphony.cuds.abstractmesh import ABCMesh
-from simphony.cuds.abstractparticles import ABCParticles
-from simphony.cuds.abstractlattice import ABCLattice
+from simphony.cuds.abc_mesh import ABCMesh
+from simphony.cuds.abc_particles import ABCParticles
+from simphony.cuds.abc_lattice import ABCLattice
 from simphony.io.h5_mesh import H5Mesh
 
 from simphony_mayavi.cuds.api import VTKParticles, VTKLattice, VTKMesh

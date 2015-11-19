@@ -4,7 +4,7 @@ import contextlib
 from tvtk.api import tvtk
 
 from simphony.core.cuba import CUBA
-from simphony.cuds.abstractparticles import ABCParticles
+from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.particles import Particle, Bond
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (

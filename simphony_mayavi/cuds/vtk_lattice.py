@@ -3,7 +3,7 @@ from itertools import izip
 
 import numpy
 from tvtk.api import tvtk
-from simphony.cuds.abstractlattice import ABCLattice
+from simphony.cuds.abc_lattice import ABCLattice
 from simphony.cuds.lattice import LatticeNode
 from simphony.core.data_container import DataContainer
 
