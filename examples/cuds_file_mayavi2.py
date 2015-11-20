@@ -15,16 +15,21 @@ points = array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]], 'f')
 bonds = array([[0, 1], [0, 3], [1, 3, 2]])
 temperature = array([10., 20., 30., 40.])
 
+# particles container
 particles = Particles('particles_example')
-uids = []
-for index, point in enumerate(points):
-    uid = particles.add_particle(
+
+# add particles
+uids = particles.add_particles((
         Particle(
             coordinates=point,
-            data=DataContainer(TEMPERATURE=temperature[index])))
-    uids.append(uid)
-for indices in bonds:
-    particles.add_bond(Bond(particles=[uids[index] for index in indices]))
+            data=DataContainer(TEMPERATURE=temperature[index]))
+        for index, point in enumerate(points)))
+
+# add bonds
+particles.add_bonds((
+        Bond(particles=[uids[index] for index in indices])
+        for indices in bonds))
+
 
 hexagonal = make_hexagonal_lattice('hexagonal', 0.1, (5, 4))
 square = make_square_lattice('square', 0.1, (5, 4))
@@ -32,16 +37,20 @@ cubic = make_cubic_lattice('cubic', 0.1, (5, 10, 12))
 
 
 def add_temperature(lattice):
+    new_nodes = []
     for node in lattice.iter_nodes():
         index = numpy.array(node.index) + 1.0
         node.data[CUBA.TEMPERATURE] = numpy.prod(index)
-        lattice.update_node(node)
+        new_nodes.append(node)
+    lattice.update_nodes(new_nodes)
 
 
 def add_velocity(lattice):
+    new_nodes = []
     for node in lattice.iter_nodes():
         node.data[CUBA.VELOCITY] = node.index
-        lattice.update_node(node)
+        new_nodes.append(node)
+    lattice.update_nodes(new_nodes)
 
 add_temperature(hexagonal)
 add_temperature(cubic)
