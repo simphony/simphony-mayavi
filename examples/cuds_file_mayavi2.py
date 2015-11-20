@@ -7,7 +7,8 @@ from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particles, Particle, Bond
 from simphony.cuds.lattice import (
-    make_hexagonal_lattice, make_cubic_lattice, make_square_lattice)
+    make_hexagonal_lattice, make_orthorhombic_lattice,
+    make_body_centered_orthorhombic_lattice)
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony.io.h5_cuds import H5CUDS
 
@@ -31,9 +32,12 @@ particles.add_bonds((
         for indices in bonds))
 
 
-hexagonal = make_hexagonal_lattice('hexagonal', 0.1, (5, 4))
-square = make_square_lattice('square', 0.1, (5, 4))
-cubic = make_cubic_lattice('cubic', 0.1, (5, 10, 12))
+hexagonal = make_hexagonal_lattice(
+    'hexagonal', 0.1, 0.1, (5, 5, 5), (5, 4, 0))
+orthorhombic = make_orthorhombic_lattice(
+    'orthorhombic', (0.1, 0.2, 0.3), (5, 5, 5), (5, 4, 0))
+body_centered = make_body_centered_orthorhombic_lattice(
+    'body_centered', (0.1, 0.2, 0.3), (5, 5, 5), (5, 10, 12))
 
 
 def add_temperature(lattice):
@@ -53,11 +57,11 @@ def add_velocity(lattice):
     lattice.update_nodes(new_nodes)
 
 add_temperature(hexagonal)
-add_temperature(cubic)
-add_temperature(square)
+add_temperature(orthorhombic)
+add_temperature(body_centered)
 add_velocity(hexagonal)
-add_velocity(cubic)
-add_velocity(square)
+add_velocity(orthorhombic)
+add_velocity(body_centered)
 
 points = array([
     [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
@@ -75,43 +79,39 @@ edges = [[1, 4], [3, 8]]
 mesh = Mesh('mesh_example')
 
 # add points
-uids = [
-    mesh.add_point(
-        Point(coordinates=point, data=DataContainer(TEMPERATURE=index)))
-    for index, point in enumerate(points)]
+uids = mesh.add_points((
+    Point(coordinates=point, data=DataContainer(TEMPERATURE=index))
+    for index, point in enumerate(points)))
 
 # add edges
-edge_uids = [
-    mesh.add_edge(
+edge_uids = mesh.add_edges((
         Edge(
             points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 20)))
-    for index, element in enumerate(edges)]
+            data=DataContainer(TEMPERATURE=index + 20))
+        for index, element in enumerate(edges)))
 
 # add faces
-face_uids = [
-    mesh.add_face(
+face_uids = mesh.add_faces((
         Face(
             points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 30)))
-    for index, element in enumerate(faces)]
+            data=DataContainer(TEMPERATURE=index + 30))
+        for index, element in enumerate(faces)))
 
 # add cells
-cell_uids = [
-    mesh.add_cell(
+cell_uids = mesh.add_cells((
         Cell(
             points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 40)))
-    for index, element in enumerate(cells)]
+            data=DataContainer(TEMPERATURE=index + 40))
+        for index, element in enumerate(cells)))
 
 
 # save the data into cuds.
 with closing(H5CUDS.open('example.cuds', 'w')) as handle:
-    handle.add_mesh(mesh)
-    handle.add_particles(particles)
-    handle.add_lattice(hexagonal)
-    handle.add_lattice(cubic)
-    handle.add_lattice(square)
+    handle.add_dataset(mesh)
+    handle.add_dataset(particles)
+    handle.add_dataset(hexagonal)
+    handle.add_dataset(orthorhombic)
+    handle.add_dataset(body_centered)
 
 
 # Now view the data.
