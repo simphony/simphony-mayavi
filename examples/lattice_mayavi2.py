@@ -8,12 +8,12 @@ from simphony.cuds.lattice import (
 from simphony.core.cuba import CUBA
 
 hexagonal = make_hexagonal_lattice(
-    'hexagonal', 0.1, 0.05, (5, 4, 3), (5, 4, 0))
-cubic = make_cubic_lattice("cubic", 0.1, (5, 4, 3), (5, 4, 0))
+    'hexagonal', 0.1, 0.05, (5, 10, 12), (5, 4, 0))
+cubic = make_cubic_lattice("cubic", 0.1, (5, 10, 12), (5, 4, 0))
 fcc = make_face_centered_cubic_lattice(
-    'fcc', 0.1, (5, 4, 3), (5, 4, 0))
+    'fcc', 0.1, (5, 10, 12), (5, 4, 0))
 bcc = make_body_centered_cubic_lattice(
-    'bcc', 0.1, (5, 4, 3), (5, 4, 0))
+    'bcc', 0.1, (5, 10, 12), (5, 4, 0))
 
 
 def add_temperature(lattice):
@@ -46,7 +46,7 @@ def view(lattice):
     mayavi.add_module(g)  # noqa
 
 if __name__ == '__main__':
-    view(hexagonal)
+    #view(hexagonal)
     view(cubic)
-    view(fcc)
-    view(bcc)
+    #view(fcc)
+    #view(bcc)

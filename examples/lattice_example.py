@@ -5,10 +5,13 @@ from simphony.core.cuba import CUBA
 
 lattice = make_cubic_lattice('test', 0.1, (5, 10, 12))
 
+new_nodes = []
 for node in lattice.iter_nodes():
     index = numpy.array(node.index) + 1.0
     node.data[CUBA.TEMPERATURE] = numpy.prod(index)
-    lattice.update_node(node)
+    new_nodes.append(node)
+
+lattice.update_nodes(new_nodes)
 
 
 if __name__ == '__main__':
