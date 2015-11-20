@@ -5,6 +5,8 @@ import numpy
 from tvtk.api import tvtk
 from simphony.cuds.abc_lattice import ABCLattice
 from simphony.cuds.lattice import LatticeNode
+from simphony.cuds.primitive_cell import BravaisLattice, PrimitiveCell
+from simphony.core.cuds_item import CUDSItem
 from simphony.core.data_container import DataContainer
 
 from simphony_mayavi.core.api import CubaData, supported_cuba, mergedocs
@@ -17,7 +19,7 @@ VTK_POLY_LINE = 4
 @mergedocs(ABCLattice)
 class VTKLattice(ABCLattice):
 
-    def __init__(self, name, type_, data_set, data=None):
+    def __init__(self, name, primitive_cell, data_set, data=None):
         """ Constructor.
 
         Parameters
@@ -25,24 +27,28 @@ class VTKLattice(ABCLattice):
         name : string
             The name of the container.
 
-        type_ : string
-            The ``type\_`` of the container.
+        primitive_cell : PrimitiveCell
+            primitive cell specifying the 3D Bravais lattice
 
         data_set : tvtk.DataSet
             The dataset to wrap in the CUDS api
 
         data : DataContainer
             The data attribute to attach to the container. Default is None.
-
         """
         self.name = name
+        self._primitive_cell = primitive_cell
         self._data = DataContainer() if data is None else DataContainer(data)
-        self._type = type_
         self.data_set = data_set
+
+        self._items_count = {
+            CUDSItem.NODE: lambda : self.size
+            }
 
         #: The currently supported and stored CUBA keywords.
         self.supported_cuba = supported_cuba()
 
+        # For constructing CubaData
         data = data_set.point_data
         npoints = data_set.number_of_points
         if data.number_of_arrays == 0 and npoints != 0:
@@ -53,29 +59,36 @@ class VTKLattice(ABCLattice):
         self.point_data = CubaData(
             data, stored_cuba=self.supported_cuba, size=size)
 
-        # Estimate the lattice parameters
-        if self.type in ('Cubic', 'OrthorombicP', 'Square', 'Rectangular'):
+        # Determine origin
+        try:
+            self._origin = self.data_set.origin
+        except AttributeError:
+            self._origin = self.data_set.points.get_point(0)
+
+        # Estimate the lattice size
+        bravais_lattice = self.primitive_cell.bravais_lattice
+        if bravais_lattice in (BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
+                               BravaisLattice.ORTHORHOMBIC):
             extent = self.data_set.extent
             x_size = extent[1] - extent[0] + 1
             y_size = extent[3] - extent[2] + 1
             z_size = extent[5] - extent[4] + 1
-            self._origin = self.data_set.origin
-            self._base_vector = self.data_set.spacing
-        elif self.type == 'Hexagonal':
-            # FIXME: we assume a lattice on the xy plane
-            points = self.data_set.points.to_array()
-            x_size = len(numpy.unique(points[:, 0])) // 2 - 1
-            y_size = len(numpy.unique(points[:, 1]))
-            z_size = len(numpy.unique(points[:, 2]))
-            self._origin = tuple(points[0])
-            self._base_vector = (
-                points[1, 0] - points[0, 0],
-                points[x_size, 1] - points[0, 1],
-                0.0)
+            self._size = x_size, y_size, z_size
+        elif bravais_lattice in BravaisLattice:
+            # the dimension of the lattice can be deduced from the coordinates
+            # of the last point in the lattice relative to the origin and
+            # the primitive cell
+            p_last = data_set.get_point(npoints-1) - numpy.array(self.origin)
+            # primitive cell can be used to deduce the size
+            pc = self.primitive_cell
+            pcs = numpy.array((pc.p1, pc.p2, pc.p3), dtype='double')
+            # compute the inverse
+            dims = numpy.round(numpy.matmul(p_last, numpy.linalg.inv(pcs))+1)
+            self._size = tuple(dims.astype("int"))
         else:
-            message = 'Unknown lattice type: {}'.format(self.type)
-            raise ValueError(message)
-        self._size = x_size, y_size, z_size
+            message = 'Unknown lattice type: {}'
+            raise ValueError(message.format(str(bravais_lattice)))
+
 
     @property
     def data(self):
@@ -88,10 +101,6 @@ class VTKLattice(ABCLattice):
         self._data = DataContainer(value)
 
     @property
-    def type(self):
-        return self._type
-
-    @property
     def size(self):
         return self._size
 
@@ -100,8 +109,8 @@ class VTKLattice(ABCLattice):
         return self._origin
 
     @property
-    def base_vect(self):
-        return self._base_vector
+    def primitive_cell(self):
+        return self._primitive_cell
 
     # Node operations ########################################################
 
@@ -109,9 +118,19 @@ class VTKLattice(ABCLattice):
         point_id = self._get_point_id(index)
         return LatticeNode(index, data=self.point_data[point_id])
 
-    def update_node(self, node):
-        point_id = self._get_point_id(node.index)
-        self.point_data[point_id] = node.data
+    def update_nodes(self, nodes):
+        """Update the corresponding lattice nodes (data copied).
+
+        Parameters
+        ----------
+        nodes : iterable of LatticeNode objects
+            reference to LatticeNode objects from where the data is
+            copied to the Lattice
+
+        """
+        for node in nodes:
+            point_id = self._get_point_id(node.index)
+            self.point_data[point_id] = node.data
 
     def iter_nodes(self, indices=None):
         if indices is None:
@@ -121,6 +140,33 @@ class VTKLattice(ABCLattice):
             for index in indices:
                 yield self.get_node(index)
 
+    def count_of(self, item_type):
+        """ Return the count of item_type in the container.
+
+        Parameters
+        ----------
+        item_type : CUDSItem
+            The CUDSItem enum of the type of the items to return
+            the count of.
+
+        Returns
+        -------
+        count : int
+            The number of items of item_type in the container.
+
+        Raises
+        ------
+        ValueError :
+            If the type of the item is not supported in the current
+            container.
+
+        """
+        try:
+            return numpy.prod(self._items_count[item_type]())
+        except KeyError:
+            error_str = "Trying to obtain count of non-supported item: {}"
+            raise ValueError(error_str.format(item_type))
+
     def get_coordinate(self, index):
         point_id = self._get_point_id(index)
         return self.data_set.get_point(point_id)
@@ -128,45 +174,54 @@ class VTKLattice(ABCLattice):
     # Alternative constructors ###############################################
 
     @classmethod
-    def empty(cls, name, type_, base_vector, size, origin, data=None):
+    def empty(cls, name, primitive_cell, size, origin, data=None):
         """ Create a new empty Lattice.
 
         """
-        if type_ in ('Cubic', 'OrthorombicP', 'Square', 'Rectangular'):
-            data_set = tvtk.ImageData(spacing=base_vector, origin=origin)
+        pc = primitive_cell
+        bravais_lattice = pc.bravais_lattice
+        if bravais_lattice in (BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
+                               BravaisLattice.ORTHORHOMBIC):
+            # Compute the spacing from the primitive cell
+            spacing = tuple(numpy.sqrt(numpy.dot(p, p))
+                            for p in (pc.p1, pc.p2, pc.p3))
+            data_set = tvtk.ImageData(spacing=spacing, origin=origin)
             data_set.extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
-        elif type_ == 'Hexagonal':
-            x, y, z = numpy.meshgrid(
-                range(size[0]), range(size[1]), range(size[2]))
+        elif bravais_lattice in BravaisLattice:
+            y, z, x = numpy.meshgrid(
+                range(size[1]), range(size[2]), range(size[0]))
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
-            points[:, 0] += base_vector[0] * x.ravel() \
-                + 0.5 * base_vector[0] * y.ravel()
-            points[:, 1] += base_vector[1] * y.ravel()
-            points[:, 0] += origin[0]
-            points[:, 1] += origin[1]
-            points[:, 2] += origin[2]
+            # construct points using primitive cells
+            for idim in range(3):
+                points[:, idim] += pc.p1[idim]*x.ravel() +\
+                    pc.p2[idim]*y.ravel() +\
+                    pc.p3[idim]*z.ravel()
+                points[:, idim] += origin[idim]
             data_set = tvtk.PolyData(points=points)
         else:
-            message = 'Unknown lattice type: {}'.format(type_)
-            raise ValueError(message)
-        return cls(name=name, type_=type_, data=data, data_set=data_set)
+            message = 'Unknown lattice type: {}'
+            raise ValueError(message.format(str(bravais_lattice)))
+        return cls(name=name, primitive_cell=primitive_cell,
+                   data=data, data_set=data_set)
 
     @classmethod
     def from_lattice(cls, lattice):
         """ Create a new Lattice from the provided one.
 
         """
-        base_vectors = lattice.base_vect
+        pc = lattice.primitive_cell
         origin = lattice.origin
-        lattice_type = lattice.type
         size = lattice.size
         name = lattice.name
         node_data = CUBADataAccumulator()
         data = lattice.data
 
-        if lattice_type in (
-                'Cubic', 'OrthorombicP', 'Square', 'Rectangular'):
-            spacing = base_vectors
+        if pc.bravais_lattice in (
+                BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
+                BravaisLattice.ORTHORHOMBIC):
+            # Compute the spacing from the primitive cell
+            spacing = tuple(numpy.sqrt(numpy.dot(p, p))
+                            for p in (pc.p1, pc.p2, pc.p3))
             origin = origin
             data_set = tvtk.ImageData(spacing=spacing, origin=origin)
             data_set.extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
@@ -175,16 +230,16 @@ class VTKLattice(ABCLattice):
             y, z, x = numpy.meshgrid(
                 range(size[1]), range(size[2]), range(size[0]))
             indices = izip(x.ravel(), y.ravel(), z.ravel())
-        elif lattice_type == 'Hexagonal':
-            x, y, z = numpy.meshgrid(
-                range(size[0]), range(size[1]), range(size[2]))
+        elif pc.bravais_lattice in BravaisLattice:
+            y, z, x = numpy.meshgrid(
+                range(size[1]), range(size[2]), range(size[0]))
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
-            points[:, 0] += base_vectors[0] * x.ravel() \
-                + 0.5 * base_vectors[0] * y.ravel()
-            points[:, 1] += base_vectors[1] * y.ravel()
-            points[:, 0] += origin[0]
-            points[:, 1] += origin[1]
-            points[:, 2] += origin[2]
+            # construct points using primitive cells
+            for idim in range(3):
+                points[:, idim] += pc.p1[idim]*x.ravel() +\
+                    pc.p2[idim]*y.ravel() +\
+                    pc.p3[idim]*z.ravel()
+                points[:, idim] += origin[idim]
             data_set = tvtk.PolyData(points=points)
             indices = izip(x.ravel(), y.ravel(), z.ravel())
         else:
@@ -195,7 +250,8 @@ class VTKLattice(ABCLattice):
             node_data.append(node.data)
         node_data.load_onto_vtk(data_set.point_data)
 
-        return cls(name=name, type_=lattice_type, data=data, data_set=data_set)
+        return cls(name=name, primitive_cell=pc, data=data,
+                   data_set=data_set)
 
     @classmethod
     def from_dataset(cls, name, data_set, data=None):
@@ -203,7 +259,7 @@ class VTKLattice(ABCLattice):
 
         """
         if isinstance(data_set, tvtk.PolyData):
-            lattice_type = 'Hexagonal'
+            lattice_type = BravaisLattice.HEXAGONAL
         elif isinstance(data_set, tvtk.ImageData):
             extent = data_set.extent
             x_size = extent[1] - extent[0]
@@ -224,16 +280,29 @@ class VTKLattice(ABCLattice):
             message = 'Cannot convert {} to a cuds Lattice'
             raise TypeError(message.format(type(data_set)))
 
-        return cls(name=name, type_=lattice_type, data=data, data_set=data_set)
+        return cls(name=name, primitive_cell=None, # FIXME
+                   data=data, data_set=data_set)
 
     # Private methods ######################################################
 
     def _get_point_id(self, index):
-        if self.type == 'Hexagonal':
-            point_id = int(
-                numpy.ravel_multi_index(index, self.size, order='F'))
-        else:
+        """ Return a raveled index for a given indices in the lattice
+
+        Parameters
+        ----------
+        index : int[3]
+
+        Returns
+        -------
+        index : int
+        """
+        bravais_lattice = self.primitive_cell.bravais_lattice
+        if bravais_lattice in (BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
+                               BravaisLattice.ORTHORHOMBIC):
             point_id = self.data_set.compute_point_id(index)
+        else:
+            point_id = int(
+                numpy.ravel_multi_index(index, self.size, order="F"))
         if point_id < 0:
             raise IndexError('index:{} is out of range'.format(index))
         return point_id
