@@ -17,10 +17,12 @@ bcc = make_body_centered_cubic_lattice(
 
 
 def add_temperature(lattice):
+    new_nodes = []
     for node in lattice.iter_nodes():
         index = numpy.array(node.index) + 1.0
         node.data[CUBA.TEMPERATURE] = numpy.prod(index)
-        lattice.update_node(node)
+        new_nodes.append(node)
+    lattice.update_nodes(new_nodes)
 
 add_temperature(hexagonal)
 add_temperature(cubic)
