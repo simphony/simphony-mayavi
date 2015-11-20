@@ -133,6 +133,20 @@ class VTKLattice(ABCLattice):
             self.point_data[point_id] = node.data
 
     def iter_nodes(self, indices=None):
+        """Get an iterator over the LatticeNodes described by the indices.
+
+        Parameters
+        ----------
+        indices : iterable set of int[3], optional
+            When indices (i.e. node index coordinates) are provided, then
+            nodes are returned in the same order of the provided indices.
+            If indices is None, there is no restriction on the order the
+            nodes that are returned.
+
+        Returns
+        -------
+        A generator for LatticeNode objects
+        """
         if indices is None:
             for index in numpy.ndindex(*self.size):
                 yield self.get_node(index)
