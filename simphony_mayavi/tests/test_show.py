@@ -6,7 +6,7 @@ from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
 
 from simphony_mayavi.show import show
-from simphony.cuds.lattice import make_square_lattice
+from simphony.cuds.lattice import make_cubic_lattice
 from simphony.cuds.mesh import Mesh, Point
 from simphony.cuds.particles import Particles, Particle
 
@@ -14,8 +14,8 @@ from simphony.cuds.particles import Particles, Particle
 class TestShow(unittest.TestCase, GuiTestAssistant):
 
     def test_lattice_show(self):
-        lattice = make_square_lattice(
-            'test', 0.2, (10, 10), origin=(0.2, -2.4))
+        lattice = make_cubic_lattice(
+            'test', 0.2, (10, 10, 1), origin=(0.2, -2.4, 0.))
 
         def function():
             show(lattice)
