@@ -42,7 +42,7 @@ class VTKLattice(ABCLattice):
         self.data_set = data_set
 
         self._items_count = {
-            CUDSItem.NODE: lambda : self.size
+            CUDSItem.NODE: lambda: self.size
             }
 
         #: The currently supported and stored CUBA keywords.
@@ -66,28 +66,28 @@ class VTKLattice(ABCLattice):
             self._origin = self.data_set.points.get_point(0)
 
         # Estimate the lattice size
-        bravais_lattice = self.primitive_cell.bravais_lattice
-        if bravais_lattice in (BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
-                               BravaisLattice.ORTHORHOMBIC):
+        if isinstance(self.data_set, tvtk.ImageData):
             extent = self.data_set.extent
             x_size = extent[1] - extent[0] + 1
             y_size = extent[3] - extent[2] + 1
             z_size = extent[5] - extent[4] + 1
             self._size = x_size, y_size, z_size
-        elif bravais_lattice in BravaisLattice:
-            # the dimension of the lattice can be deduced from the coordinates
-            # of the last point in the lattice relative to the origin and
-            # the primitive cell
+        elif isinstance(self.data_set, tvtk.PolyData):
+            # Assumed the last point is the furthest point from origin
+            # alternative method is to calculate distances for each point
+            # but this maybe costly for large datasets
             p_last = data_set.get_point(npoints-1) - numpy.array(self.origin)
             # primitive cell can be used to deduce the size
-            pc = self.primitive_cell
-            pcs = numpy.array((pc.p1, pc.p2, pc.p3), dtype='double')
+            pcs = numpy.array((primitive_cell.p1,
+                               primitive_cell.p2,
+                               primitive_cell.p3), dtype='double')
             # compute the inverse
             dims = numpy.round(numpy.matmul(p_last, numpy.linalg.inv(pcs))+1)
             self._size = tuple(dims.astype("int"))
         else:
-            message = 'Unknown lattice type: {}'
-            raise ValueError(message.format(str(bravais_lattice)))
+            message = ("Expect data_set to be either tvtk.ImageData "
+                       "or tvtk.PolyData, got {}")
+            raise TypeError(message.format(type(self.data_set)))
 
 
     @property
