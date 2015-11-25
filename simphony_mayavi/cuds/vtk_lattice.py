@@ -1,5 +1,5 @@
 from __future__ import division
-from itertools import izip
+from itertools import izip, permutations
 
 import numpy
 from tvtk.api import tvtk
@@ -12,6 +12,7 @@ from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import CubaData, supported_cuba, mergedocs
 from simphony_mayavi.core.api import CUBADataAccumulator
 
+from .lattice_tools import guess_primitive_vectors, find_lattice_type
 
 VTK_POLY_LINE = 4
 
@@ -282,33 +283,64 @@ class VTKLattice(ABCLattice):
 
     @classmethod
     def from_dataset(cls, name, data_set, data=None):
-        """ Create a new Lattice and try to guess the ``type``.
+        """ Create a new Lattice and try to guess the ``primitive_cell``
 
+        Parameters
+        ----------
+        name : str
+
+        data_set : tvtk.ImageData or tvtk.PolyData
+            The dataset to wrap in the CUDS api.  If it is a PolyData,
+            the points are assumed to be arranged in C-contiguous order
+
+        data : DataContainer
+            The data attribute to attach to the container. Default is None.
+
+        Returns
+        -------
+        lattice : VTKLattice
+
+        Raises
+        ------
+        TypeError :
+            If data_set is not either tvtk.ImageData or tvtk.PolyData
+
+        IndexError:
+            If the lattice nodes are not arranged in C-contiguous order
         """
-        if isinstance(data_set, tvtk.PolyData):
-            lattice_type = BravaisLattice.HEXAGONAL
-        elif isinstance(data_set, tvtk.ImageData):
-            extent = data_set.extent
-            x_size = extent[1] - extent[0]
-            y_size = extent[3] - extent[2]
-            z_size = extent[5] - extent[4]
+        if isinstance(data_set, tvtk.ImageData):
             spacing = data_set.spacing
-            if x_size == 0 or y_size == 0 or z_size == 0:
-                if len(set(spacing)) <= 2:
-                    lattice_type = 'Square'
+            unique_spacing = numpy.unique(spacing)
+            if len(unique_spacing) == 1:
+                pc = PrimitiveCell.for_cubic_lattice(*unique_spacing)
+            elif len(unique_spacing) == 2:
+                a, c = unique_spacing
+                if sum(spacing == a) == 2:
+                    pc = PrimitiveCell.for_tetragonal_lattice(a, c)
                 else:
-                    lattice_type = 'Rectangular'
+                    pc = PrimitiveCell.for_tetragonal_lattice(c, a)
             else:
-                if len(set(spacing)) == 1:
-                    lattice_type = 'Cubic'
-                else:
-                    lattice_type = 'OrthorombicP'
-        else:
+                pc = PrimitiveCell.for_orthorhombic_lattice(*spacing)
+
+            return cls(name=name, primitive_cell=pc,
+                       data=data, data_set=data_set)
+
+        if not isinstance(data_set, tvtk.PolyData):
             message = 'Cannot convert {} to a cuds Lattice'
             raise TypeError(message.format(type(data_set)))
 
-        return cls(name=name, primitive_cell=None, # FIXME
-                   data=data, data_set=data_set)
+        # data_set is an instance of tvtk.PolyData
+        points = data_set.points.to_array()
+
+        # Assumed C-contiguous order of points
+        p1, p2, p3 = guess_primitive_vectors(points)
+
+        # This will raise a TypeError if no bravais lattice type matches
+        bravais_lattice = find_lattice_type(p1, p2, p3)
+
+        pc = PrimitiveCell(p1, p2, p3, bravais_lattice)
+
+        return cls(name=name, primitive_cell=pc, data=data, data_set=data_set)
 
     # Private methods ######################################################
 
