@@ -1,5 +1,5 @@
 from __future__ import division
-from itertools import izip, permutations
+from itertools import izip
 
 import numpy
 from tvtk.api import tvtk
@@ -12,7 +12,8 @@ from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import CubaData, supported_cuba, mergedocs
 from simphony_mayavi.core.api import CUBADataAccumulator
 
-from .lattice_tools import guess_primitive_vectors, find_lattice_type
+from .lattice_tools import (vector_len, guess_primitive_vectors,
+                            find_lattice_type)
 
 VTK_POLY_LINE = 4
 
@@ -89,7 +90,6 @@ class VTKLattice(ABCLattice):
             message = ("Expect data_set to be either tvtk.ImageData "
                        "or tvtk.PolyData, got {}")
             raise TypeError(message.format(type(self.data_set)))
-
 
     @property
     def data(self):
@@ -271,7 +271,7 @@ class VTKLattice(ABCLattice):
             data_set = tvtk.PolyData(points=points)
             indices = izip(x.ravel(), y.ravel(), z.ravel())
         else:
-            message = 'Unknown lattice type: {}'.format(lattice_type)
+            message = 'Unknown lattice type: {}'.format(pc.bravais_lattice)
             raise ValueError(message)
 
         for node in lattice.iter_nodes(indices):
