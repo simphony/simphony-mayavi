@@ -182,6 +182,16 @@ class VTKLattice(ABCLattice):
             raise ValueError(error_str.format(item_type))
 
     def get_coordinate(self, index):
+        ''' Return the (x, y, z) coordinates of a node at ``index``
+
+        Parameters
+        ----------
+        index : tuple of int[3]
+
+        Returns
+        -------
+        coordinates : tuple of float[3]
+        '''
         point_id = self._get_point_id(index)
         return self.data_set.get_point(point_id)
 
