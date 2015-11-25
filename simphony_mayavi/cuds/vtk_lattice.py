@@ -355,11 +355,9 @@ class VTKLattice(ABCLattice):
         -------
         index : int
         """
-        bravais_lattice = self.primitive_cell.bravais_lattice
-        if bravais_lattice in (BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
-                               BravaisLattice.ORTHORHOMBIC):
+        try:
             point_id = self.data_set.compute_point_id(index)
-        else:
+        except AttributeError:
             point_id = int(
                 numpy.ravel_multi_index(index, self.size, order="F"))
         if point_id < 0:
