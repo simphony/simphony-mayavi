@@ -34,8 +34,7 @@ datasets.append(data_set)
 def create_polydata_from_pc(p1, p2, p3, size=(5, 10, 12)):
     ''' Create a tvtk.PolyData given a set of primitive vectors
     and size'''
-    y, z, x = numpy.meshgrid(
-    range(size[1]), range(size[2]), range(size[0]))
+    y, z, x = numpy.meshgrid(range(size[1]), range(size[2]), range(size[0]))
     points = numpy.zeros(shape=(x.size, 3), dtype='double')
     for idim in range(3):
         points[:, idim] += p1[idim]*x.ravel() +\
@@ -64,68 +63,76 @@ def rotate_primitive_cell(pc, angle1=numpy.pi/2., angle2=0.):
 # Test the mirror images too
 
 # a cubic lattice on a rotated coordinates represented using PolyData
-datasets.append(create_polydata_from_pc(
-    *rotate_primitive_cell(
-        PrimitiveCell.for_cubic_lattice(1.))))
+pcs = rotate_primitive_cell(PrimitiveCell.for_cubic_lattice(1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # BCC lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_body_centered_cubic_lattice(1.))))
+pcs = rotate_primitive_cell(PrimitiveCell.for_body_centered_cubic_lattice(1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # FCC lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_face_centered_cubic_lattice(1.))))
+pcs = rotate_primitive_cell(PrimitiveCell.for_face_centered_cubic_lattice(1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # rhombohedral lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_rhombohedral_lattice(1., 1.))))
+pcs = rotate_primitive_cell(PrimitiveCell.for_rhombohedral_lattice(1., 1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # tetragonal lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_tetragonal_lattice(0.5, 1.))))
+pcs = rotate_primitive_cell(PrimitiveCell.for_tetragonal_lattice(0.5, 1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # body_centered_tetragonal lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_body_centered_tetragonal_lattice(1., 1.))))
+factory = PrimitiveCell.for_body_centered_tetragonal_lattice
+pcs = rotate_primitive_cell(factory(1., 1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # hexagonal lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_hexagonal_lattice(1., 0.5))))
+pcs = rotate_primitive_cell(PrimitiveCell.for_hexagonal_lattice(1., 0.5))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # orthorhombic lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_orthorhombic_lattice(0.5, 0.8, 1.,))))
+factory = PrimitiveCell.for_orthorhombic_lattice
+pcs = rotate_primitive_cell(factory(0.5, 0.8, 1.,))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # orthorhombic lattice in a rotated coor. sys.
-# although the primitive cell has a BravaisLattice.ORTHORHOMBIC attribute
-# two of the edges are the same lengths
+# although the primitive cell has BravaisLattice.ORTHORHOMBIC attribute,
+# two of the edges are the same lengths,
 # so it would be recognised as at tetragonal lattice
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_orthorhombic_lattice(0.5, 1., 1.,))))
+factory = PrimitiveCell.for_orthorhombic_lattice
+pcs = rotate_primitive_cell(factory(0.5, 1., 1.,))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # face_centered_orthorhombic lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_face_centered_orthorhombic_lattice(0.5, 0.6, 1.,))))
+factory = PrimitiveCell.for_face_centered_orthorhombic_lattice
+pcs = rotate_primitive_cell(factory(0.5, 0.6, 1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # base_centered_orthorhombic lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_base_centered_orthorhombic_lattice(0.5, 0.6, 1.,))))
+factory = PrimitiveCell.for_base_centered_orthorhombic_lattice
+pcs = rotate_primitive_cell(factory(0.5, 0.6, 1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # body_centered_orthorhombic lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_body_centered_orthorhombic_lattice(0.5, 0.6, 1.,))))
+factory = PrimitiveCell.for_body_centered_orthorhombic_lattice
+pcs = rotate_primitive_cell(factory(0.5, 0.6, 1.))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # monoclinic lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_monoclinic_lattice(0.5, 0.6, 1., 0.3))))
+factory = PrimitiveCell.for_monoclinic_lattice
+pcs = rotate_primitive_cell(factory(0.5, 0.6, 1., 0.3))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # base_centered_monoclinic lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_base_centered_monoclinic_lattice(0.5, 0.6, 1., 0.7))))
+factory = PrimitiveCell.for_base_centered_monoclinic_lattice
+pcs = rotate_primitive_cell(factory(0.5, 0.6, 1., 0.7))
+datasets.append(create_polydata_from_pc(*pcs))
 
 # triclinic lattice in a rotated coor. sys.
-datasets.append(create_polydata_from_pc(*rotate_primitive_cell(
-            PrimitiveCell.for_triclinic_lattice(0.5, 0.6, 1., 0.6, 0.4, 0.8))))
+factory = PrimitiveCell.for_triclinic_lattice
+pcs = rotate_primitive_cell(factory(0.5, 0.6, 1., 0.6, 0.4, 0.8))
+datasets.append(create_polydata_from_pc(*pcs))
 
 
 def add_temperature(lattice):
@@ -135,6 +142,7 @@ def add_temperature(lattice):
         node.data[CUBA.TEMPERATURE] = numpy.prod(index)
         new_nodes.append(node)
     lattice.update_nodes(new_nodes)
+
 
 # Now view the data.
 @mayavi2.standalone
