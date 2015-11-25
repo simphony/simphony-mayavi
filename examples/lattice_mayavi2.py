@@ -46,7 +46,7 @@ def view(lattice):
     mayavi.add_module(g)  # noqa
 
 if __name__ == '__main__':
-    #view(hexagonal)
+    # view(hexagonal)
     view(cubic)
-    #view(fcc)
-    #view(bcc)
+    # view(fcc)
+    # view(bcc)
