@@ -20,16 +20,15 @@ temperature = array([10., 20., 30., 40.])
 particles = Particles('particles_example')
 
 # add particles
-uids = particles.add_particles((
-        Particle(
-            coordinates=point,
-            data=DataContainer(TEMPERATURE=temperature[index]))
-        for index, point in enumerate(points)))
+particle_iter = (Particle(coordinates=point,
+                          data=DataContainer(TEMPERATURE=temperature[index]))
+                 for index, point in enumerate(points))
+uids = particles.add_particles(particle_iter)
 
 # add bonds
-particles.add_bonds((
-        Bond(particles=[uids[index] for index in indices])
-        for indices in bonds))
+bond_iter = (Bond(particles=[uids[index] for index in indices])
+             for indices in bonds)
+particles.add_bonds(bond_iter)
 
 
 hexagonal = make_hexagonal_lattice(
@@ -79,30 +78,25 @@ edges = [[1, 4], [3, 8]]
 mesh = Mesh('mesh_example')
 
 # add points
-uids = mesh.add_points((
-    Point(coordinates=point, data=DataContainer(TEMPERATURE=index))
-    for index, point in enumerate(points)))
+uids = mesh.add_points((Point(coordinates=point,
+                              data=DataContainer(TEMPERATURE=index))
+                        for index, point in enumerate(points)))
 
 # add edges
-edge_uids = mesh.add_edges((
-        Edge(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 20))
-        for index, element in enumerate(edges)))
+edges = tuple(Edge(points=[uids[index] for index in element],
+                   data=DataContainer(TEMPERATURE=index + 20))
+              for index, element in enumerate(edges))
+edge_uids = mesh.add_edges(edges)
 
 # add faces
-face_uids = mesh.add_faces((
-        Face(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 30))
-        for index, element in enumerate(faces)))
+face_uids = mesh.add_faces((Face(points=[uids[index] for index in element],
+                                 data=DataContainer(TEMPERATURE=index + 30))
+                            for index, element in enumerate(faces)))
 
 # add cells
-cell_uids = mesh.add_cells((
-        Cell(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 40))
-        for index, element in enumerate(cells)))
+cell_uids = mesh.add_cells((Cell(points=[uids[index] for index in element],
+                                 data=DataContainer(TEMPERATURE=index + 40))
+                            for index, element in enumerate(cells)))
 
 
 # save the data into cuds.
