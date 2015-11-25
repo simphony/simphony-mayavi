@@ -3,6 +3,7 @@ from itertools import permutations, combinations
 import numpy
 from simphony.cuds.primitive_cell import PrimitiveCell, BravaisLattice
 
+
 def vector_len(vec, dtype=numpy.float32):
     ''' Length of vector
 
@@ -103,7 +104,7 @@ def guess_primitive_vectors(points):
         try:
             nx = find_jumps(points[:, idim])
             break
-        except IndexError: # numpy.where is empty
+        except IndexError:   # numpy.where is empty
             continue
     else:
         message = "Failed to deduce the first lattice dimension"
@@ -113,7 +114,7 @@ def guess_primitive_vectors(points):
         try:
             ny = find_jumps(points[::nx, idim])
             break
-        except IndexError: # numpy.where is empty
+        except IndexError:   # numpy.where is empty
             continue
     else:
         message = "Failed to deduce the second lattice dimension"
@@ -257,7 +258,7 @@ def is_face_centered_orthorhombic_lattice(p1, p2, p3):
 
 def is_base_centered_orthorhombic_lattice(p1, p2, p3):
     vec_lengths = map(vector_len, (p1, p2, p3))
-    factory =  PrimitiveCell.for_base_centered_orthorhombic_lattice
+    factory = PrimitiveCell.for_base_centered_orthorhombic_lattice
 
     for alpha, beta, gamma in permutations(vec_lengths, 3):
         delta = 4.*beta**2.-alpha**2.
@@ -270,7 +271,7 @@ def is_base_centered_orthorhombic_lattice(p1, p2, p3):
 
 def is_monoclinic_lattice(p1, p2, p3):
     alpha, beta, gamma = map(vector_len, (p1, p2, p3))
-    factory =  PrimitiveCell.for_monoclinic_lattice
+    factory = PrimitiveCell.for_monoclinic_lattice
 
     theta = numpy.arcsin(numpy.clip(numpy.dot(numpy.cross(p1, p2),
                                               p3)/alpha/beta/gamma, -1., 1.))
@@ -282,17 +283,17 @@ def is_monoclinic_lattice(p1, p2, p3):
 
 def is_base_centered_monoclinic_lattice(p1, p2, p3):
     vec_lengths = map(vector_len, (p1, p2, p3))
-    factory =  PrimitiveCell.for_base_centered_monoclinic_lattice
+    factory = PrimitiveCell.for_base_centered_monoclinic_lattice
 
     for alpha, beta, gamma in permutations(vec_lengths, 3):
         delta = 4.*beta**2.-alpha**2.
         if delta <= 0.:
             continue
         sin_theta = numpy.dot(numpy.cross(p1, p2),
-                             p3)/alpha/numpy.sqrt(delta)/gamma*2.
+                              p3)/alpha/numpy.sqrt(delta)/gamma*2.
         theta = numpy.arcsin(numpy.clip(sin_theta, -1., 1.))
         if (not numpy.isclose(theta, 0.) and
-            not numpy.isclose(theta, numpy.pi) and
+                not numpy.isclose(theta, numpy.pi) and
                 same_lattice_type(factory(alpha, numpy.sqrt(delta),
                                           gamma, theta),
                                   p1, p2, p3)):
@@ -303,7 +304,7 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
 def is_triclinic_lattice(p1, p2, p3):
     vectors = (p1, p2, p3)
     vec_lengths = map(vector_len, vectors)
-    factory =  PrimitiveCell.for_triclinic_lattice
+    factory = PrimitiveCell.for_triclinic_lattice
 
     for ivectors in permutations(range(3), 3):
         edges = tuple(vec_lengths[i] for i in ivectors)
@@ -312,7 +313,7 @@ def is_triclinic_lattice(p1, p2, p3):
                       numpy.arccos(cosine_two_vectors(vec1, vec3)),
                       numpy.arccos(cosine_two_vectors(vec1, vec2)))
         if (numpy.all(numpy.greater((a1+a2, a1+a3, a2+a3), (a3, a2, a1))) and
-            same_lattice_type(factory(*(edges+(a1, a2, a3))), p1, p2, p3)):
+                same_lattice_type(factory(*(edges+(a1, a2, a3))), p1, p2, p3)):
             return True
     return False
 
@@ -367,6 +368,6 @@ def find_lattice_type(p1, p2, p3):
     elif is_triclinic_lattice(p1, p2, p3):
         return BravaisLattice.TRICLINIC
     else:
-        message=("None of the predefined Bravais Lattices matches the "
-                 "given primitive vectors")
+        message = ("None of the predefined Bravais Lattices matches the "
+                   "given primitive vectors")
         raise TypeError(message)
