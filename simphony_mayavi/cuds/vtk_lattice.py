@@ -85,9 +85,9 @@ class VTKLattice(ABCLattice):
             # primitive cell can be used to deduce the size
             pcs = numpy.array((primitive_cell.p1,
                                primitive_cell.p2,
-                               primitive_cell.p3), dtype='double')
+                               primitive_cell.p3), dtype='double').T
             # compute the inverse
-            dims = numpy.round(numpy.inner(p_last, numpy.linalg.inv(pcs))+1)
+            dims = numpy.round(numpy.inner(numpy.linalg.inv(pcs), p_last)+1)
             self._size = tuple(dims.astype("int"))
         else:
             message = ("Expect data_set to be either tvtk.ImageData "
