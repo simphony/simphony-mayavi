@@ -170,10 +170,11 @@ def is_tetragonal_lattice(p1, p2, p3):
     vec_lengths = map(vector_len, (p1, p2, p3))
     unique_lengths = numpy.unique(vec_lengths)
 
-    if len(unique_lengths) != 2:
+    if len(unique_lengths) > 2:
         return False
-
-    if sum((vec_len == unique_lengths[0] for vec_len in vec_lengths)) == 2:
+    elif len(unique_lengths) == 1:
+        common = other = unique_lengths[0]
+    elif sum((vec_len == unique_lengths[0] for vec_len in vec_lengths)) == 2:
         common, other = unique_lengths
     else:
         other, common = unique_lengths
