@@ -33,7 +33,10 @@ class VTKLattice(ABCLattice):
             primitive cell specifying the 3D Bravais lattice
 
         data_set : tvtk.DataSet
-            The dataset to wrap in the CUDS api
+            The dataset to wrap in the CUDS api. If data_set is a tvtk.PolyData,
+            the points are assumed to be arranged in C-contiguous order so that
+            the first point is the origin and the last point is furthest away
+            from the origin
 
         data : DataContainer
             The data attribute to attach to the container. Default is None.
@@ -235,19 +238,20 @@ class VTKLattice(ABCLattice):
         """ Create a new Lattice from the provided one.
 
         """
-        pc = lattice.primitive_cell
         origin = lattice.origin
+        primitive_cell = lattice.primitive_cell
+        lattice_type = primitive_cell.bravais_lattice
         size = lattice.size
         name = lattice.name
         node_data = CUBADataAccumulator()
         data = lattice.data
 
-        if pc.bravais_lattice in (
+        if lattice_type in (
                 BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
                 BravaisLattice.ORTHORHOMBIC):
             # Compute the spacing from the primitive cell
-            spacing = tuple(numpy.sqrt(numpy.dot(p, p))
-                            for p in (pc.p1, pc.p2, pc.p3))
+            p1, p2, p3 = primitive_cell.p1, primitive_cell.p2, primitive_cell.p3
+            spacing = tuple(map(vector_len, (p1, p2, p3)))
             origin = origin
             data_set = tvtk.ImageData(spacing=spacing, origin=origin)
             data_set.extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
@@ -256,29 +260,30 @@ class VTKLattice(ABCLattice):
             y, z, x = numpy.meshgrid(
                 range(size[1]), range(size[2]), range(size[0]))
             indices = izip(x.ravel(), y.ravel(), z.ravel())
-        elif pc.bravais_lattice in BravaisLattice:
+        elif lattice_type in BravaisLattice:
             y, z, x = numpy.meshgrid(
                 range(size[1]), range(size[2]), range(size[0]))
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
 
             # construct points using primitive cells
+            p1, p2, p3 = primitive_cell.p1, primitive_cell.p2, primitive_cell.p3
             for idim in range(3):
-                points[:, idim] += pc.p1[idim]*x.ravel() +\
-                    pc.p2[idim]*y.ravel() +\
-                    pc.p3[idim]*z.ravel()
+                points[:, idim] += p1[idim]*x.ravel() +\
+                    p2[idim]*y.ravel() +\
+                    p3[idim]*z.ravel()
                 points[:, idim] += origin[idim]
 
             data_set = tvtk.PolyData(points=points)
             indices = izip(x.ravel(), y.ravel(), z.ravel())
         else:
-            message = 'Unknown lattice type: {}'.format(pc.bravais_lattice)
+            message = 'Unknown lattice type: {}'.format(lattice_type)
             raise ValueError(message)
 
         for node in lattice.iter_nodes(indices):
             node_data.append(node.data)
         node_data.load_onto_vtk(data_set.point_data)
 
-        return cls(name=name, primitive_cell=pc, data=data,
+        return cls(name=name, primitive_cell=primitive_cell, data=data,
                    data_set=data_set)
 
     @classmethod
@@ -312,20 +317,22 @@ class VTKLattice(ABCLattice):
             spacing = data_set.spacing
             unique_spacing = numpy.unique(spacing)
             if len(unique_spacing) == 1:
-                pc = PrimitiveCell.for_cubic_lattice(*unique_spacing)
+                primitive_cell = PrimitiveCell.for_cubic_lattice(spacing[0])
             elif len(unique_spacing) == 2:
                 a, c = unique_spacing
                 if sum(spacing == a) == 2:
-                    pc = PrimitiveCell.for_tetragonal_lattice(a, c)
+                    primitive_cell = PrimitiveCell.for_tetragonal_lattice(a, c)
                 else:
-                    pc = PrimitiveCell.for_tetragonal_lattice(c, a)
+                    primitive_cell = PrimitiveCell.for_tetragonal_lattice(c, a)
             else:
-                pc = PrimitiveCell.for_orthorhombic_lattice(*spacing)
+                factory = PrimitiveCell.for_orthorhombic_lattice
+                primitive_cell = factory(*spacing)
 
-            return cls(name=name, primitive_cell=pc,
+            return cls(name=name, primitive_cell=primitive_cell,
                        data=data, data_set=data_set)
 
         if not isinstance(data_set, tvtk.PolyData):
+            # Not ImageData nor PolyData
             message = 'Cannot convert {} to a cuds Lattice'
             raise TypeError(message.format(type(data_set)))
 
@@ -338,9 +345,10 @@ class VTKLattice(ABCLattice):
         # This will raise a TypeError if no bravais lattice type matches
         bravais_lattice = find_lattice_type(p1, p2, p3)
 
-        pc = PrimitiveCell(p1, p2, p3, bravais_lattice)
+        primitive_cell = PrimitiveCell(p1, p2, p3, bravais_lattice)
 
-        return cls(name=name, primitive_cell=pc, data=data, data_set=data_set)
+        return cls(name=name, primitive_cell=primitive_cell,
+                   data=data, data_set=data_set)
 
     # Private methods ######################################################
 
