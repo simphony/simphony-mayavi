@@ -440,7 +440,8 @@ def is_monoclinic_lattice(p1, p2, p3):
 
 
 def is_base_centered_monoclinic_lattice(p1, p2, p3):
-    ''' Test if primitive vectors describe a monoclinic lattice
+    ''' Test if primitive vectors describe a base centered monoclinic
+    lattice
 
     Also returns True for vectors describing a base centered
     orthorhombic lattice or a monoclinic lattice
@@ -476,7 +477,7 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
 def is_triclinic_lattice(p1, p2, p3):
     ''' Test if primitive vectors describe a triclinic lattice
 
-    Also return True for vectors describing any other types of Bravais
+    Also returns True for vectors describing any other types of Bravais
     lattices
 
     Parameters
