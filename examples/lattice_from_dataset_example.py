@@ -56,8 +56,8 @@ def rotate_primitive_cell(pc, angle1=numpy.pi/2., angle2=0.):
                           [0, numpy.cos(angle2), numpy.sin(angle2)],
                           [0, numpy.sin(-angle2), numpy.cos(angle2)]])
     # rotate x-y, then y-z
-    xyz_rot = numpy.matmul(yz_rot, xy_rot)
-    return tuple(numpy.matmul(xyz_rot, p) for p in (pc.p1, pc.p2, pc.p3))
+    xyz_rot = numpy.inner(yz_rot, xy_rot)
+    return tuple(numpy.inner(xyz_rot, p) for p in (pc.p1, pc.p2, pc.p3))
 
 
 # Test the mirror images too

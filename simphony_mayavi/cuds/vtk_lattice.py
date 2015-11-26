@@ -87,7 +87,7 @@ class VTKLattice(ABCLattice):
                                primitive_cell.p2,
                                primitive_cell.p3), dtype='double')
             # compute the inverse
-            dims = numpy.round(numpy.matmul(p_last, numpy.linalg.inv(pcs))+1)
+            dims = numpy.round(numpy.inner(p_last, numpy.linalg.inv(pcs))+1)
             self._size = tuple(dims.astype("int"))
         else:
             message = ("Expect data_set to be either tvtk.ImageData "
