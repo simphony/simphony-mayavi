@@ -311,17 +311,6 @@ def is_triclinic_lattice(p1, p2, p3):
     return (numpy.all(numpy.greater((a1+a2, a1+a3, a2+a3), (a3, a2, a1))) and
             same_lattice_type(factory(*(edges+(a1, a2, a3))), p1, p2, p3))
 
-    for ivectors in permutations(range(3), 3):
-        edges = tuple(vec_lengths[i] for i in ivectors)
-        vec1, vec2, vec3 = tuple(vectors[i] for i in ivectors)
-        a1, a2, a3 = (numpy.arccos(cosine_two_vectors(vec2, vec3)),
-                      numpy.arccos(cosine_two_vectors(vec1, vec3)),
-                      numpy.arccos(cosine_two_vectors(vec1, vec2)))
-        if (numpy.all(numpy.greater((a1+a2, a1+a3, a2+a3), (a3, a2, a1))) and
-                same_lattice_type(factory(*(edges+(a1, a2, a3))), p1, p2, p3)):
-            return True
-    return False
-
 
 def find_lattice_type(p1, p2, p3):
     ''' Return the lattice type as BravaisLattice(IntEnum)
