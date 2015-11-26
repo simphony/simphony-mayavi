@@ -11,13 +11,16 @@ from simphony_mayavi.tests.test_adapt2cuds import (create_image_data,
                                                    create_poly_data)
 
 good_data_sets = sampled_from([
-    (create_image_data(array_name='TEMPERATURE'), 'lattice')])
+    (create_image_data(array_name='TEMPERATURE'), 'lattice'),
+    (create_poly_data(array_name='TEMPERATURE'), 'lattice')])
 
 bad_array_data_sets = sampled_from([
-    (create_image_data(), 'lattice')])
+    (create_image_data(), 'lattice'),
+    (create_poly_data(), 'lattice')])
 
 auto_data_sets = sampled_from([
-    (create_image_data(array_name='TEMPERATURE'), 'lattice')])
+    (create_image_data(array_name='TEMPERATURE'), 'lattice'),
+    (create_poly_data(array_name='TEMPERATURE'), 'lattice')])
 
 expected = {'lattice': ABCLattice}
 
