@@ -83,10 +83,10 @@ uids = mesh.add_points((Point(coordinates=point,
                         for index, point in enumerate(points)))
 
 # add edges
-edges = (Edge(points=[uids[index] for index in element],
-              data=DataContainer(TEMPERATURE=index + 20))
-         for index, element in enumerate(edges))
-edge_uids = mesh.add_edges(edges)
+edge_iter = (Edge(points=[uids[index] for index in element],
+                  data=DataContainer(TEMPERATURE=index + 20))
+             for index, element in enumerate(edges))
+edge_uids = mesh.add_edges(edge_iter)
 
 # add faces
 face_uids = mesh.add_faces((Face(points=[uids[index] for index in element],
