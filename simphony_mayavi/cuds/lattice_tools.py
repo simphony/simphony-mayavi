@@ -4,12 +4,12 @@ import numpy
 from simphony.cuds.primitive_cell import PrimitiveCell, BravaisLattice
 
 
-def vector_len(vec, dtype=numpy.float32):
+def vector_len(vec, dtype=None):
     ''' Length of vector
 
     Parameter
     ---------
-    vec : tuple of float
+    vec : array_like
 
     dtype : str or dtype
         to which the result is casted
@@ -21,21 +21,21 @@ def vector_len(vec, dtype=numpy.float32):
     return numpy.sqrt(numpy.dot(vec, vec)).astype(dtype)
 
 
-def cosine_two_vectors(vec1, vec2, dtype=numpy.float32):
+def cosine_two_vectors(vec1, vec2, dtype=None):
     ''' Return the cosine of the acute angle between two vectors
 
     Parameters
     ----------
-    vec1 : tuple of float
+    vec1 : array_like
 
-    vec2 : tuple of float
+    vec2 : array_like
 
     dtype : str or dtype
         to which the result is casted
 
     Returns
     -------
-    cosine : float
+    cosine : numpy ndarray
     '''
     vec1_length = vector_len(vec1)
     vec2_length = vector_len(vec2)
@@ -50,9 +50,9 @@ def same_lattice_type(target_pc, p1, p2, p3):
     Parameters
     ----------
     target_pc : PrimitiveCell
-    p1 : tuple of float[3]
-    p2 : tuple of float[3]
-    p3 : tuple of float[3]
+    p1 : array_like (len=3)
+    p2 : array_like (len=3)
+    p3 : array_like (len=3)
 
     Returns
     -------
@@ -73,7 +73,6 @@ def same_lattice_type(target_pc, p1, p2, p3):
                         for vec1, vec2 in combinations(perms, 2))
         ratios = tuple(vector_len(vec1)/vector_len(vec2)
                        for vec1, vec2 in permutations(perms, 2))
-        # single precision
         if (numpy.allclose(cosines, target_cosines) and
                 numpy.allclose(ratios, target_ratios)):
             return True
