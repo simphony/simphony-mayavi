@@ -45,7 +45,7 @@ def cosine_two_vectors(vec1, vec2, dtype=numpy.float32):
 def same_lattice_type(target_pc, p1, p2, p3):
     ''' Return True if a set of primitive vectors ``p1``, ``p2``,
     ``p3`` describes the same type of lattice as the target
-    primitive cell ``target_pc`` does.
+    primitive cell ``target_pc`` does.  Single precision applies.
 
     Parameters
     ----------
