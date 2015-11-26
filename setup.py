@@ -130,4 +130,5 @@ if __name__ == "__main__":
         entry_points={'simphony.visualisation': plugin},
         version=__version__,
         zip_safe=False,
+        test_suite="simphony_mayavi.tests.lattice_only_tests",
         license='BSD')

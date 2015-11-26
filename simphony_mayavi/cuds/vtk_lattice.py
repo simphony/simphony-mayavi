@@ -33,8 +33,8 @@ class VTKLattice(ABCLattice):
             primitive cell specifying the 3D Bravais lattice
 
         data_set : tvtk.DataSet
-            The dataset to wrap in the CUDS api. If data_set is a tvtk.PolyData,
-            the points are assumed to be arranged in C-contiguous order so that
+            The dataset to wrap in the CUDS api. If it is a tvtk.PolyData, the
+            points are assumed to be arranged in C-contiguous order so that
             the first point is the origin and the last point is furthest away
             from the origin
 
@@ -250,8 +250,9 @@ class VTKLattice(ABCLattice):
                 BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
                 BravaisLattice.ORTHORHOMBIC):
             # Compute the spacing from the primitive cell
-            p1, p2, p3 = primitive_cell.p1, primitive_cell.p2, primitive_cell.p3
-            spacing = tuple(map(vector_len, (p1, p2, p3)))
+            spacing = tuple(map(vector_len, (primitive_cell.p1,
+                                             primitive_cell.p2,
+                                             primitive_cell.p3)))
             origin = origin
             data_set = tvtk.ImageData(spacing=spacing, origin=origin)
             data_set.extent = 0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1
@@ -266,11 +267,10 @@ class VTKLattice(ABCLattice):
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
 
             # construct points using primitive cells
-            p1, p2, p3 = primitive_cell.p1, primitive_cell.p2, primitive_cell.p3
             for idim in range(3):
-                points[:, idim] += p1[idim]*x.ravel() +\
-                    p2[idim]*y.ravel() +\
-                    p3[idim]*z.ravel()
+                points[:, idim] += primitive_cell.p1[idim]*x.ravel() +\
+                    primitive_cell.p2[idim]*y.ravel() +\
+                    primitive_cell.p3[idim]*z.ravel()
                 points[:, idim] += origin[idim]
 
             data_set = tvtk.PolyData(points=points)

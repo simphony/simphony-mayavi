@@ -1,7 +1,5 @@
 import unittest
 
-from numpy import array, random
-from tvtk.api import tvtk
 from hypothesis import given
 from hypothesis.strategies import sampled_from
 
