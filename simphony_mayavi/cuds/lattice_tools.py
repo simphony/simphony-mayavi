@@ -81,8 +81,11 @@ def same_lattice_type(target_pc, p1, p2, p3):
 
 def guess_primitive_vectors(points):
     ''' Guess the primitive vectors underlying a given array of
-    lattice points (N, 3).  Assume the points are arranged in
-    C-contiguous order
+    lattice points (N, 3).
+
+    Assume the points are arranged in C-contiguous order so that
+    the first point is the origin, the last point is furthest away
+    from the origin
 
     Parameter
     ----------
@@ -134,6 +137,17 @@ def guess_primitive_vectors(points):
 
 
 def is_cubic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a cubic lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
     if len(unique_lengths) != 1:
         return False
@@ -141,6 +155,17 @@ def is_cubic_lattice(p1, p2, p3):
 
 
 def is_body_centered_cubic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a body centered cubic lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
     if len(unique_lengths) != 2:
         return False
@@ -149,6 +174,17 @@ def is_body_centered_cubic_lattice(p1, p2, p3):
 
 
 def is_face_centered_cubic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a face centered cubic lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
     if len(unique_lengths) != 1:
         return False
@@ -157,6 +193,19 @@ def is_face_centered_cubic_lattice(p1, p2, p3):
 
 
 def is_rhombohedral_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a rhombohedral lattice
+
+    Also returns True for vectors describing a cubic lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
     if len(unique_lengths) != 1:
         return False
@@ -167,6 +216,19 @@ def is_rhombohedral_lattice(p1, p2, p3):
 
 
 def is_tetragonal_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a tetragonal lattice
+
+    Also returns True for vectors describing a cubic lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     vec_lengths = map(vector_len, (p1, p2, p3))
     unique_lengths = numpy.unique(vec_lengths)
 
@@ -184,6 +246,21 @@ def is_tetragonal_lattice(p1, p2, p3):
 
 
 def is_body_centered_tetragonal_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a body centered tetragonal
+    lattice
+
+    Also returns True for vectors describing a body centered cubic
+    lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
     if len(unique_lengths) != 2:
         return False
@@ -200,6 +277,17 @@ def is_body_centered_tetragonal_lattice(p1, p2, p3):
 
 
 def is_hexagonal_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a hexagonal lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     vec_lengths = map(vector_len, (p1, p2, p3))
     unique_lengths = numpy.unique(vec_lengths)
 
@@ -220,12 +308,41 @@ def is_hexagonal_lattice(p1, p2, p3):
 
 
 def is_orthorhombic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe an orthorhombic lattice
+
+    Also returns True for vectors describing a cubic or tetragonal
+    lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     vec_lengths = map(vector_len, (p1, p2, p3))
     factory = PrimitiveCell.for_orthorhombic_lattice
     return same_lattice_type(factory(*vec_lengths), p1, p2, p3)
 
 
 def is_body_centered_orthorhombic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a body centered orthorhombic
+    lattice
+
+    Also returns True for vectors describing a body centered cubic or
+    a body centered tetragonal lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     vec_lengths = map(vector_len, (p1, p2, p3))
     factory = PrimitiveCell.for_body_centered_orthorhombic_lattice
 
@@ -239,6 +356,21 @@ def is_body_centered_orthorhombic_lattice(p1, p2, p3):
 
 
 def is_face_centered_orthorhombic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a face centered orthorhombic
+    lattice
+
+    Also returns True for vectors describing a face centered cubic
+    lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     vec_lengths = map(vector_len, (p1, p2, p3))
     factory = PrimitiveCell.for_face_centered_orthorhombic_lattice
 
@@ -257,6 +389,18 @@ def is_face_centered_orthorhombic_lattice(p1, p2, p3):
 
 
 def is_base_centered_orthorhombic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a base centered orthorhombic
+    lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     vec_lengths = map(vector_len, (p1, p2, p3))
     factory = PrimitiveCell.for_base_centered_orthorhombic_lattice
 
@@ -270,6 +414,20 @@ def is_base_centered_orthorhombic_lattice(p1, p2, p3):
 
 
 def is_monoclinic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a monoclinic lattice
+
+    Also returns True for vectors describing an orthorhombic lattice
+    or a base centered orthorhombic lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     alpha, beta, gamma = map(vector_len, (p1, p2, p3))
     factory = PrimitiveCell.for_monoclinic_lattice
 
@@ -282,6 +440,20 @@ def is_monoclinic_lattice(p1, p2, p3):
 
 
 def is_base_centered_monoclinic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a monoclinic lattice
+
+    Also returns True for vectors describing a base centered
+    orthorhombic lattice or a monoclinic lattice
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     vec_lengths = map(vector_len, (p1, p2, p3))
     factory = PrimitiveCell.for_base_centered_monoclinic_lattice
 
@@ -302,6 +474,20 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
 
 
 def is_triclinic_lattice(p1, p2, p3):
+    ''' Test if primitive vectors describe a triclinic lattice
+
+    Also return True for vectors describing any other types of Bravais
+    lattices
+
+    Parameters
+    ----------
+    p1, p2, p3: array_like
+        primitive vectors
+
+    Returns
+    -------
+    output : bool
+    '''
     edges = tuple(map(vector_len, (p1, p2, p3)))
     factory = PrimitiveCell.for_triclinic_lattice
 
