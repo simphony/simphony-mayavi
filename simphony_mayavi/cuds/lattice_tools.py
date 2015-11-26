@@ -214,6 +214,11 @@ def is_rhombohedral_lattice(p1, p2, p3):
         return False
 
     beta = numpy.arccos(cosine_two_vectors(p1, p2))
+    angle1 = beta % numpy.pi
+
+    if numpy.allclose(angle1, 0) or numpy.allclose(angle1, numpy.pi):
+        return False
+
     return same_lattice_type(PrimitiveCell.for_rhombohedral_lattice(1., beta),
                              p1, p2, p3)
 
@@ -419,7 +424,7 @@ def is_base_centered_orthorhombic_lattice(p1, p2, p3):
 def is_monoclinic_lattice(p1, p2, p3):
     ''' Test if primitive vectors describe a monoclinic lattice
 
-    Also returns True for vectors describing an orthorhombic lattice
+    Also returns True for vectors describing a cubic, an orthorhombic
     or a base centered orthorhombic lattice
 
     Parameters
@@ -436,6 +441,11 @@ def is_monoclinic_lattice(p1, p2, p3):
 
     theta = numpy.arcsin(numpy.clip(numpy.dot(numpy.cross(p1, p2),
                                               p3)/alpha/beta/gamma, -1., 1.))
+    angle1 = theta % numpy.pi
+
+    if numpy.allclose(angle1, 0.) or numpy.allclose(angle1, numpy.pi):
+        return False
+
     for edges in permutations((alpha, beta, gamma), 3):
         if same_lattice_type(factory(*(edges+(theta,))), p1, p2, p3):
             return True
@@ -468,8 +478,9 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
         sin_theta = numpy.dot(numpy.cross(p1, p2),
                               p3)/alpha/numpy.sqrt(delta)/gamma*2.
         theta = numpy.arcsin(numpy.clip(sin_theta, -1., 1.))
-        if (not numpy.isclose(theta, 0.) and
-                not numpy.isclose(theta, numpy.pi) and
+        angle1 = theta % numpy.pi
+        if (not numpy.isclose(angle1, 0.) and
+                not numpy.isclose(angle1, numpy.pi) and
                 same_lattice_type(factory(alpha, numpy.sqrt(delta),
                                           gamma, theta),
                                   p1, p2, p3)):
@@ -495,12 +506,20 @@ def is_triclinic_lattice(p1, p2, p3):
     edges = tuple(map(vector_len, (p1, p2, p3)))
     factory = PrimitiveCell.for_triclinic_lattice
 
-    a1, a2, a3 = (numpy.arccos(cosine_two_vectors(p2, p3)),
-                  numpy.arccos(cosine_two_vectors(p1, p3)),
-                  numpy.arccos(cosine_two_vectors(p1, p2)))
+    alpha, beta, gamma = (numpy.arccos(cosine_two_vectors(p2, p3)),
+                          numpy.arccos(cosine_two_vectors(p1, p3)),
+                          numpy.arccos(cosine_two_vectors(p1, p2)))
+    a1 = alpha % numpy.pi
+    a2 = beta % numpy.pi
+    a3 = gamma % numpy.pi
+
+    if numpy.any(numpy.isclose((a1, a2, a3), (0, 0, 0))) or \
+           numpy.any(numpy.isclose((a1, a2, a3), (numpy.pi, numpy.pi, numpy.pi))):
+        return False
 
     return (numpy.all(numpy.greater((a1+a2, a1+a3, a2+a3), (a3, a2, a1))) and
-            same_lattice_type(factory(*(edges+(a1, a2, a3))), p1, p2, p3))
+            same_lattice_type(factory(*(edges+(alpha, beta, gamma))),
+                              p1, p2, p3))
 
 
 def find_lattice_type(p1, p2, p3):
