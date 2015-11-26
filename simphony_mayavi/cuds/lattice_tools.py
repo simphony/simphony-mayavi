@@ -94,14 +94,14 @@ def guess_primitive_vectors(points):
     p1, p2, p3 : 3 x tuple of float[3]
         primitive vectors
     '''
-    def find_jumps(arr1d):
+    def find_jump(arr1d):
         ''' Return the index where the first derivation changes '''
         sec_dev = numpy.diff(arr1d, n=2)
         return numpy.where(~numpy.isclose(sec_dev, 0.))[0][0]+2
 
     for idim in range(3):
         try:
-            nx = find_jumps(points[:, idim])
+            nx = find_jump(points[:, idim])
             break
         except IndexError:   # numpy.where is empty
             continue
@@ -111,7 +111,7 @@ def guess_primitive_vectors(points):
 
     for idim in range(3):
         try:
-            ny = find_jumps(points[::nx, idim])
+            ny = find_jump(points[::nx, idim])
             break
         except IndexError:   # numpy.where is empty
             continue
