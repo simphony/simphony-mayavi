@@ -84,7 +84,7 @@ datasets.append(create_polydata_from_pc(*pcs))
 
 # body_centered_tetragonal lattice in a rotated coor. sys.
 factory = PrimitiveCell.for_body_centered_tetragonal_lattice
-pcs = rotate_primitive_cell(factory(1., 1.))
+pcs = rotate_primitive_cell(factory(1., 0.5))
 datasets.append(create_polydata_from_pc(*pcs))
 
 # hexagonal lattice in a rotated coor. sys.
