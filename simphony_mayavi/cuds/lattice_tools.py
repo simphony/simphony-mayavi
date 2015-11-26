@@ -301,9 +301,15 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
 
 
 def is_triclinic_lattice(p1, p2, p3):
-    vectors = (p1, p2, p3)
-    vec_lengths = map(vector_len, vectors)
+    edges = tuple(map(vector_len, (p1, p2, p3)))
     factory = PrimitiveCell.for_triclinic_lattice
+
+    a1, a2, a3 = (numpy.arccos(cosine_two_vectors(p2, p3)),
+                  numpy.arccos(cosine_two_vectors(p1, p3)),
+                  numpy.arccos(cosine_two_vectors(p1, p2)))
+
+    return (numpy.all(numpy.greater((a1+a2, a1+a3, a2+a3), (a3, a2, a1))) and
+            same_lattice_type(factory(*(edges+(a1, a2, a3))), p1, p2, p3))
 
     for ivectors in permutations(range(3), 3):
         edges = tuple(vec_lengths[i] for i in ivectors)
