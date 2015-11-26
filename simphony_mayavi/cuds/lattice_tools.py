@@ -4,7 +4,7 @@ import numpy
 from simphony.cuds.primitive_cell import PrimitiveCell, BravaisLattice
 
 
-def vector_len(vec, dtype=None):
+def vector_len(vec, dtype=numpy.float32):
     ''' Length of vector
 
     Parameter
@@ -21,7 +21,7 @@ def vector_len(vec, dtype=None):
     return numpy.sqrt(numpy.dot(vec, vec)).astype(dtype)
 
 
-def cosine_two_vectors(vec1, vec2, dtype=None):
+def cosine_two_vectors(vec1, vec2, dtype=numpy.float32):
     ''' Return the cosine of the acute angle between two vectors
 
     Parameters
@@ -73,8 +73,11 @@ def same_lattice_type(target_pc, p1, p2, p3):
                         for vec1, vec2 in combinations(perms, 2))
         ratios = tuple(vector_len(vec1)/vector_len(vec2)
                        for vec1, vec2 in permutations(perms, 2))
-        if (numpy.allclose(cosines, target_cosines) and
-                numpy.allclose(ratios, target_ratios)):
+
+        # single precision
+        atol = numpy.finfo(numpy.float32).resolution
+        if (numpy.allclose(cosines, target_cosines, atol=atol) and
+                numpy.allclose(ratios, target_ratios, atol=atol)):
             return True
     return False
 
