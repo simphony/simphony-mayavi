@@ -513,8 +513,8 @@ def is_triclinic_lattice(p1, p2, p3):
     a2 = beta % numpy.pi
     a3 = gamma % numpy.pi
 
-    if numpy.any(numpy.isclose((a1, a2, a3), (0, 0, 0))) or \
-           numpy.any(numpy.isclose((a1, a2, a3), (numpy.pi, numpy.pi, numpy.pi))):
+    if (numpy.any(numpy.isclose((a1, a2, a3), (0,)*3)) or
+            numpy.any(numpy.isclose((a1, a2, a3), (numpy.pi,)*3))):
         return False
 
     return (numpy.all(numpy.greater((a1+a2, a1+a3, a2+a3), (a3, a2, a1))) and
