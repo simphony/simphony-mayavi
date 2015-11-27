@@ -126,34 +126,11 @@ class VTKLattice(ABCLattice):
         return LatticeNode(index, data=self.point_data[point_id])
 
     def update_nodes(self, nodes):
-        """Update the corresponding lattice nodes (data copied).
-
-        Parameters
-        ----------
-        nodes : iterable of LatticeNode objects
-            reference to LatticeNode objects from where the data is
-            copied to the Lattice
-
-        """
         for node in nodes:
             point_id = self._get_point_id(node.index)
             self.point_data[point_id] = node.data
 
     def iter_nodes(self, indices=None):
-        """Get an iterator over the LatticeNodes described by the indices.
-
-        Parameters
-        ----------
-        indices : iterable set of int[3], optional
-            When indices (i.e. node index coordinates) are provided, then
-            nodes are returned in the same order of the provided indices.
-            If indices is None, there is no restriction on the order the
-            nodes that are returned.
-
-        Returns
-        -------
-        A generator for LatticeNode objects
-        """
         if indices is None:
             for index in numpy.ndindex(*self.size):
                 yield self.get_node(index)
@@ -162,26 +139,6 @@ class VTKLattice(ABCLattice):
                 yield self.get_node(index)
 
     def count_of(self, item_type):
-        """ Return the count of item_type in the container.
-
-        Parameters
-        ----------
-        item_type : CUDSItem
-            The CUDSItem enum of the type of the items to return
-            the count of.
-
-        Returns
-        -------
-        count : int
-            The number of items of item_type in the container.
-
-        Raises
-        ------
-        ValueError :
-            If the type of the item is not supported in the current
-            container.
-
-        """
         try:
             return numpy.prod(self._items_count[item_type]())
         except KeyError:
@@ -189,16 +146,6 @@ class VTKLattice(ABCLattice):
             raise ValueError(error_str.format(item_type))
 
     def get_coordinate(self, index):
-        ''' Return the (x, y, z) coordinates of a node at ``index``
-
-        Parameters
-        ----------
-        index : tuple of int[3]
-
-        Returns
-        -------
-        coordinates : tuple of float[3]
-        '''
         point_id = self._get_point_id(index)
         return self.data_set.get_point(point_id)
 
