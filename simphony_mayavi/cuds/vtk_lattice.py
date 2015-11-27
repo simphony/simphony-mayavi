@@ -41,6 +41,11 @@ class VTKLattice(ABCLattice):
         data : DataContainer
             The data attribute to attach to the container. Default is None.
         """
+        if primitive_cell.bravais_lattice not in BravaisLattice:
+            message = ("Expected the primitive cell has an attribute "
+                       "`bravais_lattice` belongs to BravaisLattice, got {}")
+            raise ValueError(message.format(primitive_cell.bravais_lattice))
+
         self.name = name
         self._primitive_cell = primitive_cell
         self._data = DataContainer() if data is None else DataContainer(data)
