@@ -3,8 +3,9 @@ import numpy
 from tvtk.api import tvtk
 from mayavi.scripts import mayavi2
 from simphony.core.cuba import CUBA
-from simphony.cuds.primitive_cell import PrimitiveCell
+from simphony.cuds.primitive_cell import PrimitiveCell, BravaisLattice
 
+import simphony_mayavi.cuds.lattice_tools as lattice_tools
 from simphony.visualisation import mayavi_tools
 
 datasets = []
@@ -59,8 +60,6 @@ def rotate_primitive_cell(pc, angle1=numpy.pi/2., angle2=0.):
     xyz_rot = numpy.inner(xy_rot, yz_rot)
     return tuple(numpy.inner(xyz_rot, p) for p in (pc.p1, pc.p2, pc.p3))
 
-
-# Test the mirror images too
 
 # a cubic lattice on a rotated coordinates represented using PolyData
 pcs = rotate_primitive_cell(PrimitiveCell.for_cubic_lattice(1.))
