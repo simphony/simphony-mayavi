@@ -20,28 +20,24 @@ edges = [[1, 4], [3, 8]]
 mesh = Mesh('example')
 
 # add points
-uids = [
-    mesh.add_point(
-        Point(coordinates=point, data=DataContainer(TEMPERATURE=index)))
-    for index, point in enumerate(points)]
+point_iter = (Point(coordinates=point, data=DataContainer(TEMPERATURE=index))
+              for index, point in enumerate(points))
+uids = mesh.add_points(point_iter)
 
 # add edges
-edge_uids = [
-    mesh.add_edge(
-        Edge(points=[uids[index] for index in element]))
-    for index, element in enumerate(edges)]
+edge_iter = (Edge(points=[uids[index] for index in element])
+             for index, element in enumerate(edges))
+edge_uids = mesh.add_edges(edge_iter)
 
 # add faces
-face_uids = [
-    mesh.add_face(
-        Face(points=[uids[index] for index in element]))
-    for index, element in enumerate(faces)]
+face_iter = (Face(points=[uids[index] for index in element])
+             for index, element in enumerate(faces))
+face_uids = mesh.add_faces(face_iter)
 
 # add cells
-cell_uids = [
-    mesh.add_cell(
-        Cell(points=[uids[index] for index in element]))
-    for index, element in enumerate(cells)]
+cell_iter = (Cell(points=[uids[index] for index in element])
+             for index, element in enumerate(cells))
+cell_uids = mesh.add_cells(cell_iter)
 
 
 if __name__ == '__main__':
