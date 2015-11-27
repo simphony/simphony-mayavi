@@ -8,7 +8,7 @@ from PIL import Image
 
 
 from simphony_mayavi.snapshot import snapshot
-from simphony.cuds.lattice import make_square_lattice
+from simphony.cuds.lattice import make_cubic_lattice
 from simphony.cuds.mesh import Mesh, Point
 from simphony.cuds.particles import Particles, Particle
 
@@ -25,8 +25,8 @@ class TestSnapShot(unittest.TestCase):
 
     def test_lattice_snapshot(self):
         filename = self.filename
-        lattice = make_square_lattice(
-            'test', 0.2, (10, 10), origin=(0.2, -2.4))
+        lattice = make_cubic_lattice(
+            'test', 0.2, (10, 10, 1), origin=(0.2, -2.4, 0.))
         snapshot(lattice, filename)
         self.assertImageSavedWithContent(filename)
 

@@ -6,9 +6,9 @@ from hypothesis import given
 from hypothesis.strategies import sampled_from
 
 from simphony.core.cuba import CUBA
-from simphony.cuds.abstractmesh import ABCMesh
-from simphony.cuds.abstractlattice import ABCLattice
-from simphony.cuds.abstractparticles import ABCParticles
+from simphony.cuds.abc_mesh import ABCMesh
+from simphony.cuds.abc_lattice import ABCLattice
+from simphony.cuds.abc_particles import ABCParticles
 from simphony_mayavi.api import adapt2cuds
 
 

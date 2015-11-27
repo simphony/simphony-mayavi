@@ -1,9 +1,9 @@
 from mayavi import mlab
 from mayavi.tools.tools import _typical_distance
 
-from simphony.cuds.abstractmesh import ABCMesh
-from simphony.cuds.abstractparticles import ABCParticles
-from simphony.cuds.abstractlattice import ABCLattice
+from simphony.cuds.abc_mesh import ABCMesh
+from simphony.cuds.abc_particles import ABCParticles
+from simphony.cuds.abc_lattice import ABCLattice
 
 from simphony_mayavi.sources.api import CUDSSource
 
