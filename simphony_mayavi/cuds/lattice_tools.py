@@ -4,34 +4,28 @@ import numpy
 from simphony.cuds.primitive_cell import PrimitiveCell, BravaisLattice
 
 
-def vector_len(vec, dtype=numpy.float32):
+def vector_len(vec):
     ''' Length of vector
 
     Parameter
     ---------
     vec : array_like
 
-    dtype : str or dtype
-        to which the result is casted
-
     Returns
     -------
     length : ndarray
     '''
-    return numpy.sqrt(numpy.dot(vec, vec)).astype(dtype)
+    return numpy.sqrt(numpy.dot(vec, vec))
 
 
-def cosine_two_vectors(vec1, vec2, dtype=numpy.float32):
+def cosine_two_vectors(vec1, vec2):
     ''' Return the cosine of the acute angle between two vectors
 
     Parameters
     ----------
     vec1 : array_like
-
     vec2 : array_like
 
-    dtype : str or dtype
-        to which the result is casted
 
     Returns
     -------
@@ -39,7 +33,7 @@ def cosine_two_vectors(vec1, vec2, dtype=numpy.float32):
     '''
     vec1_length = vector_len(vec1)
     vec2_length = vector_len(vec2)
-    return (numpy.dot(vec1, vec2)/vec1_length/vec2_length).astype(dtype)
+    return numpy.dot(vec1, vec2)/vec1_length/vec2_length
 
 
 def same_lattice_type(target_pc, p1, p2, p3):
@@ -151,9 +145,14 @@ def is_cubic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
+    # single precision
+    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
+                              dtype=numpy.float32)
+    unique_lengths = numpy.unique(vec_lengths)
+
     if len(unique_lengths) != 1:
         return False
+
     return same_lattice_type(PrimitiveCell.for_cubic_lattice(1.), p1, p2, p3)
 
 
@@ -169,9 +168,14 @@ def is_body_centered_cubic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
+    # single precision
+    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
+                              dtype=numpy.float32)
+    unique_lengths = numpy.unique(vec_lengths)
+
     if len(unique_lengths) != 2:
         return False
+
     return same_lattice_type(PrimitiveCell.for_body_centered_cubic_lattice(1.),
                              p1, p2, p3)
 
@@ -188,9 +192,14 @@ def is_face_centered_cubic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
+    # single precision
+    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
+                              dtype=numpy.float32)
+    unique_lengths = numpy.unique(vec_lengths)
+
     if len(unique_lengths) != 1:
         return False
+
     return same_lattice_type(PrimitiveCell.for_face_centered_cubic_lattice(1.),
                              p1, p2, p3)
 
@@ -209,7 +218,11 @@ def is_rhombohedral_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
+    # single precision
+    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
+                              dtype=numpy.float32)
+    unique_lengths = numpy.unique(vec_lengths)
+
     if len(unique_lengths) != 1:
         return False
 
@@ -237,7 +250,9 @@ def is_tetragonal_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    vec_lengths = map(vector_len, (p1, p2, p3))
+    # single precision
+    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
+                              dtype=numpy.float32)
     unique_lengths = numpy.unique(vec_lengths)
 
     if len(unique_lengths) > 2:
@@ -269,7 +284,11 @@ def is_body_centered_tetragonal_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    unique_lengths = numpy.unique(map(vector_len, (p1, p2, p3)))
+    # single precision
+    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
+                              dtype=numpy.float32)
+    unique_lengths = numpy.unique(vec_lengths)
+
     if len(unique_lengths) != 2:
         return False
 
@@ -296,7 +315,9 @@ def is_hexagonal_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    vec_lengths = map(vector_len, (p1, p2, p3))
+    # single precision
+    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
+                              dtype=numpy.float32)
     unique_lengths = numpy.unique(vec_lengths)
 
     factory = PrimitiveCell.for_hexagonal_lattice
