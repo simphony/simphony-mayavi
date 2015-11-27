@@ -13,7 +13,7 @@ from simphony_mayavi.core.api import CubaData, supported_cuba, mergedocs
 from simphony_mayavi.core.api import CUBADataAccumulator
 
 from .lattice_tools import (vector_len, guess_primitive_vectors,
-                            find_lattice_type)
+                            find_lattice_type, is_bravais_lattice_consistent)
 
 VTK_POLY_LINE = 4
 
@@ -254,6 +254,17 @@ class VTKLattice(ABCLattice):
                 BravaisLattice.ORTHORHOMBIC):
             # Cubic/Tetragonal/Orthorhombic lattice can be represented
             # by tvtk.ImageData, which is more efficient than PolyData
+            # But we should make sure the primitive vectors do describe
+            # such a regular lattice type as PrimitiveCell does not
+            # perform this check
+            consistent = is_bravais_lattice_consistent(primitive_cell.p1,
+                                                       primitive_cell.p2,
+                                                       primitive_cell.p3,
+                                                       lattice_type)
+            if not consistent:
+                message = ("primitive vectors are not consistent with the "
+                           "bravais_lattice: {}")
+                raise ValueError(message.format(str(lattice_type)))
 
             # Compute the spacing from the primitive cell
             spacing = tuple(map(vector_len, (primitive_cell.p1,

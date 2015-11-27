@@ -599,3 +599,61 @@ def find_lattice_type(p1, p2, p3):
         message = ("None of the predefined Bravais Lattices matches the "
                    "given primitive vectors")
         raise TypeError(message)
+
+
+def is_bravais_lattice_consistent(p1, p2, p3, bravais_lattice):
+    ''' Test if the bravais lattice is consistent with the
+    primitive vectors given
+
+    Parameters
+    ----------
+    p1, p2, p3 : array_like
+        Primitive vectors
+    bravais_lattice : BravaisLattice(IntEnum)
+
+    Returns
+    -------
+    consistent : bool
+        True if the bravais lattice is consistent with the
+        primitive vectors given
+
+    Raises
+    ------
+    TypeError
+        if bravais_lattice is not a member of BravaisLattice
+
+
+    See Also
+    --------
+    is_cubic_lattice, is_body_centered_cubic_lattice,
+    is_face_centered_cubic_lattice, is_rhombohedral_lattice,
+    is_tetragonal_lattice, is_body_centered_tetragonal_lattice,
+    is_hexagonal_lattice, is_orthorhombic_lattice,
+    is_body_centered_orthorhombic_lattice,
+    is_face_centered_orthorhombic_lattice,
+    is_base_centered_orthorhombic_lattice,
+    is_monoclinic_lattice, is_base_centered_monoclinic_lattice,
+    is_triclinic_lattice
+    '''
+    check_functions = {
+        BravaisLattice.CUBIC: is_cubic_lattice,
+        BravaisLattice.BODY_CENTERED_CUBIC: is_body_centered_cubic_lattice,
+        BravaisLattice.FACE_CENTERED_CUBIC: is_face_centered_cubic_lattice,
+        BravaisLattice.RHOMBOHEDRAL: is_rhombohedral_lattice,
+        BravaisLattice.TETRAGONAL: is_tetragonal_lattice,
+        BravaisLattice.BODY_CENTERED_TETRAGONAL:
+            is_body_centered_tetragonal_lattice,
+        BravaisLattice.HEXAGONAL: is_hexagonal_lattice,
+        BravaisLattice.ORTHORHOMBIC: is_orthorhombic_lattice,
+        BravaisLattice.BODY_CENTERED_ORTHORHOMBIC:
+            is_body_centered_orthorhombic_lattice,
+        BravaisLattice.FACE_CENTERED_ORTHORHOMBIC:
+            is_face_centered_orthorhombic_lattice,
+        BravaisLattice.BASE_CENTERED_ORTHORHOMBIC:
+            is_base_centered_orthorhombic_lattice,
+        BravaisLattice.MONOCLINIC: is_monoclinic_lattice,
+        BravaisLattice.BASE_CENTERED_MONOCLINIC:
+            is_base_centered_monoclinic_lattice,
+        BravaisLattice.TRICLINIC: is_triclinic_lattice}
+
+    return check_functions[bravais_lattice](p1, p2, p3)
