@@ -7,6 +7,7 @@ import numpy
 from tvtk.api import tvtk
 
 from simphony.cuds.abc_mesh import ABCMesh
+from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.mesh import Point, Edge, Face, Cell
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
@@ -193,23 +194,31 @@ class VTKMesh(ABCMesh):
     def data(self, value):
         self._data = DataContainer(value)
 
+    def count_of(self, item_type):
+        def count_element(type_):
+            # max value of cell_types_array is small enough for
+            # bincount to be efficient
+            counts = numpy.bincount(self.data_set.cell_types_array)
+            type_ids = numpy.array(ELEMENT2VTKCELLTYPES[type_])
+            type_ids = type_ids[type_ids<len(counts)]
+            return counts[type_ids].sum()
+
+        items_count = {
+            CUDSItem.POINT: lambda: self.data_set.number_of_points,
+            CUDSItem.EDGE: lambda: count_element(Edge),
+            CUDSItem.FACE: lambda: count_element(Face),
+            CUDSItem.CELL: lambda: count_element(Cell)
+        }
+
+        try:
+            return items_count[item_type]()
+        except KeyError:
+            error_str = "Trying to obtain count a of non-supported item: {}"
+            raise ValueError(error_str.format(item_type))
+
     # Point operations ####################################################
 
     def add_points(self, points):
-        """ Adds a set of new points to the mesh.
-
-        Parameters
-        ----------
-        points : iterable of Point
-            Points to be added to the mesh
-
-        Raises
-        ------
-        ValueError :
-            If other point with a duplicated uid was already
-            in the mesh.
-
-        """
         data_set = self.data_set
         own_points = data_set.points
         point2index = self.point2index
@@ -233,23 +242,6 @@ class VTKMesh(ABCMesh):
             data=self.point_data[index])
 
     def update_points(self, points):
-        """ Updates the information of a set of points.
-
-        Gets the mesh point identified by the same
-        uid as the provided point and updates its information
-        with the one provided with the new point.
-
-        Parameters
-        ----------
-        points : iterable of Point
-            Point to be updated
-
-        Raises
-        ------
-        ValueError :
-            If the any point was not found in the mesh
-
-        """
         for point in points:
             try:
                 index = self.point2index[point.uid]
@@ -269,15 +261,16 @@ class VTKMesh(ABCMesh):
 
     # special private ########################################################
 
-    def _update_element(self, element):
-        try:
-            index = self.element2index[element.uid]
-        except KeyError:
-            message = "{} with {} does exist"
-            raise ValueError(message.format(type(element), element.uid))
-        point_ids = [self.point2index[uid] for uid in element.points]
-        self.elements[index] = point_ids
-        self.element_data[index] = element.data
+    def _update_elements(self, elements):
+        for element in elements:
+            try:
+                index = self.element2index[element.uid]
+            except KeyError:
+                message = "{} with {} does exist"
+                raise ValueError(message.format(type(element), element.uid))
+            point_ids = [self.point2index[uid] for uid in element.points]
+            self.elements[index] = point_ids
+            self.element_data[index] = element.data
 
     # Edge operations ########################################################
 
@@ -298,10 +291,14 @@ class VTKMesh(ABCMesh):
             for uid in uids:
                 yield self.get_edge(uid)
 
-    def add_edge(self, edge):
-        return self._add_element(edge, mapping=EDGE2VTKCELL)
+    def add_edges(self, edges):
+        uids = []
+        for edge in edges:
+            uids.append(self._add_element(edge, mapping=EDGE2VTKCELL))
+        return uids
 
-    update_edge = copy.copy(_update_element)
+    def update_edges(self, edges):
+        return self._update_elements(edges)
 
     # Face operations ########################################################
 
@@ -322,10 +319,14 @@ class VTKMesh(ABCMesh):
             for uid in uids:
                 yield self.get_face(uid)
 
-    def add_face(self, face):
-        return self._add_element(face, mapping=FACE2VTKCELL)
+    def add_faces(self, faces):
+        uids = []
+        for face in faces:
+            uids.append(self._add_element(face, mapping=FACE2VTKCELL))
+        return uids
 
-    update_face = copy.copy(_update_element)
+    def update_faces(self, faces):
+        return self._update_elements(faces)
 
     # Cell operations ########################################################
 
@@ -346,10 +347,14 @@ class VTKMesh(ABCMesh):
             for uid in uids:
                 yield self.get_cell(uid)
 
-    def add_cell(self, cell):
-        return self._add_element(cell, mapping=CELL2VTKCELL)
+    def add_cells(self, cells):
+        uids = []
+        for cell in cells:
+            uids.append(self._add_element(cell, mapping=CELL2VTKCELL))
+        return uids
 
-    update_cell = copy.copy(_update_element)
+    def update_cells(self, cells):
+        return self._update_elements(cells)
 
     # Private interface ######################################################
 

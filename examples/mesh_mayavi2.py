@@ -21,35 +21,27 @@ edges = [[1, 4], [3, 8]]
 container = Mesh('test')
 
 # add points
-uids = [
-    container.add_point(
-        Point(coordinates=point, data=DataContainer(TEMPERATURE=index)))
-    for index, point in enumerate(points)]
+point_iter = (Point(coordinates=point, data=DataContainer(TEMPERATURE=index))
+              for index, point in enumerate(points))
+uids = container.add_points(point_iter)
 
 # add edges
-edge_uids = [
-    container.add_edge(
-        Edge(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 20)))
-    for index, element in enumerate(edges)]
+edge_iter = (Edge(points=[uids[index] for index in element],
+                  data=DataContainer(TEMPERATURE=index + 20))
+             for index, element in enumerate(edges))
+edge_uids = container.add_edges(edge_iter)
 
 # add faces
-face_uids = [
-    container.add_face(
-        Face(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 30)))
-    for index, element in enumerate(faces)]
+face_iter = (Face(points=[uids[index] for index in element],
+                 data=DataContainer(TEMPERATURE=index + 30))
+            for index, element in enumerate(faces))
+face_uids = container.add_faces(face_iter)
 
 # add cells
-cell_uids = [
-    container.add_cell(
-        Cell(
-            points=[uids[index] for index in element],
-            data=DataContainer(TEMPERATURE=index + 40)))
-    for index, element in enumerate(cells)]
-
+cell_iter = (Cell(points=[uids[index] for index in element],
+                  data=DataContainer(TEMPERATURE=index + 40))
+             for index, element in enumerate(cells))
+cell_uids = container.add_cells(cell_iter)
 
 # Now view the data.
 @mayavi2.standalone
