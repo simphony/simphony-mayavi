@@ -69,12 +69,6 @@ class VTKLattice(ABCLattice):
         self.point_data = CubaData(
             data, stored_cuba=self.supported_cuba, size=size)
 
-        # Determine origin
-        try:
-            self._origin = self.data_set.origin
-        except AttributeError:
-            self._origin = self.data_set.points.get_point(0)
-
         # Estimate the lattice size
         if isinstance(self.data_set, tvtk.ImageData):
             extent = self.data_set.extent
@@ -82,7 +76,11 @@ class VTKLattice(ABCLattice):
             y_size = extent[3] - extent[2] + 1
             z_size = extent[5] - extent[4] + 1
             self._size = x_size, y_size, z_size
+            self._origin = self.data_set.origin
         elif isinstance(self.data_set, tvtk.PolyData):
+            # Assumed first point be the origin
+            self._origin = self.data_set.points.get_point(0)
+
             # Assumed the last point is the furthest point from origin
             # alternative method is to calculate distances for each point
             # but this maybe costly for large datasets
