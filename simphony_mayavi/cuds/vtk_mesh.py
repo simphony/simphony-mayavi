@@ -195,16 +195,33 @@ class VTKMesh(ABCMesh):
 
     # Point operations ####################################################
 
-    def add_point(self, point):
+    def add_points(self, points):
+        """ Adds a set of new points to the mesh.
+
+        Parameters
+        ----------
+        points : iterable of Point
+            Points to be added to the mesh
+
+        Raises
+        ------
+        ValueError :
+            If other point with a duplicated uid was already
+            in the mesh.
+
+        """
         data_set = self.data_set
-        points = data_set.points
+        own_points = data_set.points
         point2index = self.point2index
-        with self._add_item(point, point2index) as item:
-            index = points.insert_next_point(item.coordinates)
-            point2index[item.uid] = index
-            self.index2point[index] = item.uid
-            self.point_data.append(item.data)
-            return item.uid
+        new_uids = []
+        for point in points:
+            with self._add_item(point, point2index) as item:
+                index = own_points.insert_next_point(item.coordinates)
+                point2index[item.uid] = index
+                self.index2point[index] = item.uid
+                self.point_data.append(item.data)
+                new_uids.append(item.uid)
+        return new_uids
 
     def get_point(self, uid):
         if not isinstance(uid, uuid.UUID):
@@ -215,15 +232,32 @@ class VTKMesh(ABCMesh):
             coordinates=self.data_set.points[index],
             data=self.point_data[index])
 
-    def update_point(self, point):
-        try:
-            index = self.point2index[point.uid]
-        except KeyError:
-            message = "Point with {} does exist"
-            raise ValueError(message.format(point.uid))
-        # Need to cast to int https://github.com/enthought/mayavi/issues/173
-        self.data_set.points[int(index)] = point.coordinates
-        self.point_data[index] = point.data
+    def update_points(self, points):
+        """ Updates the information of a set of points.
+
+        Gets the mesh point identified by the same
+        uid as the provided point and updates its information
+        with the one provided with the new point.
+
+        Parameters
+        ----------
+        points : iterable of Point
+            Point to be updated
+
+        Raises
+        ------
+        ValueError :
+            If the any point was not found in the mesh
+
+        """
+        for point in points:
+            try:
+                index = self.point2index[point.uid]
+            except KeyError:
+                message = "Point with {} does exist"
+                raise ValueError(message.format(point.uid))
+            self.data_set.points[index] = point.coordinates
+            self.point_data[index] = point.data
 
     def iter_points(self, uids=None):
         if uids is None:
