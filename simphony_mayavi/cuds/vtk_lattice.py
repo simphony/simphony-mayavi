@@ -252,6 +252,9 @@ class VTKLattice(ABCLattice):
         if lattice_type in (
                 BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
                 BravaisLattice.ORTHORHOMBIC):
+            # Cubic/Tetragonal/Orthorhombic lattice can be represented
+            # by tvtk.ImageData, which is more efficient than PolyData
+
             # Compute the spacing from the primitive cell
             spacing = tuple(map(vector_len, (primitive_cell.p1,
                                              primitive_cell.p2,
@@ -265,6 +268,8 @@ class VTKLattice(ABCLattice):
                 range(size[1]), range(size[2]), range(size[0]))
             indices = izip(x.ravel(), y.ravel(), z.ravel())
         elif lattice_type in BravaisLattice:
+            # This includes any other BravaisLattice type that cannot be
+            # represented by ImageData.  PolyData is required.
             y, z, x = numpy.meshgrid(
                 range(size[1]), range(size[2]), range(size[0]))
             points = numpy.zeros(shape=(x.size, 3), dtype='double')
