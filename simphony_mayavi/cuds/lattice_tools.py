@@ -207,7 +207,8 @@ def is_face_centered_cubic_lattice(p1, p2, p3):
 def is_rhombohedral_lattice(p1, p2, p3):
     ''' Test if primitive vectors describe a rhombohedral lattice
 
-    Also returns True for vectors describing a cubic lattice
+    Also returns True for vectors describing a cubic or face centered
+    cubic lattice
 
     Parameters
     ----------
@@ -421,6 +422,8 @@ def is_base_centered_orthorhombic_lattice(p1, p2, p3):
     ''' Test if primitive vectors describe a base centered orthorhombic
     lattice
 
+    Also returns True for vectors describing a hexagonal lattice
+
     Parameters
     ----------
     p1, p2, p3: array_like
@@ -445,8 +448,8 @@ def is_base_centered_orthorhombic_lattice(p1, p2, p3):
 def is_monoclinic_lattice(p1, p2, p3):
     ''' Test if primitive vectors describe a monoclinic lattice
 
-    Also returns True for vectors describing a cubic, an orthorhombic
-    or a base centered orthorhombic lattice
+    Also returns True for vectors describing a cubic, hexagonal,
+    orthorhombic or base centered orthorhombic lattice
 
     Parameters
     ----------
@@ -478,7 +481,7 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
     lattice
 
     Also returns True for vectors describing a base centered
-    orthorhombic lattice or a monoclinic lattice
+    orthorhombic lattice or a hexagonal lattice
 
     Parameters
     ----------
