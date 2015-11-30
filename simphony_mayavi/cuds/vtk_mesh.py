@@ -379,12 +379,11 @@ class VTKMesh(ABCMesh):
 
     def _get_element(self, index, type_=None):
         data_set = self.data_set
-        element = data_set.get_cell(index)
         if type_ is None:
             type_ = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
         return type_(
             uid=self.index2element[index],
-            points=[self.index2point[i] for i in element.point_ids],
+            points=[self.index2point[i] for i in self.elements[index]],
             data=self.element_data[index])
 
     def _iter_elements(self, type_):
