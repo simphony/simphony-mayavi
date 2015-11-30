@@ -22,21 +22,19 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
             (0.5, 0.5, 0.5), (1.0, 0.0, 1.0), (1.0, 1.0, 0.0), (1.0, 1.0, 1.0)]
         self.bonds = [[0, 1], [0, 3], [1, 3, 2]]
         self.container = Particles('test')
-        self.point_uids = []
+        particle_list = []
         for index, point in enumerate(self.points):
             data = DataContainer(
                 TEMPERATURE=self.temperature[index],
                 VELOCITY=self.velocity[index])
-            uid = self.container.add_particle(
-                Particle(coordinates=point, data=data))
-            self.point_uids.append(uid)
+            particle_list.append(Particle(coordinates=point, data=data))
+        self.point_uids = self.container.add_particles(particle_list)
 
-        self.bond_uids = [
-            self.container.add_bond(
+        self.bond_uids = self.container.add_bonds((
                 Bond(
                     particles=[self.point_uids[index] for index in indices],
-                    data=DataContainer(NAME=str(len(indices)))))
-            for indices in self.bonds]
+                    data=DataContainer(NAME=str(len(indices))))
+                for indices in self.bonds))
 
     def test_initialization(self):
         container = self.container
