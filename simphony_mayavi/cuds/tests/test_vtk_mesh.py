@@ -21,6 +21,17 @@ from simphony_mayavi.cuds.api import VTKMesh
 from simphony_mayavi.core.api import supported_cuba as core_supported_cuba
 
 
+def vtk_compare_points(point, reference, msg=None, testcase=None):
+    ''' assertAlmostEqual is used for comparing point coordinates
+    retrieved from vtk dataset as vtk uses double precision for
+    point coordinates and creates errors during casting a single float
+    '''
+    self = testcase
+    self.assertEqual(point.uid, reference.uid)
+    self.assertAlmostEqual(point.coordinates, reference.coordinates)
+    compare_data_containers(point.data, reference.data, testcase=self)
+
+
 class TestVTKMeshContainer(CheckMeshContainer, unittest.TestCase):
 
     def supported_cuba(self):
@@ -31,6 +42,11 @@ class TestVTKMeshContainer(CheckMeshContainer, unittest.TestCase):
 
 
 class TestVTKMeshPointOperations(CheckMeshPointOperations, unittest.TestCase):
+
+    def setUp(self):
+        CheckMeshItemOperations.setUp(self)
+        self.addTypeEqualityFunc(
+            Point, partial(vtk_compare_points, testcase=self))
 
     def supported_cuba(self):
         return core_supported_cuba()
