@@ -34,11 +34,10 @@ class TestMeshSource(unittest.TestCase):
         self.faces = [[2, 7, 11]]
         self.edges = [[1, 4], [3, 8]]
         self.container = container = Mesh('test')
-        self.point_uids = [
-            container.add_point(
-                Point(coordinates=point,
-                      data=DataContainer(TEMPERATURE=index)))
-            for index, point in enumerate(points)]
+        point_iter = (Point(coordinates=point,
+                            data=DataContainer(TEMPERATURE=index))
+                      for index, point in enumerate(points))
+        self.point_uids = container.add_points(point_iter)
 
     def test_points(self):
         # given
@@ -64,11 +63,10 @@ class TestMeshSource(unittest.TestCase):
     def test_cells(self):
         # given
         container = self.container
-        for i, cell in enumerate(self.cells):
-            container.add_cell(
-                Cell(
-                    points=[self.point_uids[index] for index in cell],
-                    data=DataContainer(TEMPERATURE=i)))
+        cell_iter = (Cell(points=[self.point_uids[index] for index in cell],
+                          data=DataContainer(TEMPERATURE=i))
+                     for i, cell in enumerate(self.cells))
+        container.add_cells(cell_iter)
 
         # when
         source = CUDSSource(cuds=container)
@@ -94,11 +92,11 @@ class TestMeshSource(unittest.TestCase):
     def test_edges(self):
         # given
         container = self.container
-        for i, edge in enumerate(self.edges):
-            container.add_edge(
-                Edge(
-                    points=[self.point_uids[index] for index in edge],
-                    data=DataContainer(TEMPERATURE=i)))
+        edge_iter = (Edge(points=[self.point_uids[index] for index in edge],
+                          data=DataContainer(TEMPERATURE=i))
+                     for i, edge in enumerate(self.edges))
+        container.add_edges(edge_iter)
+
 
         # when
         source = CUDSSource(cuds=container)
@@ -126,11 +124,10 @@ class TestMeshSource(unittest.TestCase):
     def test_face(self):
         # given
         container = self.container
-        for i, face in enumerate(self.faces):
-            container.add_face(
-                Face(
-                    points=[self.point_uids[index] for index in face],
-                    data=DataContainer(TEMPERATURE=i)))
+        face_iter = (Face(points=[self.point_uids[index] for index in face],
+                          data=DataContainer(TEMPERATURE=i))
+                     for i, face in enumerate(self.faces))
+        container.add_faces(face_iter)
 
         # when
         source = CUDSSource(cuds=container)
@@ -160,21 +157,20 @@ class TestMeshSource(unittest.TestCase):
         # given
         container = self.container
         count = itertools.count()
-        for face in self.faces:
-            container.add_face(
-                Face(
-                    points=[self.point_uids[index] for index in face],
-                    data=DataContainer(TEMPERATURE=next(count))))
-        for edge in self.edges:
-            container.add_edge(
-                Edge(
-                    points=[self.point_uids[index] for index in edge],
-                    data=DataContainer(TEMPERATURE=next(count))))
-        for cell in self.cells:
-            container.add_cell(
-                Cell(
-                    points=[self.point_uids[index] for index in cell],
-                    data=DataContainer(TEMPERATURE=next(count))))
+        face_iter = (Face(points=[self.point_uids[index] for index in face],
+                          data=DataContainer(TEMPERATURE=next(count)))
+                     for face in self.faces)
+        container.add_faces(face_iter)
+
+        edge_iter = (Edge(points=[self.point_uids[index] for index in edge],
+                          data=DataContainer(TEMPERATURE=next(count)))
+                     for edge in self.edges)
+        container.add_edges(edge_iter)
+
+        cell_iter = (Cell(points=[self.point_uids[index] for index in cell],
+                          data=DataContainer(TEMPERATURE=next(count)))
+                     for cell in self.cells)
+        container.add_cells(cell_iter)
 
         # when
         source = CUDSSource(cuds=container)
