@@ -14,7 +14,7 @@ from simphony.testing.abc_check_mesh import (
     CheckMeshPointOperations, CheckMeshElementOperations,
     CheckMeshEdgeOperations, CheckMeshFaceOperations,
     CheckMeshCellOperations)
-from simphony.testing.utils import (compare_data_containers,
+from simphony.testing.utils import (create_points, compare_data_containers,
                                     compare_points, compare_elements)
 
 
