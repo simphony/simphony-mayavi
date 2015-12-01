@@ -5,9 +5,10 @@ import numpy
 from numpy.testing import assert_array_equal
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony.cuds.particles import Particle, Particles, Bond
+from simphony.cuds.primitive_cell import PrimitiveCell
 from simphony.cuds.lattice import (
-    Lattice, make_hexagonal_lattice, make_square_lattice,
-    make_cubic_lattice, make_rectangular_lattice, make_orthorombicp_lattice)
+    Lattice, make_hexagonal_lattice, make_cubic_lattice,
+    make_orthorhombic_lattice)
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 
@@ -237,43 +238,6 @@ class TestMeshSource(unittest.TestCase):
 
 class TestLatticeSource(unittest.TestCase):
 
-    def test_source_from_a_xy_plane_square_lattice(self):
-        shape = 2, 4
-        lattice = make_square_lattice(
-            'test', 0.2, (2, 4), origin=(0.2, -2.4, 0.0))
-        self.add_velocity(lattice)
-        source = CUDSSource(cuds=lattice)
-        data = source.data
-        self.assertEqual(data.number_of_points, numpy.prod(shape))
-        assert_array_equal(data.origin, (0.2, -2.4, 0.0))
-
-        vectors = data.point_data.vectors.to_array()
-        for node in lattice.iter_nodes():
-            index = numpy.array(node.index)
-            point_id = data.compute_point_id(index)
-            assert_array_equal(
-                lattice.get_coordinate(node.index),
-                data.get_point(point_id))
-            assert_array_equal(vectors[point_id], index)
-
-    def test_source_from_a_xy_plane_rectangular_lattice(self):
-        lattice = make_rectangular_lattice(
-            'test', (0.3, 0.35), (13, 23), origin=(0.2, -2.7, 0.0))
-        self.add_velocity(lattice)
-        source = CUDSSource(cuds=lattice)
-        data = source.data
-        self.assertEqual(data.number_of_points, 13 * 23)
-        assert_array_equal(data.origin, (0.2, -2.7, 0.0))
-
-        vectors = data.point_data.vectors.to_array()
-        for node in lattice.iter_nodes():
-            index = numpy.array(node.index)
-            point_id = data.compute_point_id(index)
-            assert_array_equal(
-                lattice.get_coordinate(node.index),
-                data.get_point(point_id))
-            assert_array_equal(vectors[point_id], index)
-
     def test_source_from_a_cubic_lattice(self):
         lattice = make_cubic_lattice('test', 0.4, (14, 24, 34), (4, 5, 6))
         self.add_velocity(lattice)
@@ -291,7 +255,7 @@ class TestLatticeSource(unittest.TestCase):
             assert_array_equal(vectors[point_id], node.index)
 
     def test_source_from_an_orthorombic_p_lattice(self):
-        lattice = make_orthorombicp_lattice(
+        lattice = make_orthorhombic_lattice(
             'test',  (0.5, 0.54, 0.58), (15, 25, 35), (7, 9, 8))
         self.add_velocity(lattice)
         source = CUDSSource(cuds=lattice)
@@ -308,12 +272,13 @@ class TestLatticeSource(unittest.TestCase):
             assert_array_equal(vectors[point_id], node.index)
 
     def test_source_from_a_xy_plane_hexagonal_lattice(self):
-        lattice = make_hexagonal_lattice('test', 0.1, (5, 4))
+        xspace = 0.1
+        yspace = 0.1*numpy.sqrt(3.)/2.
+        lattice = make_hexagonal_lattice('test', xspace, 0.2, (5, 4, 1))
         self.add_velocity(lattice)
         source = CUDSSource(cuds=lattice)
         data = source.data
-        self.assertEqual(data.number_of_points, 5 * 4)
-        xspace, yspace, _ = lattice.base_vect
+        self.assertEqual(data.number_of_points, 5 * 4 * 1)
 
         for index, point in enumerate(data.points):
             # The lattice has 4 rows (y axis) and 5 columns (x axis).
@@ -336,14 +301,18 @@ class TestLatticeSource(unittest.TestCase):
             assert_array_equal(vectors[point_id], node.index)
 
     def test_source_from_unknown(self):
-        lattice = Lattice('test', '', (1, 1, 1), (1, 1, 1), (0, 0, 0))
+        primitive_cell = PrimitiveCell((1, 0, 0), (0, 1, 0), (0, 0, 1),
+                                       bravais_lattice="Cubic")
+        lattice = Lattice('test', primitive_cell, (5, 4, 3), (0, 0, 0))
+        # bravais_lattice should be a BravaisLattice(IntEnum)
         with self.assertRaises(ValueError):
             CUDSSource(cuds=lattice)
 
     def test_source_from_a_vtk_lattice(self):
         # given
+        primitive_cell = PrimitiveCell.for_cubic_lattice(0.1)
         lattice = VTKLattice.empty(
-            'test', 'Cubic', (0.1, 0.1, 0.1), (5, 10, 12), (0, 0, 0))
+            'test', primitive_cell, (5, 10, 12), (0, 0, 0))
 
         # when
         source = CUDSSource(cuds=lattice)
@@ -354,8 +323,9 @@ class TestLatticeSource(unittest.TestCase):
 
     def test_lattice_source_name(self):
         # given
-        lattice = VTKLattice.empty(
-            'my_lattice', 'Cubic', (0.1, 0.1, 0.1), (5, 10, 12), (0, 0, 0))
+        primitive_cell = PrimitiveCell.for_cubic_lattice(0.1)
+        lattice = VTKLattice.empty('my_lattice', primitive_cell,
+                                   (5, 10, 12), (0, 0, 0))
 
         # when
         source = CUDSSource(cuds=lattice)
@@ -364,9 +334,11 @@ class TestLatticeSource(unittest.TestCase):
         self.assertEqual(source.name, 'my_lattice (CUDS Lattice)')
 
     def add_velocity(self, lattice):
+        new_nodes = []
         for node in lattice.iter_nodes():
             node.data[CUBA.VELOCITY] = node.index
-            lattice.update_node(node)
+            new_nodes.append(node)
+        lattice.update_nodes(new_nodes)
 
 
 class TestParticlesSource(unittest.TestCase):
