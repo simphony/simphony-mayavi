@@ -191,10 +191,8 @@ class VTKMesh(ABCMesh):
         return DataContainer(self._data)
 
     @data.setter
-    def data(self, new_data):
-        self._data = DataContainer({key: value
-                                    for key, value in new_data.items()
-                                    if key in self.supported_cuba})
+    def data(self, data):
+        self._data = DataContainer(data)
 
     def count_of(self, item_type):
         def count_element(type_):
