@@ -33,8 +33,8 @@ class TestShow(unittest.TestCase, GuiTestAssistant):
             'f')
 
         mesh = Mesh('test')
-        for index, point in enumerate(points):
-            mesh.add_point(Point(coordinates=point))
+        point_iter = (Point(coordinates=point) for point in points)
+        mesh.add_points(point_iter)
 
         def function():
             show(mesh)
