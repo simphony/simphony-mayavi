@@ -246,7 +246,7 @@ class VTKMesh(ABCMesh):
             try:
                 index = self.point2index[point.uid]
             except KeyError:
-                message = "Point with {} does exist"
+                message = "Point with {} does not exist"
                 raise ValueError(message.format(point.uid))
             self.data_set.points[index] = point.coordinates
             self.point_data[index] = point.data
@@ -266,7 +266,7 @@ class VTKMesh(ABCMesh):
             try:
                 index = self.element2index[element.uid]
             except KeyError:
-                message = "{} with {} does exist"
+                message = "{} with {} does not exist"
                 raise ValueError(message.format(type(element), element.uid))
             point_ids = [self.point2index[uid] for uid in element.points]
             self.elements[index] = point_ids
