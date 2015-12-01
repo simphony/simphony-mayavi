@@ -14,11 +14,26 @@ from simphony.testing.abc_check_mesh import (
     CheckMeshPointOperations, CheckMeshElementOperations,
     CheckMeshEdgeOperations, CheckMeshFaceOperations,
     CheckMeshCellOperations)
-from simphony.testing.utils import compare_points, compare_elements
+from simphony.testing.utils import (compare_data_containers,
+                                    compare_points, compare_elements)
 
 
 from simphony_mayavi.cuds.api import VTKMesh
 from simphony_mayavi.core.api import supported_cuba as core_supported_cuba
+
+
+def vtk_compare_points(point, reference, msg=None, testcase=None):
+    ''' use numpy.allclose to compare point coordinates retrieved
+    from vtk dataset with the reference as vtk casts coordinates to
+    double-precision floats and precision errors may be introduced
+    during casting
+    '''
+    self = testcase
+    self.assertEqual(point.uid, reference.uid)
+    if not numpy.allclose(point.coordinates, reference.coordinates):
+        error_message = "{} != {}"
+        self.failureException(error_message.format(point, reference))
+    compare_data_containers(point.data, reference.data, testcase=self)
 
 
 class TestVTKMeshContainer(CheckMeshContainer, unittest.TestCase):
@@ -31,6 +46,11 @@ class TestVTKMeshContainer(CheckMeshContainer, unittest.TestCase):
 
 
 class TestVTKMeshPointOperations(CheckMeshPointOperations, unittest.TestCase):
+
+    def setUp(self):
+        CheckMeshItemOperations.setUp(self)
+        self.addTypeEqualityFunc(
+            Point, partial(vtk_compare_points, testcase=self))
 
     def supported_cuba(self):
         return core_supported_cuba()
