@@ -53,6 +53,8 @@ class TestVTKMeshPointOperations(CheckMeshPointOperations, unittest.TestCase):
             Point, partial(vtk_compare_points, testcase=self))
 
     def create_items(self):
+        # for simphony-common < 0.2.4
+        # https://github.com/simphony/simphony-common/issues/217
         return create_points(restrict=self.supported_cuba())
 
     def supported_cuba(self):
