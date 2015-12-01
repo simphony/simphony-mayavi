@@ -377,6 +377,10 @@ class VTKMesh(ABCMesh):
 
     def _get_element(self, index, type_=None):
         data_set = self.data_set
+        # data_set.get_cell may return the wrong point ids
+        # if the cell type is updated
+        # Use elements[index] to retrieve point ids instead
+        # https://github.com/simphony/simphony-mayavi/issues/94
         if type_ is None:
             type_ = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
         return type_(
