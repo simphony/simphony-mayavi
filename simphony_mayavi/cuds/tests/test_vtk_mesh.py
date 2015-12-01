@@ -19,7 +19,7 @@ from simphony.testing.utils import (compare_data_containers,
 
 
 from simphony_mayavi.cuds.api import VTKMesh
-from simphony_mayavi.core.api import supported_cuba as core_supported_cuba
+from simphony_mayavi.core.api import supported_cuba as mayavi_supported_cuba
 
 
 def vtk_compare_points(point, reference, msg=None, testcase=None):
@@ -39,7 +39,7 @@ def vtk_compare_points(point, reference, msg=None, testcase=None):
 class TestVTKMeshContainer(CheckMeshContainer, unittest.TestCase):
 
     def supported_cuba(self):
-        return core_supported_cuba()
+        return set(CUBA)
 
     def container_factory(self, name):
         return VTKMesh(name=name)
@@ -52,8 +52,11 @@ class TestVTKMeshPointOperations(CheckMeshPointOperations, unittest.TestCase):
         self.addTypeEqualityFunc(
             Point, partial(vtk_compare_points, testcase=self))
 
+    def create_items(self):
+        return create_points(restrict=self.supported_cuba())
+
     def supported_cuba(self):
-        return core_supported_cuba()
+        return mayavi_supported_cuba()
 
     def container_factory(self, name):
         return VTKMesh(name=name)
@@ -62,7 +65,7 @@ class TestVTKMeshPointOperations(CheckMeshPointOperations, unittest.TestCase):
 class TestVTKMeshEdgeOperations(CheckMeshEdgeOperations, unittest.TestCase):
 
     def supported_cuba(self):
-        return core_supported_cuba()
+        return mayavi_supported_cuba()
 
     def container_factory(self, name):
         container = VTKMesh(name=name)
@@ -72,7 +75,7 @@ class TestVTKMeshEdgeOperations(CheckMeshEdgeOperations, unittest.TestCase):
 class TestVTKMeshFaceOperations(CheckMeshFaceOperations, unittest.TestCase):
 
     def supported_cuba(self):
-        return core_supported_cuba()
+        return mayavi_supported_cuba()
 
     def container_factory(self, name):
         container = VTKMesh(name=name)
@@ -82,7 +85,7 @@ class TestVTKMeshFaceOperations(CheckMeshFaceOperations, unittest.TestCase):
 class TestVTKMeshCellOperations(CheckMeshCellOperations, unittest.TestCase):
 
     def supported_cuba(self):
-        return core_supported_cuba()
+        return mayavi_supported_cuba()
 
     def container_factory(self, name):
         container = VTKMesh(name=name)
