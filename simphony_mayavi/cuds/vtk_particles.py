@@ -323,8 +323,7 @@ class VTKParticles(ABCParticles):
             with self._add_item(bond, bond2index) as item:
                 if not self.is_connected(bond):
                     message = "Cannot add Bond {} with missing uids: {}"
-                    raise ValueError(message.format(bond.uid if bond.uid else "",
-                                                    bond.particles))
+                    raise ValueError(message.format(item.uid, item.particles))
                 point_ids = [self.particle2index[uid] for uid in item.particles]
                 index = data_set.insert_next_cell(VTKEDGETYPES[1], point_ids)
                 bond2index[item.uid] = index
