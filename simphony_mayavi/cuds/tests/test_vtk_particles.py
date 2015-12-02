@@ -1,6 +1,7 @@
 import unittest
 from functools import partial
 import random
+import uuid
 
 from tvtk.api import tvtk
 from simphony.cuds.particles import Particle, Bond, Particles
@@ -8,7 +9,7 @@ from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.testing.utils import (
     compare_data_containers, compare_particles, compare_bonds,
-    create_bonds_with_id, create_particles_with_id,
+    create_bonds_with_id, create_bonds, create_particles_with_id,
     create_data_container)
 from simphony.testing.abc_check_particles import (
     CheckParticlesContainer,
@@ -56,7 +57,8 @@ class TestVTKParticlesAddingBonds(
 
         # given
         container = self.container
-        bonds = create_bonds_with_id(particles=self.particle_list)
+        bonds = create_bonds_with_id(particles=self.particle_list,
+                                     restrict=supported_cuba())
 
         # when
         uids = container.add_bonds(bonds)
@@ -105,6 +107,54 @@ class TestVTKParticlesAddingBonds(
         with self.assertRaises(ValueError):
             container.add_bonds(bonds)
 
+
+class TestVTKParticlesManipulatingBonds(
+        CheckManipulatingBonds, unittest.TestCase):
+
+    def container_factory(self, name):
+        return VTKParticles(name=name)
+
+    def supported_cuba(self):
+        return supported_cuba()
+
+    def test_update_multiple_bonds(self):
+        # for simphony-common 0.2.1 when Bond can be added
+        # even if it contains particles that are not part of
+        # the container (proposed to throw ValueError, see wiki)
+
+        # given
+        container = self.container
+        bonds = self.bond_list
+        particle_uids = [particle.uid for particle in self.particle_list]
+        for bond in bonds:
+            bond.particles = tuple(random.sample(particle_uids, 3))
+
+        # update_bonds not yet called
+        for uid, bond in map(None, self.ids, bonds):
+            retrieved = container.get_bond(uid)
+            self.assertNotEqual(retrieved, bond)
+
+        # when
+        container.update_bonds(bonds)
+        # then
+        for uid, bond in map(None, self.ids, bonds):
+            retrieved = container.get_bond(uid)
+            self.assertEqual(retrieved, bond)
+
+    def test_exception_when_updating_mulitple_invalid_bond(self):
+        # new test for adding bonds with particles that are
+        # not part of the container
+        # (proposed to throw ValueError, see wiki)
+
+        # given
+        container = self.container
+        bonds = self.bond_list
+        new_ids = [uuid.uuid4() for x in xrange(10)]
+        for bond in bonds:
+            bond.particles = random.sample(new_ids, 5)
+
+        with self.assertRaises(ValueError):
+            container.update_bonds(bonds)
 
     def test_exception_when_updating_invalid_bond(self):
         # new test for adding bonds with particles that are
