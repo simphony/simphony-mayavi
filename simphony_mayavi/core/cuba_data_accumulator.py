@@ -182,13 +182,13 @@ def gather_cells(
     iterable :
         The Element iterable object
 
-    mapping : dict
+    vtk_mapping : dict
         The mapping from points number to tvtk.Cell type.
 
     point2index: dict
         The mapping from points uid to the index of the vtk points array.
 
-    index : itertools.count
+    counter : itertools.count
         The counter object to use when evaluating the ``elements2index``
         mapping.
 

@@ -8,56 +8,90 @@ from tvtk.api import tvtk
 from simphony.cuds.mesh import Mesh, Point, Face, Edge, Cell
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
+from simphony.core.cuds_item import CUDSItem
 from simphony.testing.abc_check_mesh import (
-    MeshPointOperationsCheck, MeshEdgeOperationsCheck,
-    MeshFaceOperationsCheck, MeshCellOperationsCheck,
-    MeshAttributesCheck)
-from simphony.testing.utils import compare_points, compare_elements
+    CheckMeshContainer, CheckMeshItemOperations,
+    CheckMeshPointOperations, CheckMeshElementOperations,
+    CheckMeshEdgeOperations, CheckMeshFaceOperations,
+    CheckMeshCellOperations)
+from simphony.testing.utils import (create_points, compare_data_containers,
+                                    compare_points, compare_elements)
 
 
 from simphony_mayavi.cuds.api import VTKMesh
-from simphony_mayavi.core.api import supported_cuba
+from simphony_mayavi.core.api import supported_cuba as mayavi_supported_cuba
 
 
-class TestVTKMeshPointOperations(MeshPointOperationsCheck, unittest.TestCase):
+def vtk_compare_points(point, reference, msg=None, testcase=None):
+    ''' use numpy.allclose to compare point coordinates retrieved
+    from vtk dataset with the reference as vtk casts coordinates to
+    double-precision floats and precision errors may be introduced
+    during casting
+    '''
+    self = testcase
+    self.assertEqual(point.uid, reference.uid)
+    if not numpy.allclose(point.coordinates, reference.coordinates):
+        error_message = "{} != {}"
+        self.failureException(error_message.format(point, reference))
+    compare_data_containers(point.data, reference.data, testcase=self)
 
-    supported_cuba = supported_cuba()
+
+class TestVTKMeshContainer(CheckMeshContainer, unittest.TestCase):
+
+    def supported_cuba(self):
+        return set(CUBA)
+
+    def container_factory(self, name):
+        return VTKMesh(name=name)
+
+
+class TestVTKMeshPointOperations(CheckMeshPointOperations, unittest.TestCase):
+
+    def setUp(self):
+        CheckMeshItemOperations.setUp(self)
+        self.addTypeEqualityFunc(
+            Point, partial(vtk_compare_points, testcase=self))
+
+    def create_items(self):
+        # for simphony-common < 0.2.4
+        # https://github.com/simphony/simphony-common/issues/217
+        return create_points(restrict=self.supported_cuba())
+
+    def supported_cuba(self):
+        return mayavi_supported_cuba()
 
     def container_factory(self, name):
         return VTKMesh(name=name)
 
 
-class TestVTKMeshEdgeOperations(MeshEdgeOperationsCheck, unittest.TestCase):
+class TestVTKMeshEdgeOperations(CheckMeshEdgeOperations, unittest.TestCase):
 
-    supported_cuba = supported_cuba()
-
-    def container_factory(self, name):
-        container = VTKMesh(name=name)
-        return container
-
-
-class TestVTKMeshFaceOperations(MeshFaceOperationsCheck, unittest.TestCase):
-
-    supported_cuba = supported_cuba()
+    def supported_cuba(self):
+        return mayavi_supported_cuba()
 
     def container_factory(self, name):
         container = VTKMesh(name=name)
         return container
 
 
-class TestVTKMeshCellOperations(MeshCellOperationsCheck, unittest.TestCase):
+class TestVTKMeshFaceOperations(CheckMeshFaceOperations, unittest.TestCase):
 
-    supported_cuba = supported_cuba()
+    def supported_cuba(self):
+        return mayavi_supported_cuba()
 
     def container_factory(self, name):
         container = VTKMesh(name=name)
         return container
 
 
-class TestVTKMeshAttributes(MeshAttributesCheck, unittest.TestCase):
+class TestVTKMeshCellOperations(CheckMeshCellOperations, unittest.TestCase):
+
+    def supported_cuba(self):
+        return mayavi_supported_cuba()
 
     def container_factory(self, name):
-        return VTKMesh(name=name)
+        container = VTKMesh(name=name)
+        return container
 
 
 class TestVTKMesh(unittest.TestCase):
@@ -90,8 +124,7 @@ class TestVTKMesh(unittest.TestCase):
             for index, point in enumerate(self.points)]
 
         container = Mesh('test')
-        for point in points:
-            container.add_point(point)
+        container.add_points(points)
 
         faces = [
             Face(
@@ -108,12 +141,9 @@ class TestVTKMesh(unittest.TestCase):
                 points=[points[index].uid for index in cell],
                 data=DataContainer(TEMPERATURE=next(count)))
             for cell in self.cells]
-        for edge in edges:
-            container.add_edge(edge)
-        for face in faces:
-            container.add_face(face)
-        for cell in cells:
-            container.add_cell(cell)
+        container.add_edges(edges)
+        container.add_faces(faces)
+        container.add_cells(cells)
 
         # when
         vtk_container = VTKMesh.from_mesh(container)
@@ -177,13 +207,14 @@ class TestVTKMesh(unittest.TestCase):
         vtk_container = VTKMesh.from_dataset('test', data_set=data_set)
 
         # then
-        self.assertEqual(sum(1 for _ in vtk_container.iter_points()), 12)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_edges()), 2)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_faces()), 1)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_cells()), 2)
+        self.assertEqual(vtk_container.count_of(CUDSItem.POINT), 12)
+        self.assertEqual(vtk_container.count_of(CUDSItem.EDGE), 2)
+        self.assertEqual(vtk_container.count_of(CUDSItem.FACE), 1)
+        self.assertEqual(vtk_container.count_of(CUDSItem.CELL), 2)
         index2point = vtk_container.index2point
         point2index = vtk_container.point2index
-        for index, point in enumerate(vtk_container.iter_points()):
+        for index, uid in index2point.items():
+            point = vtk_container.get_point(uid)
             point.uid = None
             self.assertEqual(
                 point,
