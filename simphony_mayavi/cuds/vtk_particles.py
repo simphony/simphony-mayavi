@@ -405,6 +405,9 @@ class VTKParticles(ABCParticles):
         elif item.uid in container:
             message = "Item with id:{} already exists"
             raise ValueError(message.format(item.uid))
+        elif not isinstance(item.uid, uuid.UUID):
+            message = "{!r} has an invalid uid: {}"
+            raise AttributeError(message.format(item, item))
         yield item
 
     def _swap_with_last(self, uid, mapping, reverse_mapping, items, data):
