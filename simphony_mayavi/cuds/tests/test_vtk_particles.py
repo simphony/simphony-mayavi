@@ -179,7 +179,7 @@ class TestVTKParticlesContainer(CheckParticlesContainer, unittest.TestCase):
         return VTKParticles(name=name)
 
     def supported_cuba(self):
-        return supported_cuba()
+        return set(CUBA)
 
 
 class TestVTKParticlesDataContainer(unittest.TestCase):
@@ -210,7 +210,7 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         data_set = tvtk.PolyData(points=tvtk.Points(), lines=[])
         container = VTKParticles(name='test', data_set=data_set)
         particle = Particle(coordinates=(0.0, 1.0, 2.0), data=DataContainer())
-        uid = container.add_particle(particle)
+        uid = container.add_particles((particle,))[0]
         self.assertTrue(container.has_particle(uid))
         self.assertEqual(list(container.iter_bonds()), [])
         self.assertEqual(len(tuple(container.iter_particles())), 1)
@@ -224,20 +224,18 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         point_temperature = [10., 20., 30., 40.]
         bond_temperature = [60., 80., 190., 5.]
         reference = Particles('test')
-        point_uids = [
-            reference.add_particle(
+        point_uids = reference.add_particles((
                 Particle(
                     coordinates=point,
                     data=DataContainer(
-                        TEMPERATURE=point_temperature[index])))
-            for index, point in enumerate(points)]
-        bond_uids = [
-            reference.add_bond(
+                        TEMPERATURE=point_temperature[index]))
+                for index, point in enumerate(points)))
+        bond_uids = reference.add_bonds((
                 Bond(
                     particles=[point_uids[index] for index in indices],
                     data=DataContainer(
-                        TEMPERATURE=bond_temperature[index])))
-            for index, indices in enumerate(bonds)]
+                        TEMPERATURE=bond_temperature[index]))
+                for index, indices in enumerate(bonds)))
 
         # when
         container = VTKParticles.from_particles(reference)
