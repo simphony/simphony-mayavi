@@ -25,7 +25,7 @@ Requirements
 ------------
 
 - mayavi[app] >= 4.4.0
-- simphony[H5IO] == 0.1.5
+- simphony[H5IO] == 0.2.1
 
 Optional requirements
 ~~~~~~~~~~~~~~~~~~~~~
