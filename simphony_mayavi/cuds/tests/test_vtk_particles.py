@@ -48,6 +48,51 @@ class TestVTKParticlesAddingBonds(
     def supported_cuba(self):
         return supported_cuba()
 
+    def test_add_multiple_bonds_with_id(self):
+        # for simphony-common 0.2.1 when Bond can be added
+        # even if it contains particles that are not part of
+        # the container (proposed to throw ValueError, see wiki)
+
+        # given
+        container = self.container
+        bonds = create_bonds_with_id(particles=self.particle_list)
+
+        # when
+        uids = container.add_bonds(bonds)
+
+        # then
+        for bond in bonds:
+            uid = bond.uid
+            self.assertIn(uid, uids)
+            self.assertTrue(container.has_bond(uid))
+            self.assertEqual(container.get_bond(uid), bond)
+
+    def test_add_multiple_bonds_with_unsupported_cuba(self):
+        # for simphony-common 0.2.1 when Bond can be added
+        # even if it contains particles that are not part of
+        # the container (proposed to throw ValueError, see wiki)
+
+        # given
+        container = self.container
+        bonds = []
+        particle_ids = [particle.uid for particle in self.particle_list]
+        for i in xrange(5):
+            data = create_data_container()
+            ids = random.sample(particle_ids, 5)
+            bonds.append(Bond(particles=ids, data=data))
+
+        # when
+        container.add_bonds(bonds)
+
+        # then
+        for bond in bonds:
+            bond.data = create_data_container(
+                restrict=self.supported_cuba())
+            uid = bond.uid
+            self.assertTrue(container.has_bond(uid))
+            self.assertEqual(container.get_bond(uid), bond)
+
+
 
 class TestVTKParticlesManipulatingBonds(
         CheckManipulatingBonds, unittest.TestCase):
