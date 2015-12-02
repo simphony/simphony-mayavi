@@ -33,7 +33,8 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
         self.point_uids = self.container.add_particles(particle_list)
 
         # add bonds
-        bond_iter = (Bond(particles=[self.point_uids[index] for index in indices],
+        bond_iter = (Bond(particles=[self.point_uids[index]
+                                     for index in indices],
                           data=DataContainer(NAME=str(len(indices))))
                      for indices in self.bonds)
         self.bond_uids = self.container.add_bonds(bond_iter)
