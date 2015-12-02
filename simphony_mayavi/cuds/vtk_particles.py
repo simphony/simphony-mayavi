@@ -334,10 +334,14 @@ class VTKParticles(ABCParticles):
 
     def get_bond(self, uid):
         index = self.bond2index[uid]
-        line = self.data_set.get_cell(index)
+
+        # cannot use self.data_set.get_cell(index) here because
+        # get_cell would give the wrong point_ids if the dimension
+        # of the cell changes upon update
+        point_ids = self.bonds[index]
         return Bond(
             uid=uid,
-            particles=[self.index2particle[i] for i in line.point_ids],
+            particles=[self.index2particle[i] for i in point_ids],
             data=self.bond_data[index])
 
     def update_bonds(self, bonds):
