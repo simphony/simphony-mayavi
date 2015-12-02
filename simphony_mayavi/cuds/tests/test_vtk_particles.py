@@ -1,23 +1,26 @@
 import unittest
 from functools import partial
+import random
 
 from tvtk.api import tvtk
 from simphony.cuds.particles import Particle, Bond, Particles
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.testing.utils import (
-    compare_data_containers, compare_particles, compare_bonds)
+    compare_data_containers, compare_particles, compare_bonds,
+    create_bonds_with_id, create_data_container)
 from simphony.testing.abc_check_particles import (
-    ContainerManipulatingBondsCheck, ContainerAddParticlesCheck,
-    ContainerAddBondsCheck, ContainerManipulatingParticlesCheck)
+    CheckParticlesContainer,
+    CheckAddingParticles, CheckManipulatingParticles,
+    CheckAddingBonds, CheckManipulatingBonds)
 
 from simphony_mayavi.cuds.api import VTKParticles
 from simphony_mayavi.core.api import (
     supported_cuba, VTKEDGETYPES, VTKFACETYPES)
 
 
-class TestVTKParticlesParticleOperations(
-        ContainerAddParticlesCheck, unittest.TestCase):
+class TestVTKParticlesAddingParticlesOperations(
+        CheckAddingParticles, unittest.TestCase):
 
     def supported_cuba(self):
         return supported_cuba()
@@ -27,7 +30,7 @@ class TestVTKParticlesParticleOperations(
 
 
 class TestVTKParticlesManipulatingParticles(
-        ContainerManipulatingParticlesCheck, unittest.TestCase):
+        CheckManipulatingParticles, unittest.TestCase):
 
     def supported_cuba(self):
         return supported_cuba()
@@ -36,8 +39,8 @@ class TestVTKParticlesManipulatingParticles(
         return VTKParticles(name=name)
 
 
-class TestVTKParticlesAddBonds(
-        ContainerAddBondsCheck, unittest.TestCase):
+class TestVTKParticlesAddingBonds(
+        CheckAddingBonds, unittest.TestCase):
 
     def container_factory(self, name):
         return VTKParticles(name=name)
@@ -47,7 +50,16 @@ class TestVTKParticlesAddBonds(
 
 
 class TestVTKParticlesManipulatingBonds(
-        ContainerManipulatingBondsCheck, unittest.TestCase):
+        CheckManipulatingBonds, unittest.TestCase):
+
+    def container_factory(self, name):
+        return VTKParticles(name=name)
+
+    def supported_cuba(self):
+        return supported_cuba()
+
+
+class TestVTKParticlesContainer(CheckParticlesContainer, unittest.TestCase):
 
     def container_factory(self, name):
         return VTKParticles(name=name)
