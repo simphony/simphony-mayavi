@@ -1,3 +1,4 @@
+import sys
 import uuid
 import contextlib
 
@@ -5,6 +6,7 @@ from tvtk.api import tvtk
 
 from simphony.core.cuba import CUBA
 from simphony.cuds.abc_particles import ABCParticles
+from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.particles import Particle, Bond
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
@@ -48,6 +50,11 @@ class VTKParticles(ABCParticles):
         self.bond2index = {}
         #: The reverse mapping from index to bond uid
         self.index2bond = {}
+
+        self._items_count = {
+            CUDSItem.PARTICLE: lambda: self.particle2index,
+            CUDSItem.BOND: lambda: self.bond2index
+        }
 
         # Setup the data_set
         if data_set is None:
@@ -200,21 +207,40 @@ class VTKParticles(ABCParticles):
 
     # Particle operations ####################################################
 
-    def add_particle(self, particle):
+    def add_particles(self, particles):
         data_set = self.data_set
         points = data_set.points
         particle2index = self.particle2index
-        with self._add_item(particle, particle2index) as item:
-            if self.initialized:
-                # We remove the dummy point
-                self.data_set.points = tvtk.Points()
-                points = data_set.points
-                self.initialized = False
-            index = points.insert_next_point(item.coordinates)
-            particle2index[item.uid] = index
-            self.index2particle[index] = item.uid
-            self.point_data.append(item.data)
-        return item.uid
+        item_uids = []
+        for particle in particles:
+            with self._add_item(particle, particle2index) as item:
+                if self.initialized:
+                    # We remove the dummy point
+                    self.data_set.points = tvtk.Points()
+                    points = data_set.points
+                    self.initialized = False
+                index = points.insert_next_point(item.coordinates)
+                particle2index[item.uid] = index
+                self.index2particle[index] = item.uid
+                self.point_data.append(item.data)
+                item_uids.append(item.uid)
+
+        # adding new points causes the cached array under
+        # tvtk.array_handler to be inconsistent with the
+        # points FloatArray, therefore we need to remove
+        # the reference in the tvtk.array_handler._array_cache
+        # for points.to_array() to work properly
+        _array_cache = None
+        for name in ['array_handler', 'tvtk.array_handler']:
+            if sys.modules.has_key(name):
+                mod = sys.modules[name]
+                if hasattr(mod, '_array_cache'):
+                    _array_cache = mod._array_cache
+                break
+        if _array_cache:
+            _array_cache._remove_array(tvtk.to_vtk(points.data).__this__)
+
+        return item_uids
 
     def get_particle(self, uid):
         index = int(self.particle2index[uid])
@@ -223,37 +249,44 @@ class VTKParticles(ABCParticles):
             coordinates=self.data_set.points[index],
             data=self.point_data[index])
 
-    def remove_particle(self, uid):
+    def remove_particles(self, uids):
         particle2index = self.particle2index
         index2particle = self.index2particle
         points = self.data_set.points
         point_data = self.point_data
 
-        # move uid item to the end
-        self._swap_with_last(
-            uid, particle2index, index2particle,
-            points, point_data)
-        index = particle2index[uid]
+        # keep a counter in case uids is a generator
+        # it is used for resizing data_set.points in batch
+        count = 0
 
-        # remove last point info
+        for uid in uids:
+            # move uid item to the end
+            self._swap_with_last(
+                uid, particle2index, index2particle,
+                points, point_data)
+            index = particle2index[uid]
+
+            # remove last point info
+            del self.point_data[index]
+
+            # remove uid item from mappings
+            del particle2index[uid]
+            del index2particle[index]
+            count += 1
+
         array = points.to_array()
-        self.data_set.points = array[:-1]
-        del self.point_data[index]
-
-        # remove uid item from mappings
-        del particle2index[uid]
-        del index2particle[index]
+        self.data_set.points = array[:-count]
         assert len(self.data_set.points) == len(particle2index)
 
-    def update_particle(self, particle):
-        try:
-            index = self.particle2index[particle.uid]
-        except KeyError:
-            message = "Particle with {} does exist"
-            raise ValueError(message.format(particle.uid))
-        # Need to cast to int https://github.com/enthought/mayavi/issues/173
-        self.data_set.points[int(index)] = particle.coordinates
-        self.point_data[index] = particle.data
+    def update_particles(self, particles):
+        for particle in particles:
+            try:
+                index = self.particle2index[particle.uid]
+            except KeyError:
+                message = "Particle with {} does exist"
+                raise ValueError(message.format(particle.uid))
+            self.data_set.points[index] = particle.coordinates
+            self.point_data[index] = particle.data
 
     def iter_particles(self, uids=None):
         if uids is None:
@@ -328,6 +361,13 @@ class VTKParticles(ABCParticles):
             for uid in uids:
                 yield self.get_bond(uid)
 
+    def count_of(self, item_type):
+        try:
+            return len(self._items_count[item_type]())
+        except KeyError:
+            error_str = "Trying to obtain count a of non-supported item: {}"
+            raise ValueError(error_str.format(item_type))
+
     # Private interface ######################################################
 
     @contextlib.contextmanager
@@ -356,9 +396,8 @@ class VTKParticles(ABCParticles):
             The associated CubaData instance
 
         """
-        # Need to cast to int https://github.com/enthought/mayavi/issues/173
-        index = int(mapping[uid])
-        last_index = int(len(mapping) - 1)
+        index = mapping[uid]
+        last_index = len(mapping) - 1
         last_uid = reverse_mapping[last_index]
         mapping[last_uid], mapping[uid] = index, last_index
         reverse_mapping[index], reverse_mapping[last_index] = last_uid, uid
