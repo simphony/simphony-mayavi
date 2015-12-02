@@ -8,7 +8,8 @@ from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.testing.utils import (
     compare_data_containers, compare_particles, compare_bonds,
-    create_bonds_with_id, create_data_container)
+    create_bonds_with_id, create_particles_with_id,
+    create_data_container)
 from simphony.testing.abc_check_particles import (
     CheckParticlesContainer,
     CheckAddingParticles, CheckManipulatingParticles,
@@ -92,6 +93,34 @@ class TestVTKParticlesAddingBonds(
             self.assertTrue(container.has_bond(uid))
             self.assertEqual(container.get_bond(uid), bond)
 
+    def test_exception_when_adding_multiple_invalid_bonds(self):
+        # new test for adding bonds with particles that are
+        # not part of the container
+        # (proposed to throw ValueError, see wiki)
+
+        # given
+        container = self.container
+        bonds = create_bonds_with_id()
+
+        with self.assertRaises(ValueError):
+            container.add_bonds(bonds)
+
+
+    def test_exception_when_updating_invalid_bond(self):
+        # new test for adding bonds with particles that are
+        # not part of the container
+        # (proposed to throw ValueError, see wiki)
+
+        # given
+        container = self.container
+        new_particles = create_particles_with_id()
+
+        # when
+        bond = container.get_bond(self.ids[1])
+        bond.particles = new_particles
+
+        with self.assertRaises(ValueError):
+            container.update_bonds([bond])
 
 
 class TestVTKParticlesManipulatingBonds(
