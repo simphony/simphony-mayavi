@@ -97,7 +97,6 @@ class TestMeshSource(unittest.TestCase):
                      for i, edge in enumerate(self.edges))
         container.add_edges(edge_iter)
 
-
         # when
         source = CUDSSource(cuds=container)
 

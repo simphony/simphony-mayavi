@@ -33,8 +33,8 @@ edge_uids = container.add_edges(edge_iter)
 
 # add faces
 face_iter = (Face(points=[uids[index] for index in element],
-                 data=DataContainer(TEMPERATURE=index + 30))
-            for index, element in enumerate(faces))
+                  data=DataContainer(TEMPERATURE=index + 30))
+             for index, element in enumerate(faces))
 face_uids = container.add_faces(face_iter)
 
 # add cells
@@ -42,6 +42,7 @@ cell_iter = (Cell(points=[uids[index] for index in element],
                   data=DataContainer(TEMPERATURE=index + 40))
              for index, element in enumerate(cells))
 cell_uids = container.add_cells(cell_iter)
+
 
 # Now view the data.
 @mayavi2.standalone

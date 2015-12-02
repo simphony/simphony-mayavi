@@ -1,6 +1,5 @@
 import uuid
 import contextlib
-import copy
 from itertools import count
 
 import numpy
@@ -200,7 +199,7 @@ class VTKMesh(ABCMesh):
             # bincount to be efficient
             counts = numpy.bincount(self.data_set.cell_types_array)
             type_ids = numpy.array(ELEMENT2VTKCELLTYPES[type_])
-            type_ids = type_ids[type_ids<len(counts)]
+            type_ids = type_ids[type_ids < len(counts)]
             return counts[type_ids].sum()
 
         items_count = {
