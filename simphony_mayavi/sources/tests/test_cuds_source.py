@@ -348,18 +348,21 @@ class TestParticlesSource(unittest.TestCase):
         self.container = Particles('test')
 
         # add particles
-        self.point_uids = self.container.add_particles(
-            (Particle(coordinates=point,
-                      data=DataContainer(
-                                  TEMPERATURE=self.point_temperature[index]))
-             for index, point in enumerate(self.points)))
+        def particle_iter():
+            for temp, point in zip(self.point_temperature, self.points):
+                yield Particle(coordinates=point,
+                               data=DataContainer(TEMPERATURE=temp))
+
+        self.point_uids = self.container.add_particles(particle_iter())
 
         # add bonds
-        self.bond_uids = self.container.add_bonds(
-                (Bond(particles=[self.point_uids[index] for index in indices],
-                      data=DataContainer(
-                                  TEMPERATURE=self.bond_temperature[index]))
-                 for index, indices in enumerate(self.bonds)))
+        def bond_iter():
+            for temp, indices in zip(self.bond_temperature, self.bonds):
+                yield Bond(particles=[self.point_uids[index]
+                                      for index in indices],
+                           data=DataContainer(TEMPERATURE=temp))
+
+        self.bond_uids = self.container.add_bonds(bond_iter())
 
     def test_source_from_vtk_particles(self):
         # given
