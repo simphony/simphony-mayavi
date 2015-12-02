@@ -9,8 +9,7 @@ from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.testing.utils import (
     compare_data_containers, compare_particles, compare_bonds,
-    create_bonds_with_id, create_bonds, create_particles_with_id,
-    create_data_container)
+    create_bonds_with_id, create_data_container)
 from simphony.testing.abc_check_particles import (
     CheckParticlesContainer,
     CheckAddingParticles, CheckManipulatingParticles,
@@ -224,18 +223,18 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         point_temperature = [10., 20., 30., 40.]
         bond_temperature = [60., 80., 190., 5.]
         reference = Particles('test')
-        point_uids = reference.add_particles((
-                Particle(
-                    coordinates=point,
-                    data=DataContainer(
-                        TEMPERATURE=point_temperature[index]))
-                for index, point in enumerate(points)))
-        bond_uids = reference.add_bonds((
-                Bond(
-                    particles=[point_uids[index] for index in indices],
-                    data=DataContainer(
-                        TEMPERATURE=bond_temperature[index]))
-                for index, indices in enumerate(bonds)))
+
+        # add particles
+        particle_iter = (Particle(coordinates=point,
+                                  data=DataContainer(TEMPERATURE=temp))
+                         for temp, point in zip(point_temperature, points))
+        point_uids = reference.add_particles(particle_iter)
+
+        # add bonds
+        bond_iter = (Bond(particles=[point_uids[index] for index in indices],
+                          data=DataContainer(TEMPERATURE=temp))
+                     for temp, indices in zip(bond_temperature, bonds))
+        bond_uids = reference.add_bonds(bond_iter)
 
         # when
         container = VTKParticles.from_particles(reference)

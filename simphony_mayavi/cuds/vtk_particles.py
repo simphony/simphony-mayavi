@@ -4,7 +4,6 @@ import contextlib
 
 from tvtk.api import tvtk
 
-from simphony.core.cuba import CUBA
 from simphony.cuds.abc_particles import ABCParticles
 from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.particles import Particle, Bond
@@ -232,7 +231,7 @@ class VTKParticles(ABCParticles):
         # for points.to_array() to work properly
         _array_cache = None
         for name in ['array_handler', 'tvtk.array_handler']:
-            if sys.modules.has_key(name):
+            if name in sys.modules:
                 mod = sys.modules[name]
                 if hasattr(mod, '_array_cache'):
                     _array_cache = mod._array_cache
@@ -324,7 +323,8 @@ class VTKParticles(ABCParticles):
                 if not self.is_connected(bond):
                     message = "Cannot add Bond {} with missing uids: {}"
                     raise ValueError(message.format(item.uid, item.particles))
-                point_ids = [self.particle2index[uid] for uid in item.particles]
+                point_ids = [self.particle2index[uid]
+                             for uid in item.particles]
                 index = data_set.insert_next_cell(VTKEDGETYPES[1], point_ids)
                 bond2index[item.uid] = index
                 self.index2bond[index] = item.uid
