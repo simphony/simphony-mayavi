@@ -301,16 +301,37 @@ class VTKParticles(ABCParticles):
 
     # Bond operations ########################################################
 
-    def add_bond(self, bond):
+    def is_connected(self, bond):
+        """ Test if the connectivity described in bonds is valid
+        i.e. the particles are part of the container
+
+        Parameters
+        ----------
+        bond : Bond
+
+        Returns
+        -------
+        valid : bool
+        """
+        return all((self.has_particle(uid) for uid in bond.particles))
+
+    def add_bonds(self, bonds):
         data_set = self.data_set
         bond2index = self.bond2index
-        with self._add_item(bond, bond2index) as item:
-            point_ids = [self.particle2index[uid] for uid in item.particles]
-            index = data_set.insert_next_cell(VTKEDGETYPES[1], point_ids)
-            bond2index[item.uid] = index
-            self.index2bond[index] = item.uid
-            self.bond_data.append(item.data)
-        return item.uid
+        item_uids = []
+        for bond in bonds:
+            with self._add_item(bond, bond2index) as item:
+                if not self.is_connected(bond):
+                    message = "Cannot add Bond {} with missing uids: {}"
+                    raise ValueError(message.format(bond.uid if bond.uid else "",
+                                                    bond.particles))
+                point_ids = [self.particle2index[uid] for uid in item.particles]
+                index = data_set.insert_next_cell(VTKEDGETYPES[1], point_ids)
+                bond2index[item.uid] = index
+                self.index2bond[index] = item.uid
+                self.bond_data.append(item.data)
+                item_uids.append(item.uid)
+        return item_uids
 
     def get_bond(self, uid):
         index = self.bond2index[uid]
@@ -320,38 +341,42 @@ class VTKParticles(ABCParticles):
             particles=[self.index2particle[i] for i in line.point_ids],
             data=self.bond_data[index])
 
-    def update_bond(self, bond):
-        try:
-            index = self.bond2index[bond.uid]
-        except KeyError:
-            message = "Bond with {} does exist"
-            raise ValueError(message.format(bond.uid))
-        point_ids = [self.particle2index[uid] for uid in bond.particles]
-        self.bonds[index] = point_ids
-        self.bond_data[index] = bond.data
+    def update_bonds(self, bonds):
+        for bond in bonds:
+            if not self.is_connected(bond):
+                message = "Cannot update Bond {} with missing uids: {}"
+                raise ValueError(message.format(bond.uid, bond.particles))
+            try:
+                index = self.bond2index[bond.uid]
+            except KeyError:
+                message = "Bond with {} does not exist"
+                raise ValueError(message.format(bond.uid))
+            point_ids = [self.particle2index[uid] for uid in bond.particles]
+            self.bonds[index] = point_ids
+            self.bond_data[index] = bond.data
 
     def has_bond(self, uid):
         return uid in self.bond2index
 
-    def remove_bond(self, uid):
+    def remove_bonds(self, uids):
         bond2index = self.bond2index
         index2bond = self.index2bond
         bond_data = self.bond_data
         bonds = self.bonds
 
-        index = bond2index[uid]
-        # move uid item to the end
-        self._swap_with_last(
-            uid, bond2index, index2bond, bonds, bond_data)
-        index = bond2index[uid]
+        for uid in uids:
+            # move uid item to the end
+            self._swap_with_last(
+                uid, bond2index, index2bond, bonds, bond_data)
+            index = bond2index[uid]
 
-        # remove last bond info
-        del bonds[index]
-        del bond_data[index]
+            # remove last bond info
+            del bonds[index]
+            del bond_data[index]
 
-        # remove uid item from mappings
-        del bond2index[uid]
-        del index2bond[index]
+            # remove uid item from mappings
+            del bond2index[uid]
+            del index2bond[index]
 
     def iter_bonds(self, uids=None):
         if uids is None:
