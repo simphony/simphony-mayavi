@@ -163,24 +163,14 @@ class TestVTKParticlesManipulatingBonds(
 
         # given
         container = self.container
-        new_particles = create_particles_with_id()
+        new_ids = [uuid.uuid4() for x in xrange(5)]
 
         # when
         bond = container.get_bond(self.ids[1])
-        bond.particles = new_particles
+        bond.particles = new_ids
 
         with self.assertRaises(ValueError):
             container.update_bonds([bond])
-
-
-class TestVTKParticlesManipulatingBonds(
-        CheckManipulatingBonds, unittest.TestCase):
-
-    def container_factory(self, name):
-        return VTKParticles(name=name)
-
-    def supported_cuba(self):
-        return supported_cuba()
 
 
 class TestVTKParticlesContainer(CheckParticlesContainer, unittest.TestCase):
