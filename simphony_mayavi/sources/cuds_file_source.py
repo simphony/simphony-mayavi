@@ -45,9 +45,7 @@ class CUDSFileSource(CUDSSource):
         """
         self.file_path = FilePath(filename)
         with closing(H5CUDS.open(filename)) as handle:
-            names = [container.name for container in handle.iter_particles()]
-            names += [container.name for container in handle.iter_lattices()]
-            names += [container.name for container in handle.iter_meshes()]
+            names = [container.name for container in handle.iter_datasets()]
         if len(names) == 0:
             logger.warning('No datasets found in: %s', self.file_path)
         self.datasets = names
@@ -60,18 +58,10 @@ class CUDSFileSource(CUDSSource):
     def update(self):
         dataset = self.dataset
         with closing(H5CUDS.open(str(self.file_path))) as handle:
-            for container in ['particles', 'lattice', 'mesh']:
-                method = getattr(handle, 'get_{}'.format(container))
-                try:
-                    container = method(dataset)
-                except ValueError:
-                    continue
-                else:
-                    self.cuds = container
-                    break
-            else:
-                message = 'A dataset "%s" was not found'
-                logger.warning(message, dataset)
+            try:
+                self.cuds = handle.get_dataset(dataset)
+            except ValueError as ex:
+                logger.warning(ex.message)
 
     # Trait Change Handlers ################################################
 
