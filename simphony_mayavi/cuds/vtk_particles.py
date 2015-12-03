@@ -254,11 +254,8 @@ class VTKParticles(ABCParticles):
         points = self.data_set.points
         point_data = self.point_data
 
-        # keep a counter in case uids is a generator
-        # it is used for resizing data_set.points in batch
-        count = 0
-
-        for uid in uids:
+        # `count` is used for resizing data_set.points in batch
+        for count, uid in enumerate(uids, start=1):
             # move uid item to the end
             self._swap_with_last(
                 uid, particle2index, index2particle,
@@ -271,7 +268,6 @@ class VTKParticles(ABCParticles):
             # remove uid item from mappings
             del particle2index[uid]
             del index2particle[index]
-            count += 1
 
         array = points.to_array()
         self.data_set.points = array[:-count]
