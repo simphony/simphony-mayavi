@@ -407,7 +407,7 @@ class VTKParticles(ABCParticles):
             raise ValueError(message.format(item.uid))
         elif not isinstance(item.uid, uuid.UUID):
             message = "{!r} has an invalid uid: {}"
-            raise AttributeError(message.format(item, item))
+            raise AttributeError(message.format(item, item.uid))
         yield item
 
     def _swap_with_last(self, uid, mapping, reverse_mapping, items, data):
