@@ -6,6 +6,7 @@ from simphony.core.cuba import CUBA
 
 cubic = make_cubic_lattice("cubic", 0.1, (5, 10, 12))
 
+
 def add_temperature(lattice):
     new_nodes = []
     for node in lattice.iter_nodes():
@@ -15,6 +16,7 @@ def add_temperature(lattice):
     lattice.update_nodes(new_nodes)
 
 add_temperature(cubic)
+
 
 # Now view the data.
 @mayavi2.standalone
