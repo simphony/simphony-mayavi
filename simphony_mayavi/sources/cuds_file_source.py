@@ -60,8 +60,8 @@ class CUDSFileSource(CUDSSource):
         with closing(H5CUDS.open(str(self.file_path))) as handle:
             try:
                 self.cuds = handle.get_dataset(dataset)
-            except ValueError as ex:
-                logger.warning(ex.message)
+            except ValueError as exception:
+                logger.warning(exception.message)
 
     # Trait Change Handlers ################################################
 
