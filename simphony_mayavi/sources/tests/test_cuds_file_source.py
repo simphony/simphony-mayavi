@@ -9,7 +9,7 @@ from tvtk.api import tvtk
 from mayavi.core.api import NullEngine
 from simphony.cuds.particles import Particles
 from simphony.cuds.mesh import Mesh
-from simphony.cuds.lattice import Lattice
+from simphony.cuds.lattice import Lattice, make_cubic_lattice
 from simphony.io.h5_cuds import H5CUDS
 from simphony.io.h5_lattice import H5Lattice
 from simphony.io.h5_mesh import H5Mesh
@@ -26,12 +26,11 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
         self.maxDiff = None
         self.filename = os.path.join(self.temp_dir, 'test.cuds')
         with closing(H5CUDS.open(self.filename, mode='w')) as handle:
-            handle.add_mesh(Mesh(name='mesh1'))
-            handle.add_particles(Particles(name='particles1'))
-            handle.add_particles(Particles(name='particles3'))
-            handle.add_lattice(Lattice(
-                'lattice0', 'Cubic', (0.2, 0.2, 0.2),
-                (5, 10, 15), (0.0, 0.0, 0.0)))
+            handle.add_dataset(Mesh(name='mesh1'))
+            handle.add_dataset(Particles(name='particles1'))
+            handle.add_dataset(Particles(name='particles3'))
+            handle.add_dataset(make_cubic_lattice(
+                'lattice0', 0.2, (5, 10, 15), (0.0, 0.0, 0.0)))
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
