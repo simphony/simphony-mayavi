@@ -232,13 +232,18 @@ def is_rhombohedral_lattice(p1, p2, p3):
     if len(unique_lengths) != 1:
         return False
 
-    beta = numpy.arccos(cosine_two_vectors(p1, p2))
-    angle1 = beta % numpy.pi
+    alpha = numpy.arccos(cosine_two_vectors(p1, p2))
+    angle1 = alpha % numpy.pi
 
     if numpy.allclose(angle1, 0) or numpy.allclose(angle1, numpy.pi):
         return False
 
-    return same_lattice_type(PrimitiveCell.for_rhombohedral_lattice(1., beta),
+    cosa = numpy.cos(alpha)
+    sina = numpy.sin(alpha)
+    if (sina**2. - ((cosa-cosa**2.)/sina)**2.) < 0:
+        return False
+
+    return same_lattice_type(PrimitiveCell.for_rhombohedral_lattice(1., alpha),
                              p1, p2, p3)
 
 
