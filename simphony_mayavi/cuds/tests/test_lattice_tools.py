@@ -258,6 +258,3 @@ class TestLatticeTools(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             lattice_tools.guess_primitive_vectors(points)
-
-
-

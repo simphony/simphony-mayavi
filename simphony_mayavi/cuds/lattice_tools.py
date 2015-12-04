@@ -535,7 +535,7 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
                        "centered monoclinic cell due to accumulated "
                        "numerical errors. a:{}, b:{}, c:{}, "
                        "theta: +/-{}".format(alpha, numpy.sqrt(delta),
-                                          gamma, theta))
+                                             gamma, theta))
             warnings.warn(message)
     return False
 
