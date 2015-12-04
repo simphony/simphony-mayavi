@@ -1,4 +1,5 @@
 from itertools import permutations, combinations
+import warnings
 
 import numpy
 from simphony.cuds.primitive_cell import PrimitiveCell, BravaisLattice
@@ -470,20 +471,14 @@ def is_monoclinic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    alpha, beta, gamma = map(vector_len, (p1, p2, p3))
-    factory = PrimitiveCell.for_monoclinic_lattice
+    cosines = (cosine_two_vectors(p1, p2),
+               cosine_two_vectors(p2, p3),
+               cosine_two_vectors(p1, p3))
 
-    theta = numpy.arcsin(numpy.clip(numpy.dot(numpy.cross(p1, p2),
-                                              p3)/alpha/beta/gamma, -1., 1.))
-    angle1 = theta % numpy.pi
-
-    if numpy.allclose(angle1, 0.) or numpy.allclose(angle1, numpy.pi):
-        return False
-
-    for edges in permutations((alpha, beta, gamma), 3):
-        if same_lattice_type(factory(*(edges+(theta,))), p1, p2, p3):
-            return True
-    return False
+    # base on loose definition: at least 2 angles are 90 degrees
+    return (numpy.isclose(cosines, 0.).sum() >= 2 and
+            not numpy.isclose(cosines, 1.).any() and
+            not numpy.isclose(cosines, -1.).any())
 
 
 def is_base_centered_monoclinic_lattice(p1, p2, p3):
@@ -503,22 +498,45 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
     output : bool
     '''
     vec_lengths = map(vector_len, (p1, p2, p3))
+
+    if numpy.any(numpy.isclose(vec_lengths, 0)):
+        message = 'Edge lengths must be strictly positive'
+        raise ValueError(message)
+
     factory = PrimitiveCell.for_base_centered_monoclinic_lattice
 
     for alpha, beta, gamma in permutations(vec_lengths, 3):
         delta = 4.*beta**2.-alpha**2.
         if delta <= 0.:
             continue
+
         sin_theta = numpy.dot(numpy.cross(p1, p2),
                               p3)/alpha/numpy.sqrt(delta)/gamma*2.
         theta = numpy.arcsin(numpy.clip(sin_theta, -1., 1.))
         angle1 = theta % numpy.pi
-        if (not numpy.isclose(angle1, 0.) and
-                not numpy.isclose(angle1, numpy.pi) and
+
+        if numpy.isclose(angle1, 0.) or numpy.isclose(angle1, numpy.pi):
+            continue
+
+        # two possible solutions of theta
+        theta1, theta2 = theta, numpy.pi-theta
+
+        try:
+            # More sines and cosines are computed in the factory.
+            # Numerical errors may lead to the end vectors be parallel
+            # to each other.
+            if (same_lattice_type(factory(alpha, numpy.sqrt(delta),
+                                          gamma, theta1), p1, p2, p3) or
                 same_lattice_type(factory(alpha, numpy.sqrt(delta),
-                                          gamma, theta),
-                                  p1, p2, p3)):
-            return True
+                                          gamma, theta2), p1, p2, p3)):
+                return True
+        except ValueError:
+            message = ("Failed to compare given vectors with a base "
+                       "centered monoclinic cell due to accumulated "
+                       "numerical errors. a:{}, b:{}, c:{}, "
+                       "theta: +/-{}".format(alpha, numpy.sqrt(delta),
+                                          gamma, theta))
+            warnings.warn(message)
     return False
 
 
