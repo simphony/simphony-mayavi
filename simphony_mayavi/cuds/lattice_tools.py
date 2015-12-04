@@ -80,19 +80,24 @@ def guess_primitive_vectors(points):
     ''' Guess the primitive vectors underlying a given array of
     lattice points (N, 3).
 
-    Assume the points are arranged in C-contiguous order so that
-    the first point is the origin, the last point is furthest away
-    from the origin
-
     Parameter
     ----------
     points : numpy ndarray (N, 3)
-        intended for tvtk.PolyData.points.to_array()
+        Coordinates of lattice nodes
+        Assumed to be arranged in C-contiguous order so that the
+        first point is the origin, the last point is furthest
+        away from the origin
 
     Returns
     -------
     p1, p2, p3 : 3 x tuple of float[3]
         primitive vectors
+
+    Raises
+    ------
+    IndexError
+        (1) if the lattice dimension cannot be determined
+        (2) if the points are not ordered contiguously
     '''
     def find_jump(arr1d):
         ''' Return the index where the first derivation changes '''
@@ -449,7 +454,7 @@ def is_monoclinic_lattice(p1, p2, p3):
     ''' Test if primitive vectors describe a monoclinic lattice
 
     Also returns True for vectors describing a cubic, hexagonal,
-    orthorhombic or base centered orthorhombic lattice
+    tetragonal, orthorhombic or base centered orthorhombic lattice
 
     Parameters
     ----------
