@@ -1,10 +1,8 @@
 import unittest
-from collections import defaultdict
-from functools import partial
 
 import numpy
 from hypothesis import given
-from hypothesis.strategies import floats, tuples, just, builds, composite
+from hypothesis.strategies import floats, tuples, composite
 from hypothesis.strategies import fixed_dictionaries
 
 from simphony.cuds.primitive_cell import BravaisLattice, PrimitiveCell
@@ -13,8 +11,9 @@ import simphony_mayavi.cuds.lattice_tools as lattice_tools
 
 # Tests for Error raised by PrimitiveCell should be placed separately
 # Edge lengths and angles are assumed to be valid
-edges = floats(min_value=0.1, max_value=1.).filter(lambda x: x==x)
-angles = floats(min_value=0.1, max_value=numpy.pi-0.1).filter(lambda x: x==x)
+edges = floats(min_value=0.1, max_value=1.).filter(lambda x: x == x)
+angles = floats(min_value=0.1, max_value=numpy.pi-0.1).filter(lambda x: x == x)
+
 
 @composite
 def builds_unpack(draw, factory, elements):
@@ -66,7 +65,7 @@ factories = {
 
 def for_rhombohedral(a, alpha):
     ''' criteria for a rhombohedral lattice '''
-    return (numpy.abs(alpha)<(numpy.pi/3.*2.) and
+    return (numpy.abs(alpha) < (numpy.pi/3.*2.) and
             not numpy.isclose(alpha, numpy.pi/2.))
 
 
@@ -75,9 +74,11 @@ def for_triclinic(a, b, c, alpha, beta, gamma):
     a1, a2, a3 = numpy.mod((alpha, beta, gamma), numpy.pi)
     cosa, cosb, cosg = numpy.cos((alpha, beta, gamma))
     sinb, sing = numpy.sin((beta, gamma))
+
     return (numpy.all(numpy.greater((a1+a2, a1+a3, a2+a3), (a3, a2, a1))) and
             (sinb**2 - ((cosa-cosb*cosg) / sing)**2) > 0. and
-            not numpy.isclose((alpha, beta, alpha), (gamma, gamma, beta)).any())
+            not numpy.isclose((alpha, beta, alpha),
+                              (gamma, gamma, beta)).any())
 
 
 """ Specific criteria for primitive cell parameters such that
@@ -113,12 +114,14 @@ criteria[BravaisLattice.BASE_CENTERED_MONOCLINIC] = (
 
 criteria[BravaisLattice.TRICLINIC] = for_triclinic
 
+
 def filter_func(bravais_lattice):
     def new_func(args):
         if bravais_lattice in criteria:
             return criteria[bravais_lattice](*args)
         return True
     return new_func
+
 
 def builder(bravais_lattices=None):
     lattices = {}
@@ -198,10 +201,11 @@ def create_points_from_pc(p1, p2, p3, size):
 
 
 # angles for rotating the primitive vectors
-rotate_angles = floats(min_value=-numpy.pi+0.1, max_value=numpy.pi-0.1).filter(
-    lambda x: x==x)
+rotate_angles = floats(min_value=-numpy.pi+0.1,
+                       max_value=numpy.pi-0.1).filter(lambda x: x == x)
 
 all_lattices = builder()
+
 
 class TestLatticeTools(unittest.TestCase):
 
@@ -254,6 +258,6 @@ class TestLatticeTools(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             lattice_tools.guess_primitive_vectors(points)
-            
+
 
 
