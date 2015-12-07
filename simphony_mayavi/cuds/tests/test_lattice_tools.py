@@ -75,9 +75,10 @@ def func_pack_args(func):
 
 
 def get_general_primitive_cell_factories():
-    ''' Return a dictionary with BravaisLattice(IntEnum) as key,
-    PrimitiveCell factory function and its corresponding
-    hypothesis.strategies.tuples (arguments for the factory) as value
+    ''' General (loose) definitions of all Bravais Lattice
+    primitive cells
+
+    For hypothesis.strategies random generations
 
     Returns
     -------
@@ -155,6 +156,18 @@ def get_general_primitive_cell_factories():
 
 
 def get_specific_primitive_cell_factories():
+    ''' Specific (strict) definitions of all Bravais Lattice
+    primitive cells. For hypothesis.strategies random generations
+
+    e.g. a tetragonal lattice cell cannot have all edges of the same
+    length (otherwise it is a cubic lattice)
+
+    Returns
+    -------
+    factories: dict
+        {BravaisLattice(IntEnum): (PrimitiveCell.<factory_function>,
+                                   hypothesis.strategies.tuples)}
+    '''
     criteria = {}
 
     criteria[BravaisLattice.TETRAGONAL] = lambda a, c: not numpy.isclose(a, c)
@@ -278,6 +291,7 @@ class TestLatticeTools(unittest.TestCase):
 
     @given(all_lattices, rotate_angles, rotate_angles)
     def test_find_lattice_type_specific(self, lattice, alpha, beta):
+        ''' Test getting the most specific lattice type correctly'''
         for expected_type, primitive_cell in lattice.items():
             vectors = list(rotate_primitive_cell(primitive_cell, alpha, beta))
             random.shuffle(vectors)
