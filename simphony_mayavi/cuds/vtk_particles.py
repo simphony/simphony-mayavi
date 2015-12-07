@@ -278,7 +278,7 @@ class VTKParticles(ABCParticles):
             try:
                 index = self.particle2index[particle.uid]
             except KeyError:
-                message = "Particle with {} does exist"
+                message = "Particle with {} does not exist"
                 raise ValueError(message.format(particle.uid))
             self.data_set.points[index] = particle.coordinates
             self.point_data[index] = particle.data
