@@ -37,7 +37,7 @@ def cosine_two_vectors(vec1, vec2):
     return numpy.dot(vec1, vec2)/vec1_length/vec2_length
 
 
-def same_lattice_type(target_pc, p1, p2, p3):
+def same_lattice_type(target_pc, p1, p2, p3, permute=True):
     ''' Return True if a set of primitive vectors ``p1``, ``p2``,
     ``p3`` describes the same type of lattice as the target
     primitive cell ``target_pc`` does.  Single precision applies.
@@ -45,9 +45,11 @@ def same_lattice_type(target_pc, p1, p2, p3):
     Parameters
     ----------
     target_pc : PrimitiveCell
-    p1 : array_like (len=3)
-    p2 : array_like (len=3)
-    p3 : array_like (len=3)
+        Target lattice's primitive cell
+    p1, p2, p3 : array_like (len=3)
+        Primitive vectors
+    permute: boolean
+        whether p1, p2, p3 are permutated
 
     Returns
     -------
@@ -63,7 +65,12 @@ def same_lattice_type(target_pc, p1, p2, p3):
     target_ratios = tuple(vector_len(vec1)/vector_len(vec2)
                           for vec1, vec2 in permutations(pcs, 2))
 
-    for iperm, perms in enumerate(permutations((p1, p2, p3), 3)):
+    if permute:
+        iter_func = permutations
+    else:
+        iter_func = combinations
+
+    for iperm, perms in enumerate(iter_func((p1, p2, p3), 3)):
         cosines = tuple(cosine_two_vectors(vec1, vec2)
                         for vec1, vec2 in combinations(perms, 2))
         ratios = tuple(vector_len(vec1)/vector_len(vec2)
@@ -151,15 +158,15 @@ def is_cubic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    # single precision
-    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
-                              dtype=numpy.float32)
-    unique_lengths = numpy.unique(vec_lengths)
-
-    if len(unique_lengths) != 1:
+    # if all lengths close to each other
+    a, b, c = map(vector_len, (p1, p2, p3))
+    if not numpy.allclose((b, c), a):
         return False
 
-    return same_lattice_type(PrimitiveCell.for_cubic_lattice(1.), p1, p2, p3)
+    # all angles close to 90 degree
+    cosines = map(cosine_two_vectors,
+                  (p1, p2, p3), (p2, p3, p1))
+    return numpy.isclose(cosines, 0.).all()
 
 
 def is_body_centered_cubic_lattice(p1, p2, p3):
@@ -174,12 +181,11 @@ def is_body_centered_cubic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    # single precision
-    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
-                              dtype=numpy.float32)
-    unique_lengths = numpy.unique(vec_lengths)
+    # exactly two sides of equal lengths
+    a, b, c = map(vector_len, (p1, p2, p3))
+    equal_len_pairs = numpy.isclose((a, b, c), (b, c, a))
 
-    if len(unique_lengths) != 2:
+    if not equal_len_pairs.sum() == 1:
         return False
 
     return same_lattice_type(PrimitiveCell.for_body_centered_cubic_lattice(1.),
@@ -198,16 +204,15 @@ def is_face_centered_cubic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    # single precision
-    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
-                              dtype=numpy.float32)
-    unique_lengths = numpy.unique(vec_lengths)
-
-    if len(unique_lengths) != 1:
+    # all sides of equal lengths
+    a, b, c = map(vector_len, (p1, p2, p3))
+    if not numpy.allclose((a, b), c):
         return False
 
-    return same_lattice_type(PrimitiveCell.for_face_centered_cubic_lattice(1.),
-                             p1, p2, p3)
+    # all angles close to 60 degree
+    cosines = map(cosine_two_vectors,
+                  (p1, p2, p3), (p2, p3, p1))
+    return numpy.allclose(cosines, 0.5)
 
 
 def is_rhombohedral_lattice(p1, p2, p3):
@@ -225,27 +230,15 @@ def is_rhombohedral_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    # single precision
-    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
-                              dtype=numpy.float32)
-    unique_lengths = numpy.unique(vec_lengths)
-
-    if len(unique_lengths) != 1:
+    # all sides of equal lengths
+    a, b, c = map(vector_len, (p1, p2, p3))
+    if not numpy.allclose((a, b), c):
         return False
 
-    alpha = numpy.arccos(cosine_two_vectors(p1, p2))
-    angle1 = alpha % numpy.pi
-
-    if numpy.allclose(angle1, 0) or numpy.allclose(angle1, numpy.pi):
-        return False
-
-    cosa = numpy.cos(alpha)
-    sina = numpy.sin(alpha)
-    if (sina**2. - ((cosa-cosa**2.)/sina)**2.) < 0:
-        return False
-
-    return same_lattice_type(PrimitiveCell.for_rhombohedral_lattice(1., alpha),
-                             p1, p2, p3)
+    # all angles close to each other
+    cosa, cosb, cosc = map(cosine_two_vectors,
+                           (p1, p2, p3), (p2, p3, p1))
+    return numpy.allclose((cosa, cosb), cosc)
 
 
 def is_tetragonal_lattice(p1, p2, p3):
@@ -262,22 +255,17 @@ def is_tetragonal_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    # single precision
-    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
-                              dtype=numpy.float32)
-    unique_lengths = numpy.unique(vec_lengths)
+    # at least two sides of equal lengths
+    a, b, c = map(vector_len, (p1, p2, p3))
+    equal_lengths = numpy.isclose((a, b, c), (b, c, a))
 
-    if len(unique_lengths) > 2:
+    if not equal_lengths.any():
         return False
-    elif len(unique_lengths) == 1:
-        common = other = unique_lengths[0]
-    elif sum((vec_len == unique_lengths[0] for vec_len in vec_lengths)) == 2:
-        common, other = unique_lengths
-    else:
-        other, common = unique_lengths
 
-    target_pc = PrimitiveCell.for_tetragonal_lattice(common, other)
-    return same_lattice_type(target_pc, p1, p2, p3)
+    # all angles close to 90 degrees
+    cosines = map(cosine_two_vectors,
+                  (p1, p2, p3), (p2, p3, p1))
+    return numpy.allclose(cosines, 0.)
 
 
 def is_body_centered_tetragonal_lattice(p1, p2, p3):
@@ -296,23 +284,29 @@ def is_body_centered_tetragonal_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    # single precision
-    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
-                              dtype=numpy.float32)
-    unique_lengths = numpy.unique(vec_lengths)
+    # at least two sides of equal lengths
+    a, b, c = map(vector_len, (p1, p2, p3))
+    equal_len_pairs = numpy.isclose((a, b, c), (b, c, a))
 
-    if len(unique_lengths) != 2:
+    if not equal_len_pairs.any():
         return False
+    elif equal_len_pairs.all():
+        factory = PrimitiveCell.for_body_centered_tetragonal_lattice
+        return same_lattice_type(factory(1., 1.), p1, p2, p3)
+    else:
+        # only one pair of equal edges
+        # mapping for the vectors and edges
+        pair_other = {0: ((p1, p2), p3, (a, c)),
+                      1: ((p2, p3), p1, (b, a)),
+                      2: ((p1, p3), p2, (a, b))}
 
-    factory = PrimitiveCell.for_body_centered_tetragonal_lattice
+        # v1 and v2 should be perpendicular vectors of the same lengths
+        # the another vector make the same angle with the other two
+        (v1, v2), v3, (a, b) = pair_other[numpy.where(equal_len_pairs)[0][0]]
 
-    for alpha, gamma in permutations(unique_lengths, 2):
-        delta = gamma**2. - 0.5*alpha**2.
-        if (delta > 0. and
-                same_lattice_type(factory(alpha, 2.*numpy.sqrt(delta)),
-                                  p1, p2, p3)):
-            return True
-    return False
+        return (numpy.isclose(cosine_two_vectors(v1, v2), 0.) and
+                numpy.allclose((cosine_two_vectors(v1, v3),
+                                cosine_two_vectors(v2, v3)), 0.5*a/b))
 
 
 def is_hexagonal_lattice(p1, p2, p3):
@@ -327,25 +321,27 @@ def is_hexagonal_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    # single precision
-    vec_lengths = numpy.array(map(vector_len, (p1, p2, p3)),
-                              dtype=numpy.float32)
-    unique_lengths = numpy.unique(vec_lengths)
+    # at least two sides of equal lengths
+    a, b, c = map(vector_len, (p1, p2, p3))
+    equal_len_pairs = numpy.isclose((a, b, c), (b, c, a))
 
-    factory = PrimitiveCell.for_hexagonal_lattice
-
-    if len(unique_lengths) == 3:
+    if not equal_len_pairs.any():
         return False
-    elif len(unique_lengths) == 1:
+    elif equal_len_pairs.all():
+        factory = PrimitiveCell.for_hexagonal_lattice
         return same_lattice_type(factory(1., 1.), p1, p2, p3)
     else:
-        if sum((vec_len == unique_lengths[0] for vec_len in vec_lengths)) == 2:
-            common, other = unique_lengths
-        else:
-            other, common = unique_lengths
-
-        target_pc = factory(common, other)
-        return same_lattice_type(target_pc, p1, p2, p3)
+        # only one pair of equal edges
+        pair_other = {0: ((p1, p2), p3),
+                      1: ((p2, p3), p1),
+                      2: ((p1, p3), p2)}
+        # v1 and v2 have the same length
+        (v1, v2), v3 = pair_other[numpy.where(equal_len_pairs)[0][0]]
+        # check if v1 and v2 make an angle of 60 degree
+        # v3 makes a right angle with both v1 and v2
+        return (numpy.isclose(cosine_two_vectors(v1, v2), 0.5) and
+                numpy.allclose((cosine_two_vectors(v1, v3),
+                                cosine_two_vectors(v2, v3)), 0.))
 
 
 def is_orthorhombic_lattice(p1, p2, p3):
@@ -363,9 +359,10 @@ def is_orthorhombic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    vec_lengths = map(vector_len, (p1, p2, p3))
-    factory = PrimitiveCell.for_orthorhombic_lattice
-    return same_lattice_type(factory(*vec_lengths), p1, p2, p3)
+    # all angles close to 90 degrees
+    cosines = map(cosine_two_vectors,
+                  (p1, p2, p3), (p2, p3, p1))
+    return numpy.allclose(cosines, 0.)
 
 
 def is_body_centered_orthorhombic_lattice(p1, p2, p3):
@@ -423,10 +420,8 @@ def is_face_centered_orthorhombic_lattice(p1, p2, p3):
     if a2 <= 0 or b2 <= 0 or c2 <= 0:
         return False
 
-    for abc in permutations(map(numpy.sqrt, (a2, b2, c2)), 3):
-        if same_lattice_type(factory(*abc), p1, p2, p3):
-            return True
-    return False
+    abc = map(numpy.sqrt, (a2, b2, c2))
+    return same_lattice_type(factory(*abc), p1, p2, p3, permute=False)
 
 
 def is_base_centered_orthorhombic_lattice(p1, p2, p3):
@@ -471,9 +466,8 @@ def is_monoclinic_lattice(p1, p2, p3):
     -------
     output : bool
     '''
-    cosines = (cosine_two_vectors(p1, p2),
-               cosine_two_vectors(p2, p3),
-               cosine_two_vectors(p1, p3))
+    cosines = map(cosine_two_vectors,
+                  (p1, p2, p3), (p2, p3, p1))
 
     # base on loose definition: at least 2 angles are 90 degrees
     return (numpy.isclose(cosines, 0.).sum() >= 2 and
@@ -498,45 +492,45 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
     output : bool
     '''
     vec_lengths = map(vector_len, (p1, p2, p3))
-
-    if numpy.any(numpy.isclose(vec_lengths, 0)):
-        message = 'Edge lengths must be strictly positive'
-        raise ValueError(message)
-
     factory = PrimitiveCell.for_base_centered_monoclinic_lattice
 
-    for alpha, beta, gamma in permutations(vec_lengths, 3):
-        delta = 4.*beta**2.-alpha**2.
-        if delta <= 0.:
+    for alpha, delta, gamma in permutations(vec_lengths, 3):
+        beta2 = 4.*delta**2.-alpha**2.
+        if beta2 <= 0.:
             continue
 
+        # length of the second vector
+        beta = numpy.sqrt(beta2)
+
         sin_theta = numpy.dot(numpy.cross(p1, p2),
-                              p3)/alpha/numpy.sqrt(delta)/gamma*2.
+                              p3)/alpha/beta/gamma*2.
         theta = numpy.arcsin(numpy.clip(sin_theta, -1., 1.))
         angle1 = theta % numpy.pi
 
         if numpy.isclose(angle1, 0.) or numpy.isclose(angle1, numpy.pi):
             continue
 
-        # two possible solutions of theta
-        theta1, theta2 = theta, numpy.pi-theta
-
+        # More sines and cosines are computed in the factory.
+        # Numerical errors may lead to the end vectors be parallel
+        # to each other.
         try:
-            # More sines and cosines are computed in the factory.
-            # Numerical errors may lead to the end vectors be parallel
-            # to each other.
-            if (same_lattice_type(factory(alpha, numpy.sqrt(delta),
-                                          gamma, theta1), p1, p2, p3) or
-                same_lattice_type(factory(alpha, numpy.sqrt(delta),
-                                          gamma, theta2), p1, p2, p3)):
-                return True
+            target_pc1 = factory(alpha, beta, gamma, theta)
         except ValueError:
             message = ("Failed to compare given vectors with a base "
                        "centered monoclinic cell due to accumulated "
                        "numerical errors. a:{}, b:{}, c:{}, "
-                       "theta: +/-{}".format(alpha, numpy.sqrt(delta),
+                       "theta: +/-{}".format(alpha, beta,
                                              gamma, theta))
             warnings.warn(message)
+            continue
+
+        # two possible solutions of theta
+        theta2 = numpy.pi-theta
+
+        if (same_lattice_type(target_pc1, p1, p2, p3) or
+                same_lattice_type(factory(alpha, beta,
+                                          gamma, theta2), p1, p2, p3)):
+                return True
     return False
 
 
@@ -564,10 +558,6 @@ def is_triclinic_lattice(p1, p2, p3):
     a1 = alpha % numpy.pi
     a2 = beta % numpy.pi
     a3 = gamma % numpy.pi
-
-    if (numpy.any(numpy.isclose((a1, a2, a3), (0,)*3)) or
-            numpy.any(numpy.isclose((a1, a2, a3), (numpy.pi,)*3))):
-        return False
 
     return (numpy.all(numpy.greater((a1+a2, a1+a3, a2+a3), (a3, a2, a1))) and
             same_lattice_type(factory(*(edges+(alpha, beta, gamma))),
