@@ -1,5 +1,6 @@
 import unittest
 import random
+import warnings
 
 import numpy
 from hypothesis import given
@@ -347,3 +348,17 @@ class TestLatticeTools(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             lattice_tools.guess_primitive_vectors(points)
+
+    def test_warning_comparing_shallow_triclinic(self):
+        ''' Test warning when checking shallow triclinic against base
+        centered monoclinic'''
+        # given
+        primitive_cell = PrimitiveCell.for_triclinic_lattice(0.2, 0.3, 0.4,
+                                                             0.4, 0.4, 0.0045)
+        p1, p2, p3 = self.get_primitive_vectors(primitive_cell)
+
+        # then
+        with warnings.catch_warnings(record=True) as warn_manager:
+            lattice_tools.is_base_centered_monoclinic_lattice(p1, p2, p3)
+            assert len(warn_manager) >= 1
+            assert issubclass(warn_manager[-1].category, UserWarning)

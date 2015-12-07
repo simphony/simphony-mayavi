@@ -505,10 +505,6 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
         sin_theta = numpy.dot(numpy.cross(p1, p2),
                               p3)/alpha/beta/gamma*2.
         theta = numpy.arcsin(numpy.clip(sin_theta, -1., 1.))
-        angle1 = theta % numpy.pi
-
-        if numpy.isclose(angle1, 0.) or numpy.isclose(angle1, numpy.pi):
-            continue
 
         # More sines and cosines are computed in the factory.
         # Numerical errors may lead to the end vectors be parallel
@@ -516,11 +512,10 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
         try:
             target_pc1 = factory(alpha, beta, gamma, theta)
         except ValueError:
-            message = ("Failed to compare given vectors with a base "
-                       "centered monoclinic cell due to accumulated "
-                       "numerical errors. a:{}, b:{}, c:{}, "
-                       "theta: +/-{}".format(alpha, beta,
-                                             gamma, theta))
+            message = ("Could not create a base centered monoclinic cell "
+                       "for comparison. "
+                       "a:{}, b:{}, c:{}, theta: +/-{}".format(alpha, beta,
+                                                               gamma, theta))
             warnings.warn(message)
             continue
 
