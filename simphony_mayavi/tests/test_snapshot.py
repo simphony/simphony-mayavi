@@ -52,8 +52,9 @@ class TestSnapShot(unittest.TestCase):
             [2, 0, 1], [3, 0, 1], [3, 1, 1], [2, 1, 1]],
             'f')
         particles = Particles('test')
-        for index, point in enumerate(coordinates):
-            particles.add_particle(Particle(coordinates=point + 3))
+        particle_iter = (Particle(coordinates=point+3)
+                         for point in coordinates)
+        particles.add_particles(particle_iter)
 
         snapshot(particles, filename)
         self.assertImageSavedWithContent(filename)

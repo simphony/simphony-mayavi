@@ -346,28 +346,29 @@ class TestParticlesSource(unittest.TestCase):
         self.bond_temperature = [60., 80., 190., 5.]
 
         self.container = Particles('test')
-        self.point_uids = [
-            self.container.add_particle(
-                Particle(
-                    coordinates=point,
-                    data=DataContainer(
-                        TEMPERATURE=self.point_temperature[index])))
-            for index, point in enumerate(self.points)]
-        self.bond_uids = [
-            self.container.add_bond(
-                Bond(
-                    particles=[self.point_uids[index] for index in indices],
-                    data=DataContainer(
-                        TEMPERATURE=self.bond_temperature[index])))
-            for index, indices in enumerate(self.bonds)]
+
+        # add particles
+        def particle_iter():
+            for temp, point in zip(self.point_temperature, self.points):
+                yield Particle(coordinates=point,
+                               data=DataContainer(TEMPERATURE=temp))
+
+        self.point_uids = self.container.add_particles(particle_iter())
+
+        # add bonds
+        def bond_iter():
+            for temp, indices in zip(self.bond_temperature, self.bonds):
+                yield Bond(particles=[self.point_uids[index]
+                                      for index in indices],
+                           data=DataContainer(TEMPERATURE=temp))
+
+        self.bond_uids = self.container.add_bonds(bond_iter())
 
     def test_source_from_vtk_particles(self):
         # given
         container = VTKParticles('test')
-        for particle in self.container.iter_particles():
-            container.add_particle(particle)
-        for bond in self.container.iter_bonds():
-            container.add_bond(bond)
+        container.add_particles(self.container.iter_particles())
+        container.add_bonds(self.container.iter_bonds())
 
         # when
         source = CUDSSource(cuds=container)

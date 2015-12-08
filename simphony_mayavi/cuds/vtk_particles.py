@@ -1,10 +1,11 @@
+import sys
 import uuid
 import contextlib
 
 from tvtk.api import tvtk
 
-from simphony.core.cuba import CUBA
 from simphony.cuds.abc_particles import ABCParticles
+from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.particles import Particle, Bond
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
@@ -48,6 +49,11 @@ class VTKParticles(ABCParticles):
         self.bond2index = {}
         #: The reverse mapping from index to bond uid
         self.index2bond = {}
+
+        self._items_count = {
+            CUDSItem.PARTICLE: lambda: self.particle2index,
+            CUDSItem.BOND: lambda: self.bond2index
+        }
 
         # Setup the data_set
         if data_set is None:
@@ -200,21 +206,40 @@ class VTKParticles(ABCParticles):
 
     # Particle operations ####################################################
 
-    def add_particle(self, particle):
+    def add_particles(self, particles):
         data_set = self.data_set
         points = data_set.points
         particle2index = self.particle2index
-        with self._add_item(particle, particle2index) as item:
-            if self.initialized:
-                # We remove the dummy point
-                self.data_set.points = tvtk.Points()
-                points = data_set.points
-                self.initialized = False
-            index = points.insert_next_point(item.coordinates)
-            particle2index[item.uid] = index
-            self.index2particle[index] = item.uid
-            self.point_data.append(item.data)
-        return item.uid
+        item_uids = []
+        for particle in particles:
+            with self._add_item(particle, particle2index) as item:
+                if self.initialized:
+                    # We remove the dummy point
+                    self.data_set.points = tvtk.Points()
+                    points = data_set.points
+                    self.initialized = False
+                index = points.insert_next_point(item.coordinates)
+                particle2index[item.uid] = index
+                self.index2particle[index] = item.uid
+                self.point_data.append(item.data)
+                item_uids.append(item.uid)
+
+        # adding new points causes the cached array under
+        # tvtk.array_handler to be inconsistent with the
+        # points FloatArray, therefore we need to remove
+        # the reference in the tvtk.array_handler._array_cache
+        # for points.to_array() to work properly
+        _array_cache = None
+        for name in ['array_handler', 'tvtk.array_handler']:
+            if name in sys.modules:
+                mod = sys.modules[name]
+                if hasattr(mod, '_array_cache'):
+                    _array_cache = mod._array_cache
+                break
+        if _array_cache:
+            _array_cache._remove_array(tvtk.to_vtk(points.data).__this__)
+
+        return item_uids
 
     def get_particle(self, uid):
         index = int(self.particle2index[uid])
@@ -223,37 +248,40 @@ class VTKParticles(ABCParticles):
             coordinates=self.data_set.points[index],
             data=self.point_data[index])
 
-    def remove_particle(self, uid):
+    def remove_particles(self, uids):
         particle2index = self.particle2index
         index2particle = self.index2particle
         points = self.data_set.points
         point_data = self.point_data
 
-        # move uid item to the end
-        self._swap_with_last(
-            uid, particle2index, index2particle,
-            points, point_data)
-        index = particle2index[uid]
+        # `count` is used for resizing data_set.points in batch
+        for count, uid in enumerate(uids, start=1):
+            # move uid item to the end
+            self._swap_with_last(
+                uid, particle2index, index2particle,
+                points, point_data)
+            index = particle2index[uid]
 
-        # remove last point info
+            # remove last point info
+            del self.point_data[index]
+
+            # remove uid item from mappings
+            del particle2index[uid]
+            del index2particle[index]
+
         array = points.to_array()
-        self.data_set.points = array[:-1]
-        del self.point_data[index]
-
-        # remove uid item from mappings
-        del particle2index[uid]
-        del index2particle[index]
+        self.data_set.points = array[:-count]
         assert len(self.data_set.points) == len(particle2index)
 
-    def update_particle(self, particle):
-        try:
-            index = self.particle2index[particle.uid]
-        except KeyError:
-            message = "Particle with {} does exist"
-            raise ValueError(message.format(particle.uid))
-        # Need to cast to int https://github.com/enthought/mayavi/issues/173
-        self.data_set.points[int(index)] = particle.coordinates
-        self.point_data[index] = particle.data
+    def update_particles(self, particles):
+        for particle in particles:
+            try:
+                index = self.particle2index[particle.uid]
+            except KeyError:
+                message = "Particle with {} does not exist"
+                raise ValueError(message.format(particle.uid))
+            self.data_set.points[index] = particle.coordinates
+            self.point_data[index] = particle.data
 
     def iter_particles(self, uids=None):
         if uids is None:
@@ -268,57 +296,86 @@ class VTKParticles(ABCParticles):
 
     # Bond operations ########################################################
 
-    def add_bond(self, bond):
+    def is_connected(self, bond):
+        """ Test if the connectivity described in bonds is valid
+        i.e. the particles are part of the container
+
+        Parameters
+        ----------
+        bond : Bond
+
+        Returns
+        -------
+        valid : bool
+        """
+        return all((self.has_particle(uid) for uid in bond.particles))
+
+    def add_bonds(self, bonds):
         data_set = self.data_set
         bond2index = self.bond2index
-        with self._add_item(bond, bond2index) as item:
-            point_ids = [self.particle2index[uid] for uid in item.particles]
-            index = data_set.insert_next_cell(VTKEDGETYPES[1], point_ids)
-            bond2index[item.uid] = index
-            self.index2bond[index] = item.uid
-            self.bond_data.append(item.data)
-        return item.uid
+        item_uids = []
+        for bond in bonds:
+            with self._add_item(bond, bond2index) as item:
+                if not self.is_connected(bond):
+                    message = "Cannot add Bond {} with missing uids: {}"
+                    raise ValueError(message.format(item.uid, item.particles))
+                point_ids = [self.particle2index[uid]
+                             for uid in item.particles]
+                index = data_set.insert_next_cell(VTKEDGETYPES[1], point_ids)
+                bond2index[item.uid] = index
+                self.index2bond[index] = item.uid
+                self.bond_data.append(item.data)
+                item_uids.append(item.uid)
+        return item_uids
 
     def get_bond(self, uid):
         index = self.bond2index[uid]
-        line = self.data_set.get_cell(index)
+
+        # cannot use self.data_set.get_cell(index) here because
+        # get_cell would give the wrong point_ids if the dimension
+        # of the cell changes upon update
+        point_ids = self.bonds[index]
         return Bond(
             uid=uid,
-            particles=[self.index2particle[i] for i in line.point_ids],
+            particles=[self.index2particle[i] for i in point_ids],
             data=self.bond_data[index])
 
-    def update_bond(self, bond):
-        try:
-            index = self.bond2index[bond.uid]
-        except KeyError:
-            message = "Bond with {} does exist"
-            raise ValueError(message.format(bond.uid))
-        point_ids = [self.particle2index[uid] for uid in bond.particles]
-        self.bonds[index] = point_ids
-        self.bond_data[index] = bond.data
+    def update_bonds(self, bonds):
+        for bond in bonds:
+            if not self.is_connected(bond):
+                message = "Cannot update Bond {} with missing uids: {}"
+                raise ValueError(message.format(bond.uid, bond.particles))
+            try:
+                index = self.bond2index[bond.uid]
+            except KeyError:
+                message = "Bond with {} does not exist"
+                raise ValueError(message.format(bond.uid))
+            point_ids = [self.particle2index[uid] for uid in bond.particles]
+            self.bonds[index] = point_ids
+            self.bond_data[index] = bond.data
 
     def has_bond(self, uid):
         return uid in self.bond2index
 
-    def remove_bond(self, uid):
+    def remove_bonds(self, uids):
         bond2index = self.bond2index
         index2bond = self.index2bond
         bond_data = self.bond_data
         bonds = self.bonds
 
-        index = bond2index[uid]
-        # move uid item to the end
-        self._swap_with_last(
-            uid, bond2index, index2bond, bonds, bond_data)
-        index = bond2index[uid]
+        for uid in uids:
+            # move uid item to the end
+            self._swap_with_last(
+                uid, bond2index, index2bond, bonds, bond_data)
+            index = bond2index[uid]
 
-        # remove last bond info
-        del bonds[index]
-        del bond_data[index]
+            # remove last bond info
+            del bonds[index]
+            del bond_data[index]
 
-        # remove uid item from mappings
-        del bond2index[uid]
-        del index2bond[index]
+            # remove uid item from mappings
+            del bond2index[uid]
+            del index2bond[index]
 
     def iter_bonds(self, uids=None):
         if uids is None:
@@ -327,6 +384,13 @@ class VTKParticles(ABCParticles):
         else:
             for uid in uids:
                 yield self.get_bond(uid)
+
+    def count_of(self, item_type):
+        try:
+            return len(self._items_count[item_type]())
+        except KeyError:
+            error_str = "Trying to obtain count a of non-supported item: {}"
+            raise ValueError(error_str.format(item_type))
 
     # Private interface ######################################################
 
@@ -337,6 +401,9 @@ class VTKParticles(ABCParticles):
         elif item.uid in container:
             message = "Item with id:{} already exists"
             raise ValueError(message.format(item.uid))
+        elif not isinstance(item.uid, uuid.UUID):
+            message = "{!r} has an invalid uid: {}"
+            raise AttributeError(message.format(item, item.uid))
         yield item
 
     def _swap_with_last(self, uid, mapping, reverse_mapping, items, data):
@@ -356,9 +423,8 @@ class VTKParticles(ABCParticles):
             The associated CubaData instance
 
         """
-        # Need to cast to int https://github.com/enthought/mayavi/issues/173
-        index = int(mapping[uid])
-        last_index = int(len(mapping) - 1)
+        index = mapping[uid]
+        last_index = len(mapping) - 1
         last_uid = reverse_mapping[last_index]
         mapping[last_uid], mapping[uid] = index, last_index
         reverse_mapping[index], reverse_mapping[last_index] = last_uid, uid
