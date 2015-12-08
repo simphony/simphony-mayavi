@@ -6,17 +6,9 @@ from simphony.visualisation import mayavi_tools
 
 cubic = mayavi_tools.VTKLattice.empty(
     "test", PrimitiveCell.for_cubic_lattice(0.1),
-    (5, 10, 12), (5, 4, 0))
+    (5, 10, 12), (0, 0, 0))
 
-hexagonal = mayavi_tools.VTKLattice.empty(
-    "test", PrimitiveCell.for_hexagonal_lattice(0.1, 0.05),
-    (5, 10, 12), (5, 4, 0))
-
-bcc = mayavi_tools.VTKLattice.empty(
-    "test", PrimitiveCell.for_body_centered_cubic_lattice(0.1),
-    (5, 10, 12), (5, 4, 0))
-
-lattice = bcc
+lattice = cubic
 
 new_nodes = []
 for node in lattice.iter_nodes():
