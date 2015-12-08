@@ -22,8 +22,8 @@ from simphony.cuds.lattice import (
     make_monoclinic_lattice,
     make_base_centered_monoclinic_lattice,
     make_triclinic_lattice,
-    Lattice, LatticeNode)
-from simphony.cuds.primitive_cell import BravaisLattice, PrimitiveCell
+    LatticeNode)
+from simphony.cuds.primitive_cell import PrimitiveCell
 
 from simphony_mayavi.cuds.api import VTKLattice
 from simphony_mayavi.core.api import supported_cuba
@@ -152,17 +152,6 @@ class TestVTKLattice(unittest.TestCase):
                 name=lattice.name, primitive_cell=primitive_cell,
                 data_set=data.data_set)
 
-    def test_initialization_with_unfamiliar_dataset(self):
-        # given
-        data_set = tvtk.UnstructuredGrid(points=[(0, 0, 0,), (1, 1, 1)])
-        primitive_cell = PrimitiveCell.for_cubic_lattice(1.)
-
-        # when/then
-        with self.assertRaises(TypeError):
-            VTKLattice(
-                name='test', primitive_cell=primitive_cell,
-                data_set=data_set)
-
     def test_create_empty_with_unknown_type(self):
         primitive_cell = PrimitiveCell((1., 0., 0.), (0., 1., 0.),
                                        (0., 0., 1.), "Cubic")
@@ -209,33 +198,6 @@ class TestVTKLattice(unittest.TestCase):
                            lattice.primitive_cell.p2)
         assert_array_equal(vtk_lattice.primitive_cell.p3,
                            lattice.primitive_cell.p3)
-
-    def test_data_setter(self):
-        # when
-        primitive_cell = PrimitiveCell.for_cubic_lattice(1.)
-        vtk_lattice = VTKLattice.empty('test', primitive_cell, (2, 3, 4),
-                                       (0, 0, 0))
-        vtk_lattice.data = {CUBA.TEMPERATURE: 40.}
-
-        # then
-        self.assertIsInstance(vtk_lattice.data, DataContainer)
-
-    def test_exception_create_dataset_with_inconsistent_lattice_type(self):
-        bad_lattice_types = (BravaisLattice.CUBIC,
-                             BravaisLattice.TETRAGONAL,
-                             BravaisLattice.ORTHORHOMBIC)
-        for lattice_type in bad_lattice_types:
-            # when
-            primitive_cell = PrimitiveCell((1., 0., 0.),  # require PolyData
-                                           (0.5, 0.5, 0.),
-                                           (0., 0., 1.),
-                                           lattice_type)
-            lattice = Lattice('test', primitive_cell, (2, 3, 4),
-                              (0., 0., 0.))
-
-            # then
-            with self.assertRaises(ValueError):
-                vtk_lattice = VTKLattice.from_lattice(lattice)
 
     def add_velocity(self, lattice):
         new_nodes = []
