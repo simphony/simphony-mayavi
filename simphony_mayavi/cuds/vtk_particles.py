@@ -177,6 +177,18 @@ class VTKParticles(ABCParticles):
         the tvtk.DataSet is compatible and all the information can
         be properly used.
 
+        Parameters
+        ----------
+        name : str
+            The name of the container.
+
+        data_set : tvtk.DataSet
+            The dataset to wrap in the CUDS api. Default is None which
+            will create a tvtk.PolyData
+
+        data : DataContainer
+            The data attribute to attach to the container. Default is None.
+
         Raises
         ------
         TypeError :
@@ -206,12 +218,12 @@ class VTKParticles(ABCParticles):
 
     # Particle operations ####################################################
 
-    def add_particles(self, particles):
+    def add_particles(self, iterable):
         data_set = self.data_set
         points = data_set.points
         particle2index = self.particle2index
         item_uids = []
-        for particle in particles:
+        for particle in iterable:
             with self._add_item(particle, particle2index) as item:
                 if self.initialized:
                     # We remove the dummy point
@@ -273,8 +285,8 @@ class VTKParticles(ABCParticles):
         self.data_set.points = array[:-count]
         assert len(self.data_set.points) == len(particle2index)
 
-    def update_particles(self, particles):
-        for particle in particles:
+    def update_particles(self, iterable):
+        for particle in iterable:
             try:
                 index = self.particle2index[particle.uid]
             except KeyError:
@@ -310,11 +322,11 @@ class VTKParticles(ABCParticles):
         """
         return all((self.has_particle(uid) for uid in bond.particles))
 
-    def add_bonds(self, bonds):
+    def add_bonds(self, iterable):
         data_set = self.data_set
         bond2index = self.bond2index
         item_uids = []
-        for bond in bonds:
+        for bond in iterable:
             with self._add_item(bond, bond2index) as item:
                 if not self.is_connected(bond):
                     message = "Cannot add Bond {} with missing uids: {}"
@@ -340,8 +352,8 @@ class VTKParticles(ABCParticles):
             particles=[self.index2particle[i] for i in point_ids],
             data=self.bond_data[index])
 
-    def update_bonds(self, bonds):
-        for bond in bonds:
+    def update_bonds(self, iterable):
+        for bond in iterable:
             if not self.is_connected(bond):
                 message = "Cannot update Bond {} with missing uids: {}"
                 raise ValueError(message.format(bond.uid, bond.particles))

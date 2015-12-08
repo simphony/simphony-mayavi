@@ -169,6 +169,18 @@ class VTKMesh(ABCMesh):
         the tvtk.DataSet is compatible and all the information can
         be properly used.
 
+        Parameters
+        ----------
+        name : string
+            The name of the container
+
+        data_set : tvtk.DataSet
+            The dataset to wrap in the CUDS api. Default is None which
+            will create a tvtk.UnstructuredGrid.
+
+        data : DataContainer
+            The data attribute to attach to the container. Default is None.
+
         Raises
         ------
         TypeError :
