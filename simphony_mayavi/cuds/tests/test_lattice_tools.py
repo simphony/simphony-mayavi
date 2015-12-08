@@ -208,7 +208,7 @@ def get_specific_primitive_cell_factories():
     return factories
 
 
-def builder(factories):
+def builder(factories, bravais_lattices=BravaisLattice):
     '''
     Return a hypothesis.strategies.fixed_dictionaries containing
     lattice primitive cells
@@ -218,6 +218,10 @@ def builder(factories):
     factories: dict
         {BravaisLattice(IntEnum): (PrimitiveCell.<factory_function>,
                                    hypothesis.strategies.tuples)}
+    bravais_lattices: iterable
+        iterable of BravaisLattice(IntEnum) for selecting a subset of
+        BravaisLattice.  Default: all BravaisLattice
+
     Returns
     -------
     lattice: fixed_dictionary
@@ -232,7 +236,8 @@ def builder(factories):
         return factory(*args)
 
     lattices = {}
-    for bravais_lattice, (factory, elements) in factories.items():
+    for bravais_lattice in bravais_lattices:
+        factory, elements = factories[bravais_lattice]
         lattices[bravais_lattice] = builds_unpack(factory, elements)
 
     return fixed_dictionaries(lattices)
@@ -281,7 +286,9 @@ specific_map2_general = {
 rotate_angles = floats(min_value=-numpy.pi+0.1,
                        max_value=numpy.pi-0.1).filter(lambda x: x == x)
 
-all_lattices = builder(get_specific_primitive_cell_factories())
+factories = get_specific_primitive_cell_factories()
+all_lattices = builder(factories)
+specific_lattices = builder(factories, specific_map2_general.keys())
 
 
 class TestLatticeTools(unittest.TestCase):
@@ -299,7 +306,7 @@ class TestLatticeTools(unittest.TestCase):
             actual_type = lattice_tools.find_lattice_type(*vectors)
             self.assertEqual(actual_type, expected_type)
 
-    @given(all_lattices, rotate_angles, rotate_angles)
+    @given(specific_lattices, rotate_angles, rotate_angles)
     def test_find_lattice_type_ambiguous(self, lattice, alpha, beta):
         ''' Test if more symmetric lattices are part of more general lattices
 
@@ -320,6 +327,23 @@ class TestLatticeTools(unittest.TestCase):
                 self.assertTrue(
                     lattice_tools.is_bravais_lattice_consistent(p1, p2, p3,
                                                                 general))
+
+    def test_incompatible_lattice_type(self, lattices=specific_lattices.example()):
+        exclusive_lattices = {}
+        for bravais_lattice in BravaisLattice:
+            exclusive = (set(BravaisLattice)-set([bravais_lattice])-
+                         set([BravaisLattice.TRICLINIC]))
+            if bravais_lattice in specific_map2_general:
+                exclusive -= set(specific_map2_general[bravais_lattice])
+            exclusive_lattices[bravais_lattice] = exclusive
+
+        for bravais_lattice, primitive_cell in lattices.items():
+            exclusives = exclusive_lattices[bravais_lattice]
+            p1, p2, p3 = self.get_primitive_vectors(primitive_cell)
+            for exclusive in exclusives:
+                self.assertFalse(
+                    lattice_tools.is_bravais_lattice_consistent(p1, p2, p3,
+                                                                exclusive))
 
     def test_guess_primitive_vectors(self):
         primitive_cell = PrimitiveCell.for_rhombohedral_lattice(0.1, 0.7)
@@ -348,17 +372,3 @@ class TestLatticeTools(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             lattice_tools.guess_primitive_vectors(points)
-
-    def test_warning_comparing_shallow_triclinic(self):
-        ''' Test warning when checking shallow triclinic against base
-        centered monoclinic'''
-        # given
-        primitive_cell = PrimitiveCell.for_triclinic_lattice(0.2, 0.3, 0.4,
-                                                             0.4, 0.4, 0.0045)
-        p1, p2, p3 = self.get_primitive_vectors(primitive_cell)
-
-        # then
-        with warnings.catch_warnings(record=True) as warn_manager:
-            lattice_tools.is_base_centered_monoclinic_lattice(p1, p2, p3)
-            assert len(warn_manager) >= 1
-            assert issubclass(warn_manager[-1].category, UserWarning)
