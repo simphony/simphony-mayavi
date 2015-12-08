@@ -1,6 +1,5 @@
 import unittest
 import random
-import warnings
 
 import numpy
 from hypothesis import given
