@@ -287,9 +287,9 @@ rotate_angles = floats(min_value=-numpy.pi+0.1,
                        max_value=numpy.pi-0.1).filter(lambda x: x == x)
 
 factories = get_specific_primitive_cell_factories()
-all_lattices = builder(factories)
-specific_lattices = builder(factories, specific_map2_general.keys())
-lattice_examples = all_lattices.example()
+specific_lattices = builder(factories)
+some_specific_lattices = builder(factories, specific_map2_general.keys())
+lattice_strict_examples = specific_lattices.example()
 
 
 class TestLatticeTools(unittest.TestCase):
@@ -298,7 +298,7 @@ class TestLatticeTools(unittest.TestCase):
     def get_primitive_vectors(primitive_cell):
         return primitive_cell.p1, primitive_cell.p2, primitive_cell.p3
 
-    @given(all_lattices, rotate_angles, rotate_angles)
+    @given(specific_lattices, rotate_angles, rotate_angles)
     def test_find_lattice_type_specific(self, lattice, alpha, beta):
         ''' Test getting the most specific lattice type correctly'''
         for expected_type, primitive_cell in lattice.items():
@@ -307,7 +307,7 @@ class TestLatticeTools(unittest.TestCase):
             actual_type = lattice_tools.find_lattice_type(*vectors)
             self.assertEqual(actual_type, expected_type)
 
-    @given(specific_lattices, rotate_angles, rotate_angles)
+    @given(some_specific_lattices, rotate_angles, rotate_angles)
     def test_find_lattice_type_ambiguous(self, lattice, alpha, beta):
         ''' Test if more symmetric lattices are part of more general lattices
 
@@ -329,7 +329,14 @@ class TestLatticeTools(unittest.TestCase):
                     lattice_tools.is_bravais_lattice_consistent(p1, p2, p3,
                                                                 general))
 
-    def test_incompatible_lattice_type(self, lattices=lattice_examples):
+    def test_incompatible_lattice_type(self, lattices=lattice_strict_examples):
+        ''' Test if some specific lattices are incompatible with some others
+        '''
+        # information on which lattice should not be part of another
+        # lattice. e.g. a strict BravaisLattice.TRICLINIC lattice
+        # cannot be considered as any other lattice of higher symmetry
+        # exclusive_lattices[BravaisLattice.TRICLINIC]= All Bravais
+        # lattice types except triclinic
         exclusive_lattices = {}
         for bravais_lattice in BravaisLattice:
             exclusive = set(BravaisLattice)-set([bravais_lattice,
@@ -338,6 +345,7 @@ class TestLatticeTools(unittest.TestCase):
                 exclusive -= set(specific_map2_general[bravais_lattice])
             exclusive_lattices[bravais_lattice] = exclusive
 
+        # then
         for bravais_lattice, primitive_cell in lattices.items():
             exclusives = exclusive_lattices[bravais_lattice]
             p1, p2, p3 = self.get_primitive_vectors(primitive_cell)
@@ -347,29 +355,43 @@ class TestLatticeTools(unittest.TestCase):
                                                                 exclusive))
 
     def test_guess_primitive_vectors(self):
+        # given
         primitive_cell = PrimitiveCell.for_rhombohedral_lattice(0.1, 0.7)
+
+        # when
         p1, p2, p3 = self.get_primitive_vectors(primitive_cell)
         points = create_points_from_pc(p1, p2, p3, (4, 5, 6))
         actual = lattice_tools.guess_primitive_vectors(points)
+
+        # then
         numpy.testing.assert_allclose((p1, p2, p3), actual)
 
     def test_exception_guess_vectors_with_unsorted_points(self):
+        # given
         primitive_cell = PrimitiveCell.for_rhombohedral_lattice(0.1, 0.7)
+
+        # when
         p1, p2, p3 = self.get_primitive_vectors(primitive_cell)
         points = create_points_from_pc(p1, p2, p3, (4, 5, 6))
         numpy.random.shuffle(points)
 
+        # then
         with self.assertRaises(IndexError):
             lattice_tools.guess_primitive_vectors(points)
 
     def test_exception_guess_vectors_with_no_first_jump(self):
+        # given
         points = numpy.zeros((20, 3))
+
+        # then
         with self.assertRaises(IndexError):
             lattice_tools.guess_primitive_vectors(points)
 
     def test_exception_guess_vectors_with_no_second_jump(self):
+        # given
         points = numpy.zeros((20, 3))
         points[1, 0] = 2
 
+        # then
         with self.assertRaises(IndexError):
             lattice_tools.guess_primitive_vectors(points)
