@@ -109,14 +109,20 @@ class VTKLattice(ABCLattice):
 
     @property
     def size(self):
+        """ lattice dimensions (nx, ny, nz)
+        """
         return self._size
 
     @property
     def origin(self):
+        """ lattice origin (x, y, z)
+        """
         return self._origin
 
     @property
     def primitive_cell(self):
+        """ Primitive cell specifying the 3D Bravais lattice
+        """
         return self._primitive_cell
 
     # Node operations ########################################################
@@ -145,8 +151,8 @@ class VTKLattice(ABCLattice):
             error_str = "Trying to obtain count of non-supported item: {}"
             raise ValueError(error_str.format(item_type))
 
-    def get_coordinate(self, index):
-        point_id = self._get_point_id(index)
+    def get_coordinate(self, ind):
+        point_id = self._get_point_id(ind)
         return self.data_set.get_point(point_id)
 
     # Alternative constructors ###############################################
@@ -155,6 +161,26 @@ class VTKLattice(ABCLattice):
     def empty(cls, name, primitive_cell, size, origin, data=None):
         """ Create a new empty Lattice.
 
+        Parameters
+        ----------
+        name : string
+            The name of the container.
+
+        primitive_cell : PrimitiveCell
+            Primitive cell specifying the 3D Bravais lattice
+
+        size : tuple
+            lattice dimensions (nx, ny, nz)
+
+        origin : tuple
+            lattice origin (x, y, z)
+
+        data : DataContainer
+            The data attribute to attach to the container. Default is None.
+
+        Returns
+        -------
+        lattice : VTKLattice
         """
         bravais_lattice = primitive_cell.bravais_lattice
         if bravais_lattice in (BravaisLattice.CUBIC, BravaisLattice.TETRAGONAL,
@@ -187,6 +213,21 @@ class VTKLattice(ABCLattice):
     def from_lattice(cls, lattice):
         """ Create a new Lattice from the provided one.
 
+        Parameter
+        ---------
+        lattice : simphony.cuds.lattice.Lattice
+
+        Returns
+        -------
+        lattice : VTKLattice
+
+        Raises
+        ------
+        ValueError
+            - if bravais_lattice attribute of the primitive cell indicates
+              a cubic/tetragonal/orthorhombic lattice but the primitive vectors
+              are inconsistent with this attribute
+            - if bravais_lattice is not a member of BravaisLattice
         """
         origin = lattice.origin
         primitive_cell = lattice.primitive_cell
