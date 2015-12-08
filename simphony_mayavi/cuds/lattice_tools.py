@@ -492,39 +492,35 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
     output : bool
     '''
     vec_lengths = map(vector_len, (p1, p2, p3))
-    factory = PrimitiveCell.for_base_centered_monoclinic_lattice
+    cosines = map(cosine_two_vectors,
+                  (p1, p2, p3), (p2, p3, p1))
 
-    for alpha, delta, gamma in permutations(vec_lengths, 3):
-        beta2 = 4.*delta**2.-alpha**2.
-        if beta2 <= 0.:
+    for ivectors in permutations(range(3)):
+        alpha, beta, gamma = (vec_lengths[i] for i in ivectors)
+        delta2 = 4.*beta**2.-alpha**2.
+        if delta2 <= 0.:
             continue
+        delta = numpy.sqrt(delta2)
 
-        # length of the second vector
-        beta = numpy.sqrt(beta2)
+        # cosines are compared directly instead of using
+        # `same_lattice_type`.  This is because the latter requires
+        # creating a target base centered monoclinic cell
+        # and additional cosine and sine operations within the
+        # primitive cell factory functions lead to additional numerical
+        # errors
 
-        sin_theta = numpy.dot(numpy.cross(p1, p2),
-                              p3)/alpha/beta/gamma*2.
-        theta = numpy.arcsin(numpy.clip(sin_theta, -1., 1.))
-
-        # More sines and cosines are computed in the factory.
-        # Numerical errors may lead to the end vectors be parallel
-        # to each other.
-        try:
-            target_pc1 = factory(alpha, beta, gamma, theta)
-        except ValueError:
-            message = ("Could not create a base centered monoclinic cell "
-                       "for comparison. "
-                       "a:{}, b:{}, c:{}, theta: +/-{}".format(alpha, beta,
-                                                               gamma, theta))
-            warnings.warn(message)
-            continue
-
-        # two possible solutions of theta
-        theta2 = numpy.pi-theta
-
-        if (same_lattice_type(target_pc1, p1, p2, p3) or
-                same_lattice_type(factory(alpha, beta,
-                                          gamma, theta2), p1, p2, p3)):
+        # In order to minimise numerical errors, cosine(special angle)
+        # is taken directly from the given vectors
+        # There are two possible positions for the special angle
+        expected_cosines1 = tuple((alpha/beta/2.,
+                                   alpha*cosines[ivectors[-1]]/beta/2.,
+                                   cosines[ivectors[-1]]))
+        expected_cosines2 = tuple((alpha/beta/2.,
+                                   alpha*cosines[ivectors[0]]/beta/2.,
+                                   cosines[ivectors[0]]))
+        for actual_cosines in permutations(cosines):
+            if (numpy.allclose(expected_cosines1, actual_cosines) or
+                numpy.allclose(expected_cosines2, actual_cosines)):
                 return True
     return False
 
