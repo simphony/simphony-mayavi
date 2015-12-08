@@ -289,6 +289,7 @@ rotate_angles = floats(min_value=-numpy.pi+0.1,
 factories = get_specific_primitive_cell_factories()
 all_lattices = builder(factories)
 specific_lattices = builder(factories, specific_map2_general.keys())
+lattice_examples = all_lattices.example()
 
 
 class TestLatticeTools(unittest.TestCase):
@@ -328,11 +329,11 @@ class TestLatticeTools(unittest.TestCase):
                     lattice_tools.is_bravais_lattice_consistent(p1, p2, p3,
                                                                 general))
 
-    def test_incompatible_lattice_type(self, lattices=specific_lattices.example()):
+    def test_incompatible_lattice_type(self, lattices=lattice_examples):
         exclusive_lattices = {}
         for bravais_lattice in BravaisLattice:
-            exclusive = (set(BravaisLattice)-set([bravais_lattice])-
-                         set([BravaisLattice.TRICLINIC]))
+            exclusive = set(BravaisLattice)-set([bravais_lattice,
+                                                 BravaisLattice.TRICLINIC])
             if bravais_lattice in specific_map2_general:
                 exclusive -= set(specific_map2_general[bravais_lattice])
             exclusive_lattices[bravais_lattice] = exclusive

@@ -1,5 +1,4 @@
 from itertools import permutations, combinations
-import warnings
 
 import numpy
 from simphony.cuds.primitive_cell import PrimitiveCell, BravaisLattice
@@ -500,7 +499,6 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
         delta2 = 4.*beta**2.-alpha**2.
         if delta2 <= 0.:
             continue
-        delta = numpy.sqrt(delta2)
 
         # cosines are compared directly instead of using
         # `same_lattice_type`.  This is because the latter requires
@@ -520,7 +518,7 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
                                    cosines[ivectors[0]]))
         for actual_cosines in permutations(cosines):
             if (numpy.allclose(expected_cosines1, actual_cosines) or
-                numpy.allclose(expected_cosines2, actual_cosines)):
+                    numpy.allclose(expected_cosines2, actual_cosines)):
                 return True
     return False
 
