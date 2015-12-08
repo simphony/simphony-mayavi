@@ -16,7 +16,6 @@ bcc = make_body_centered_cubic_lattice(
     'bcc', 0.1, (5, 10, 12), (5, 4, 0))
 
 
-
 def add_temperature(lattice):
     new_nodes = []
     for node in lattice.iter_nodes():
@@ -29,7 +28,6 @@ add_temperature(hexagonal)
 add_temperature(cubic)
 add_temperature(bcc)
 add_temperature(fcc)
-
 
 
 # Now view the data.
