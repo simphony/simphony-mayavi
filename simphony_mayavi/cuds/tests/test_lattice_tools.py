@@ -246,7 +246,8 @@ def builder(factories, bravais_lattices=BravaisLattice):
 # A list of general lattices and their special cases
 # e.g. cubic and face-centered-cubic are special cases
 # of the rhombohedral lattice
-specific_map2_general = defaultdict(tuple, {
+specific_map2_general = defaultdict(
+    tuple, {
         BravaisLattice.CUBIC: (
             BravaisLattice.RHOMBOHEDRAL,
             BravaisLattice.TETRAGONAL,
@@ -340,8 +341,8 @@ class TestLatticeTools(unittest.TestCase):
             # bravais_lattice cannot be compatible with lattice
             # types in `exclusive`
             exclusives = (set(BravaisLattice)
-                          -set(specific_map2_general[bravais_lattice])
-                          -set([bravais_lattice, BravaisLattice.TRICLINIC]))
+                          - set(specific_map2_general[bravais_lattice])
+                          - set([bravais_lattice, BravaisLattice.TRICLINIC]))
             p1, p2, p3 = self.get_primitive_vectors(primitive_cell)
             for exclusive in exclusives:
                 self.assertFalse(
