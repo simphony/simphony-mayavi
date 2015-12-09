@@ -1,5 +1,6 @@
 import unittest
 import random
+from collections import defaultdict
 
 import numpy
 from hypothesis import given
@@ -245,40 +246,40 @@ def builder(factories, bravais_lattices=BravaisLattice):
 # A list of general lattices and their special cases
 # e.g. cubic and face-centered-cubic are special cases
 # of the rhombohedral lattice
-specific_map2_general = {
-    BravaisLattice.CUBIC: (
-        BravaisLattice.RHOMBOHEDRAL,
-        BravaisLattice.TETRAGONAL,
-        BravaisLattice.ORTHORHOMBIC,
-        BravaisLattice.MONOCLINIC,
-        BravaisLattice.TRICLINIC),
-    BravaisLattice.FACE_CENTERED_CUBIC: (
-        BravaisLattice.RHOMBOHEDRAL,
-        BravaisLattice.FACE_CENTERED_ORTHORHOMBIC,
-        BravaisLattice.TRICLINIC),
-    BravaisLattice.BODY_CENTERED_CUBIC: (
-        BravaisLattice.BODY_CENTERED_TETRAGONAL,
-        BravaisLattice.BODY_CENTERED_ORTHORHOMBIC,
-        BravaisLattice.TRICLINIC),
-    BravaisLattice.TETRAGONAL: (
-        BravaisLattice.ORTHORHOMBIC,
-        BravaisLattice.MONOCLINIC,
-        BravaisLattice.TRICLINIC),
-    BravaisLattice.HEXAGONAL: (
-        BravaisLattice.BASE_CENTERED_ORTHORHOMBIC,
-        BravaisLattice.MONOCLINIC,
-        BravaisLattice.BASE_CENTERED_MONOCLINIC,
-        BravaisLattice.TRICLINIC),
-    BravaisLattice.ORTHORHOMBIC: (
-        BravaisLattice.MONOCLINIC,
-        BravaisLattice.TRICLINIC),
-    BravaisLattice.BODY_CENTERED_TETRAGONAL: (
-        BravaisLattice.BODY_CENTERED_ORTHORHOMBIC,
-        BravaisLattice.TRICLINIC),
-    BravaisLattice.BASE_CENTERED_ORTHORHOMBIC: (
-        BravaisLattice.MONOCLINIC,
-        BravaisLattice.BASE_CENTERED_MONOCLINIC,
-        BravaisLattice.TRICLINIC)}
+specific_map2_general = defaultdict(tuple, {
+        BravaisLattice.CUBIC: (
+            BravaisLattice.RHOMBOHEDRAL,
+            BravaisLattice.TETRAGONAL,
+            BravaisLattice.ORTHORHOMBIC,
+            BravaisLattice.MONOCLINIC,
+            BravaisLattice.TRICLINIC),
+        BravaisLattice.FACE_CENTERED_CUBIC: (
+            BravaisLattice.RHOMBOHEDRAL,
+            BravaisLattice.FACE_CENTERED_ORTHORHOMBIC,
+            BravaisLattice.TRICLINIC),
+        BravaisLattice.BODY_CENTERED_CUBIC: (
+            BravaisLattice.BODY_CENTERED_TETRAGONAL,
+            BravaisLattice.BODY_CENTERED_ORTHORHOMBIC,
+            BravaisLattice.TRICLINIC),
+        BravaisLattice.TETRAGONAL: (
+            BravaisLattice.ORTHORHOMBIC,
+            BravaisLattice.MONOCLINIC,
+            BravaisLattice.TRICLINIC),
+        BravaisLattice.HEXAGONAL: (
+            BravaisLattice.BASE_CENTERED_ORTHORHOMBIC,
+            BravaisLattice.MONOCLINIC,
+            BravaisLattice.BASE_CENTERED_MONOCLINIC,
+            BravaisLattice.TRICLINIC),
+        BravaisLattice.ORTHORHOMBIC: (
+            BravaisLattice.MONOCLINIC,
+            BravaisLattice.TRICLINIC),
+        BravaisLattice.BODY_CENTERED_TETRAGONAL: (
+            BravaisLattice.BODY_CENTERED_ORTHORHOMBIC,
+            BravaisLattice.TRICLINIC),
+        BravaisLattice.BASE_CENTERED_ORTHORHOMBIC: (
+            BravaisLattice.MONOCLINIC,
+            BravaisLattice.BASE_CENTERED_MONOCLINIC,
+            BravaisLattice.TRICLINIC)})
 
 
 # angles for rotating the primitive vectors
@@ -331,22 +332,16 @@ class TestLatticeTools(unittest.TestCase):
     def test_incompatible_lattice_type(self, lattices=lattice_strict_examples):
         ''' Test if some specific lattices are incompatible with some others
         '''
-        # information on which lattice should not be part of another
-        # lattice. e.g. a strict BravaisLattice.TRICLINIC lattice
+        # e.g. a strict BravaisLattice.TRICLINIC lattice
         # cannot be considered as any other lattice of higher symmetry
-        # exclusive_lattices[BravaisLattice.TRICLINIC]= All Bravais
-        # lattice types except triclinic
-        exclusive_lattices = {}
-        for bravais_lattice in BravaisLattice:
-            exclusive = set(BravaisLattice)-set([bravais_lattice,
-                                                 BravaisLattice.TRICLINIC])
-            if bravais_lattice in specific_map2_general:
-                exclusive -= set(specific_map2_general[bravais_lattice])
-            exclusive_lattices[bravais_lattice] = exclusive
+        # All other lattices are triclinic in its loose definition
 
-        # then
         for bravais_lattice, primitive_cell in lattices.items():
-            exclusives = exclusive_lattices[bravais_lattice]
+            # bravais_lattice cannot be compatible with lattice
+            # types in `exclusive`
+            exclusives = (set(BravaisLattice)
+                          -set(specific_map2_general[bravais_lattice])
+                          -set([bravais_lattice, BravaisLattice.TRICLINIC]))
             p1, p2, p3 = self.get_primitive_vectors(primitive_cell)
             for exclusive in exclusives:
                 self.assertFalse(
