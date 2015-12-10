@@ -5,7 +5,7 @@ import subprocess
 from setuptools import setup, find_packages
 
 MAJOR = 0
-MINOR = 3
+MINOR = 4
 MICRO = 0
 
 IS_RELEASED = False
@@ -20,7 +20,7 @@ if on_rtd:
     requirements = []
 else:
     requirements = [
-        "simphony[H5IO]>=0.2.1,<0.3.0", "mayavi[app]", "hypothesis"]
+        "simphony[H5IO]>=0.3.0", "mayavi[app]", "hypothesis"]
 
 
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
@@ -29,7 +29,7 @@ if on_rtd:
     requirements = ["hypothesis", "traits"],
 else:
     requirements = [
-        "simphony[H5IO]>=0.2.1,<0.3.0",
+        "simphony[H5IO]>=0.3.0",
         "mayavi[app]",
         "hypothesis"],
 
