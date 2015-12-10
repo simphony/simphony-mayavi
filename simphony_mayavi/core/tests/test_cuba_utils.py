@@ -32,7 +32,6 @@ class TestCubaUtils(unittest.TestCase):
                 elif numpy.issubdtype(dtype, numpy.int):
                     self.int_vector_cuba.append(cuba)
 
-
     def test_supported_cuba(self):
         # given
         expected = (
