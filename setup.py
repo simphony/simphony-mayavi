@@ -29,7 +29,7 @@ if on_rtd:
     requirements = ["hypothesis", "traits"],
 else:
     requirements = [
-        "simphony[H5IO]>=0.3.0",
+        "simphony[H5IO]==0.3.0.dev0",
         "mayavi[app]",
         "hypothesis"],
 
