@@ -297,14 +297,20 @@ class TestLatticeTools(unittest.TestCase):
 
     @staticmethod
     def get_primitive_vectors(primitive_cell):
-        return primitive_cell.p1, primitive_cell.p2, primitive_cell.p3
+        return map(numpy.array,
+                   (primitive_cell.p1, primitive_cell.p2, primitive_cell.p3))
 
     @given(specific_lattices, rotate_angles, rotate_angles)
     def test_find_lattice_type_specific(self, lattice, alpha, beta):
         ''' Test getting the most specific lattice type correctly'''
         for expected_type, primitive_cell in lattice.items():
+            # rotate vectors
             vectors = list(rotate_primitive_cell(primitive_cell, alpha, beta))
+            # random permutation
             random.shuffle(vectors)
+            # flipping vectors
+            vectors = numpy.random.choice((1, -1), (3, 1))*vectors
+
             actual_type = lattice_tools.find_lattice_type(*vectors)
             self.assertEqual(actual_type, expected_type)
 
@@ -321,9 +327,12 @@ class TestLatticeTools(unittest.TestCase):
         '''
         for specific, generals in specific_map2_general.items():
             primitive_cell = lattice[specific]
+            # rotating vectors
             vectors = list(rotate_primitive_cell(primitive_cell, alpha, beta))
+            # random permutation
             random.shuffle(vectors)
-            p1, p2, p3 = vectors
+            # flipping vectors
+            p1, p2, p3 = numpy.random.choice((1, -1), (3, 1))*vectors
 
             for general in generals:
                 self.assertTrue(

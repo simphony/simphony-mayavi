@@ -57,7 +57,7 @@ def same_lattice_type(target_pc, p1, p2, p3, permute=True):
     pcs = (target_pc.p1, target_pc.p2, target_pc.p3)
 
     # cosine angles between pairs of the target primitive vectors
-    target_cosines = tuple(cosine_two_vectors(vec1, vec2)
+    target_cosines = tuple(numpy.abs(cosine_two_vectors(vec1, vec2))
                            for vec1, vec2 in combinations(pcs, 2))
 
     # length ratios between pairs of the target primitive vectors
@@ -70,7 +70,7 @@ def same_lattice_type(target_pc, p1, p2, p3, permute=True):
         iter_func = combinations
 
     for iperm, perms in enumerate(iter_func((p1, p2, p3), 3)):
-        cosines = tuple(cosine_two_vectors(vec1, vec2)
+        cosines = tuple(numpy.abs(cosine_two_vectors(vec1, vec2))
                         for vec1, vec2 in combinations(perms, 2))
         ratios = tuple(vector_len(vec1)/vector_len(vec2)
                        for vec1, vec2 in permutations(perms, 2))
@@ -209,8 +209,8 @@ def is_face_centered_cubic_lattice(p1, p2, p3):
         return False
 
     # all angles close to 60 degree
-    cosines = map(cosine_two_vectors,
-                  (p1, p2, p3), (p2, p3, p1))
+    cosines = numpy.abs(map(cosine_two_vectors,
+                            (p1, p2, p3), (p2, p3, p1)))
     return numpy.allclose(cosines, 0.5)
 
 
@@ -235,8 +235,8 @@ def is_rhombohedral_lattice(p1, p2, p3):
         return False
 
     # all angles close to each other
-    cosa, cosb, cosc = map(cosine_two_vectors,
-                           (p1, p2, p3), (p2, p3, p1))
+    cosa, cosb, cosc = numpy.abs(map(cosine_two_vectors,
+                                     (p1, p2, p3), (p2, p3, p1)))
     return numpy.allclose((cosa, cosb), cosc)
 
 
@@ -304,8 +304,9 @@ def is_body_centered_tetragonal_lattice(p1, p2, p3):
         (v1, v2), v3, (a, b) = pair_other[numpy.where(equal_len_pairs)[0][0]]
 
         return (numpy.isclose(cosine_two_vectors(v1, v2), 0.) and
-                numpy.allclose((cosine_two_vectors(v1, v3),
-                                cosine_two_vectors(v2, v3)), 0.5*a/b))
+                numpy.allclose((numpy.abs(cosine_two_vectors(v1, v3)),
+                                numpy.abs(cosine_two_vectors(v2, v3))),
+                               0.5*a/b))
 
 
 def is_hexagonal_lattice(p1, p2, p3):
@@ -338,7 +339,7 @@ def is_hexagonal_lattice(p1, p2, p3):
         (v1, v2), v3 = pair_other[numpy.where(equal_len_pairs)[0][0]]
         # check if v1 and v2 make an angle of 60 degree
         # v3 makes a right angle with both v1 and v2
-        return (numpy.isclose(cosine_two_vectors(v1, v2), 0.5) and
+        return (numpy.isclose(numpy.abs(cosine_two_vectors(v1, v2)), 0.5) and
                 numpy.allclose((cosine_two_vectors(v1, v3),
                                 cosine_two_vectors(v2, v3)), 0.))
 
@@ -491,8 +492,8 @@ def is_base_centered_monoclinic_lattice(p1, p2, p3):
     output : bool
     '''
     vec_lengths = map(vector_len, (p1, p2, p3))
-    cosines = map(cosine_two_vectors,
-                  (p1, p2, p3), (p2, p3, p1))
+    cosines = numpy.abs(map(cosine_two_vectors,
+                            (p1, p2, p3), (p2, p3, p1)))
 
     for ivectors in permutations(range(3)):
         alpha, beta, gamma = (vec_lengths[i] for i in ivectors)
