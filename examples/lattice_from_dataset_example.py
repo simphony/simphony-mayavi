@@ -3,9 +3,8 @@ import numpy
 from tvtk.api import tvtk
 from mayavi.scripts import mayavi2
 from simphony.core.cuba import CUBA
-from simphony.cuds.primitive_cell import PrimitiveCell, BravaisLattice
+from simphony.cuds.primitive_cell import PrimitiveCell
 
-import simphony_mayavi.cuds.lattice_tools as lattice_tools
 from simphony.visualisation import mayavi_tools
 
 datasets = []
