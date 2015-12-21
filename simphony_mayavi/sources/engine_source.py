@@ -1,7 +1,6 @@
 
 from traits.api import ListStr, Instance, Property, cached_property
 from traitsui.api import View, Group, Item, VGroup
-from mayavi.core.api import PipelineInfo
 from mayavi.core.trait_defs import DEnum
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -37,7 +36,7 @@ class EngineSource(CUDSSource):
     @cached_property
     def _get_engine(self):
         return self._engine
-    
+
     def _set_engine(self, value):
         self._engine = value
         self.datasets = value.get_dataset_names()

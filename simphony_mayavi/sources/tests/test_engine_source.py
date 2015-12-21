@@ -4,13 +4,12 @@ from traits.testing.api import UnittestTools
 from tvtk.api import tvtk
 
 from simphony.cuds.particles import Particles
-from simphony.cuds.mesh import Mesh
 from simphony.cuds.lattice import Lattice
-from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 
-from simphony_mayavi.cuds.api import VTKParticles, VTKLattice, VTKMesh
+from simphony_mayavi.cuds.api import VTKParticles, VTKLattice
 from simphony_mayavi.sources.api import EngineSource
 from simphony_mayavi.sources.tests.testing_utils import DummyEngine
+
 
 class TestEngineSource(unittest.TestCase, UnittestTools):
     def setUp(self):
@@ -43,12 +42,12 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
         source.update()
 
         # then
-        self.assertEqual(source.name, 'Engine CUDS: particles (VTK Data (PolyData))')
+        self.assertEqual(source.name,
+                         'Engine CUDS: particles (VTK Data (PolyData))')
 
         # when
         source.dataset = 'lattice'
 
         # then
-        self.assertEqual(source.name, 'Engine CUDS: lattice (VTK Data (ImageData))')
-
-    
+        self.assertEqual(source.name,
+                         'Engine CUDS: lattice (VTK Data (ImageData))')
