@@ -11,9 +11,8 @@ from simphony.core.cuba import CUBA
 from simphony.core.cuds_item import CUDSItem
 from simphony.testing.abc_check_mesh import (
     CheckMeshContainer, CheckMeshItemOperations,
-    CheckMeshPointOperations, CheckMeshElementOperations,
-    CheckMeshEdgeOperations, CheckMeshFaceOperations,
-    CheckMeshCellOperations)
+    CheckMeshPointOperations, CheckMeshEdgeOperations,
+    CheckMeshFaceOperations, CheckMeshCellOperations)
 from simphony.testing.utils import (create_points, compare_data_containers,
                                     compare_points, compare_elements)
 

@@ -1,7 +1,7 @@
 
 from traits.api import (Event, Either, Instance, TraitError,
                         Property, cached_property, on_trait_change)
-from traitsui.api import View, Group, Item, VGroup
+from traitsui.api import View, Group, Item
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
 from simphony.cuds.abc_mesh import ABCMesh
