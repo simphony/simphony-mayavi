@@ -56,7 +56,7 @@ class CUDSSource(VTKDataSource):
 
     def _set_cuds(self, value):
         self._cuds = value
-        self.update_vtk()
+        self._set_vtk_cuds()
 
     # Traits change handlers ###############################################
 
@@ -65,21 +65,8 @@ class CUDSSource(VTKDataSource):
 
     # Public methods #######################################################
 
-    def update_vtk(self):
-        value = self.cuds
-        if isinstance(value, (VTKMesh, VTKParticles, VTKLattice)):
-            vtk_cuds = value
-        else:
-            if isinstance(value, (ABCMesh, H5Mesh)):
-                vtk_cuds = VTKMesh.from_mesh(value)
-            elif isinstance(value, ABCParticles):
-                vtk_cuds = VTKParticles.from_particles(value)
-            elif isinstance(value, ABCLattice):
-                vtk_cuds = VTKLattice.from_lattice(value)
-            else:
-                msg = 'Provided object {} is not of any known cuds type'
-                raise TraitError(msg.format(type(value)))
-        self._vtk_cuds = vtk_cuds
+    def update(self):
+        self._set_vtk_cuds()
 
     # Private interface ####################################################
 
@@ -101,3 +88,20 @@ class CUDSSource(VTKDataSource):
             name = u'Uninitialised'
             kind = u'Unknown'
         return '{} ({})'.format(name, kind)
+
+    def _set_vtk_cuds(self):
+        """ update _vtk_cuds.  Note that this is not a property getter """
+        value = self.cuds
+        if isinstance(value, (VTKMesh, VTKParticles, VTKLattice)):
+            vtk_cuds = value
+        else:
+            if isinstance(value, (ABCMesh, H5Mesh)):
+                vtk_cuds = VTKMesh.from_mesh(value)
+            elif isinstance(value, ABCParticles):
+                vtk_cuds = VTKParticles.from_particles(value)
+            elif isinstance(value, ABCLattice):
+                vtk_cuds = VTKLattice.from_lattice(value)
+            else:
+                msg = 'Provided object {} is not of any known cuds type'
+                raise TraitError(msg.format(type(value)))
+        self._vtk_cuds = vtk_cuds
