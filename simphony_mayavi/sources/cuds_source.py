@@ -1,6 +1,5 @@
 
-from traits.api import (Event, Either, Instance, TraitError,
-                        Property, cached_property, on_trait_change)
+from traits.api import Either, Instance, TraitError, Property, cached_property
 from traitsui.api import View, Group, Item
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
@@ -49,7 +48,6 @@ class CUDSSource(VTKDataSource):
             Item(name='cell_vectors_name'),
             Item(name='data')))
 
-    updated = Event
     # Property get/set/validate methods ######################################
 
     @cached_property
@@ -58,10 +56,17 @@ class CUDSSource(VTKDataSource):
 
     def _set_cuds(self, value):
         self._cuds = value
+        self.update_vtk()
 
     # Traits change handlers ###############################################
 
-    def __cuds_changed(self, value):
+    def __vtk_cuds_changed(self, value):
+        self.data = value.data_set
+
+    # Public methods #######################################################
+
+    def update_vtk(self):
+        value = self.cuds
         if isinstance(value, (VTKMesh, VTKParticles, VTKLattice)):
             vtk_cuds = value
         else:
@@ -75,10 +80,6 @@ class CUDSSource(VTKDataSource):
                 msg = 'Provided object {} is not of any known cuds type'
                 raise TraitError(msg.format(type(value)))
         self._vtk_cuds = vtk_cuds
-
-    def __vtk_cuds_changed(self, value):
-        print "vtk object is updated"
-        self.data = value.data_set
 
     # Private interface ####################################################
 
