@@ -28,27 +28,20 @@ def default_cuba_value(cuba):
     """
     description = KEYWORDS[cuba.name]
 
-    try:
-        dtype = numpy.dtype(description.dtype)
-    except TypeError:
-        message = 'ignored property {!r} : do not have a valid numpy dtype'
-        warnings.warn(message.format(cuba))
-        return
-
     if description.shape == [1]:
-        if numpy.issubdtype(dtype, numpy.float):
+        if numpy.issubdtype(description.dtype, numpy.float):
             return numpy.nan
-        elif numpy.issubdtype(dtype, numpy.int):
+        elif numpy.issubdtype(description.dtype, numpy.int):
             return -1
         else:
             message = 'ignored property {!r} : not a float or int'
             warnings.warn(message.format(cuba))
     elif description.shape == [3]:
-        if numpy.issubdtype(dtype, numpy.float):
+        if numpy.issubdtype(description.dtype, numpy.float):
             return numpy.array(
-                [numpy.nan, numpy.nan, numpy.nan], dtype=dtype)
-        elif numpy.issubdtype(dtype, numpy.int):
-            return numpy.array([-1, -1, -1], dtype=dtype)
+                [numpy.nan, numpy.nan, numpy.nan], dtype=description.dtype)
+        elif numpy.issubdtype(description.dtype, numpy.int):
+            return numpy.array([-1, -1, -1], dtype=description.dtype)
         else:
             message = 'ignored property {!r} : not a float or int'
             warnings.warn(message.format(cuba))
