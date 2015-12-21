@@ -48,7 +48,7 @@ class DummyEngine(ABCModelingEngine):
             particle_list.append(particle)
         particles.update_particles(particle_list)
 
-        # reverse the temperatures of lattice nodes
+        # change the temperature of the lattice nodes
         lattice = self.get_dataset("lattice")
         num_nodes = numpy.prod(lattice.size)
         new_nodes = []
