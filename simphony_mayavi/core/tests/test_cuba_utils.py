@@ -15,19 +15,19 @@ class TestCubaUtils(unittest.TestCase):
         self.float_scalar_cuba = [
             cuba for cuba in CUBA
             if KEYWORDS[cuba.name].shape == [1] and numpy.issubdtype(
-                    KEYWORDS[cuba.name].dtype, numpy.float)]
+                KEYWORDS[cuba.name].dtype, numpy.float)]
         self.int_scalar_cuba = [
             cuba for cuba in CUBA
             if KEYWORDS[cuba.name].shape == [1] and numpy.issubdtype(
-                    KEYWORDS[cuba.name].dtype, numpy.int)]
+                KEYWORDS[cuba.name].dtype, numpy.int)]
         self.float_vector_cuba = [
             cuba for cuba in CUBA
             if KEYWORDS[cuba.name].shape == [3] and numpy.issubdtype(
-                    KEYWORDS[cuba.name].dtype, numpy.float)]
+                KEYWORDS[cuba.name].dtype, numpy.float)]
         self.int_vector_cuba = [
             cuba for cuba in CUBA
             if KEYWORDS[cuba.name].shape == [3] and numpy.issubdtype(
-                    KEYWORDS[cuba.name].dtype, numpy.int)]
+                KEYWORDS[cuba.name].dtype, numpy.int)]
 
     def test_supported_cuba(self):
         # given
