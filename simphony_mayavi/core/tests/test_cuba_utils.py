@@ -12,25 +12,22 @@ from simphony_mayavi.core.cuba_utils import (
 class TestCubaUtils(unittest.TestCase):
 
     def setUp(self):
-        self.float_scalar_cuba = []
-        self.int_scalar_cuba = []
-        self.float_vector_cuba = []
-        self.int_vector_cuba = []
-        for cuba in CUBA:
-            try:
-                dtype = numpy.dtype(KEYWORDS[cuba.name].dtype)
-            except TypeError:
-                continue
-            if KEYWORDS[cuba.name].shape == [1]:
-                if numpy.issubdtype(dtype, numpy.float):
-                    self.float_scalar_cuba.append(cuba)
-                elif numpy.issubdtype(dtype, numpy.int):
-                    self.int_scalar_cuba.append(cuba)
-            elif KEYWORDS[cuba.name].shape == [3]:
-                if numpy.issubdtype(dtype, numpy.float):
-                    self.float_vector_cuba.append(cuba)
-                elif numpy.issubdtype(dtype, numpy.int):
-                    self.int_vector_cuba.append(cuba)
+        self.float_scalar_cuba = [
+            cuba for cuba in CUBA
+            if KEYWORDS[cuba.name].shape == [1] and numpy.issubdtype(
+                    KEYWORDS[cuba.name].dtype, numpy.float)]
+        self.int_scalar_cuba = [
+            cuba for cuba in CUBA
+            if KEYWORDS[cuba.name].shape == [1] and numpy.issubdtype(
+                    KEYWORDS[cuba.name].dtype, numpy.int)]
+        self.float_vector_cuba = [
+            cuba for cuba in CUBA
+            if KEYWORDS[cuba.name].shape == [3] and numpy.issubdtype(
+                    KEYWORDS[cuba.name].dtype, numpy.float)]
+        self.int_vector_cuba = [
+            cuba for cuba in CUBA
+            if KEYWORDS[cuba.name].shape == [3] and numpy.issubdtype(
+                    KEYWORDS[cuba.name].dtype, numpy.int)]
 
     def test_supported_cuba(self):
         # given
