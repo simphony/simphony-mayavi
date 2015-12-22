@@ -1,7 +1,9 @@
 import numpy
 
 from simphony.core.cuba import CUBA
+from simphony.core.cuds_item import CUDSItem
 
+from simphony.cuds.mesh import Mesh, Point
 from simphony.cuds.particles import Particles, Particle
 from simphony.cuds.lattice import make_tetragonal_lattice
 from simphony.cuds.abc_particles import ABCParticles
@@ -9,17 +11,28 @@ from simphony.cuds.abc_mesh import ABCMesh
 from simphony.cuds.abc_lattice import ABCLattice
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 
+from simphony_mayavi.core.doc_utils import mergedocs
 
+
+@mergedocs(ABCModelingEngine)
 class DummyEngine(ABCModelingEngine):
+    ''' Simulate a modeling engine for tests
+    On initialisation an engine contains three datasets: "particles",
+    "lattice" and "mesh". Contents in each of these datasets evolve
+    each time when ``run`` is called.
+    '''
 
     def __init__(self):
         self.datasets = {}
+        self.time = 0.
+
         # add lattice
-        lattice = make_tetragonal_lattice("lattice", 0.2, 0.3, (5, 6, 10))
+        lattice = make_tetragonal_lattice("lattice", 1., 1.1, (4, 5, 6))
+        size = numpy.prod(lattice.size)
         new_node = []
         for node in lattice.iter_nodes():
-            index = numpy.array(node.index) + 1.0
-            node.data[CUBA.TEMPERATURE] = numpy.prod(index)
+            index = numpy.prod(numpy.array(node.index)) + 1.0
+            node.data[CUBA.TEMPERATURE] = numpy.sin(index/size/2.)*size
             new_node.append(node)
         lattice.update_nodes(new_node)
         self.datasets["lattice"] = lattice
@@ -30,32 +43,56 @@ class DummyEngine(ABCModelingEngine):
             particles.add_particles([Particle(coordinates=node.index,
                                               data=node.data)])
         self.datasets["particles"] = particles
-        self.time = 0.
+
+        # add mesh from lattice
+        mesh = Mesh("mesh")
+        for node in lattice.iter_nodes():
+            mesh.add_points([Point(coordinates=node.index,
+                                   data=node.data)])
+        self.datasets["mesh"] = mesh
 
     def run(self):
-        self.time += 1.
-        size = numpy.prod(self.get_dataset("lattice").size)
+        self.time += 10.
 
-        # wobble particles and change temperature
-        particles = self.get_dataset("particles")
-        particle_list = []
+        mappings = {
+            ABCLattice:
+                ("iter_nodes", CUDSItem.NODE, "update_nodes", "index"),
+            ABCMesh:
+                ("iter_points", CUDSItem.POINT, "update_points",
+                 "coordinates"),
+            ABCParticles:
+                ("iter_particles", CUDSItem.PARTICLE, "update_particles",
+                 "coordinates")
+        }
+        for dataset in self.datasets.values():
+            # get parent class
+            parent = dataset.__class__.__mro__[1]
 
-        for index, particle in enumerate(particles.iter_particles()):
-            particle.coordinates += numpy.random.uniform(-0.2, 0.2, 3)
-            particle.data[CUBA.TEMPERATURE] = numpy.sin((index+self.time)/size)
-            particle.data[CUBA.TEMPERATURE] *= size
-            particle_list.append(particle)
-        particles.update_particles(particle_list)
+            iter_func, cudsitem, update_fun, index_name = mappings[parent]
 
-        # change the temperature of the lattice nodes
-        lattice = self.get_dataset("lattice")
-        size = numpy.prod(lattice.size)
-        new_nodes = []
-        for index, node in enumerate(lattice.iter_nodes()):
-            node.data[CUBA.TEMPERATURE] = numpy.sin((index+self.time)/size)
-            node.data[CUBA.TEMPERATURE] *= size
-            new_nodes.append(node)
-        lattice.update_nodes(new_nodes)
+            # list of items in the datasets
+            item_list = [item for item in getattr(dataset, iter_func)()]
+            # number of items
+            size = dataset.count_of(cudsitem)
+            # function for updating items
+            update_fun = getattr(dataset, update_fun)
+
+            # if items have "coordinates", wobblem them
+            if hasattr(item_list[0], "coordinates"):
+                new_items = []
+                for item in item_list:
+                    item.coordinates += numpy.random.uniform(-0.05, 0.05, 3)
+                    new_items.append(item)
+                item_list = new_items
+
+            # change temperature for all items
+            new_items = []
+            for item in item_list:
+                index = numpy.prod(getattr(item, index_name)) + 1.0
+                temperature = numpy.sin((index+self.time)/size/2.)*size
+                item.data[CUBA.TEMPERATURE] = temperature
+                new_items.append(item)
+            update_fun(new_items)
 
     def add_dataset(self, container):
         if not isinstance(container, (ABCParticles, ABCMesh, ABCLattice)):
