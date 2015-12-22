@@ -12,8 +12,9 @@ from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import CubaData, supported_cuba, mergedocs
 from simphony_mayavi.core.api import CUBADataAccumulator
 
-from .lattice_tools import (vector_len, guess_primitive_vectors,
-                            find_lattice_type, is_bravais_lattice_consistent)
+from simphony.tools.lattice_tools import (vector_len, guess_primitive_vectors,
+                                          find_lattice_type,
+                                          is_bravais_lattice_consistent)
 
 VTK_POLY_LINE = 4
 

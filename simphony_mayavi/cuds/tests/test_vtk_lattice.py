@@ -235,7 +235,7 @@ class TestVTKLattice(unittest.TestCase):
 
             # then
             with self.assertRaises(ValueError):
-                vtk_lattice = VTKLattice.from_lattice(lattice)
+                VTKLattice.from_lattice(lattice)
 
     def add_velocity(self, lattice):
         new_nodes = []

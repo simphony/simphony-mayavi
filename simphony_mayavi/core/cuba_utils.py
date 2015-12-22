@@ -27,13 +27,14 @@ def default_cuba_value(cuba):
 
     """
     description = KEYWORDS[cuba.name]
+
     if description.shape == [1]:
         if numpy.issubdtype(description.dtype, numpy.float):
             return numpy.nan
         elif numpy.issubdtype(description.dtype, numpy.int):
             return -1
         else:
-            message = 'property {!r} is currently ignored'
+            message = 'ignored property {!r} : not a float or int'
             warnings.warn(message.format(cuba))
     elif description.shape == [3]:
         if numpy.issubdtype(description.dtype, numpy.float):
@@ -42,10 +43,10 @@ def default_cuba_value(cuba):
         elif numpy.issubdtype(description.dtype, numpy.int):
             return numpy.array([-1, -1, -1], dtype=description.dtype)
         else:
-            message = 'property {!r} is currently ignored'
+            message = 'ignored property {!r} : not a float or int'
             warnings.warn(message.format(cuba))
     else:
-        message = 'property {!r} is currently ignored'
+        message = 'ignored property {!r} : not a vector or scalar'
         warnings.warn(message.format(cuba))
 
 

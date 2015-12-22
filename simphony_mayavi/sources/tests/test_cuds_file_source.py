@@ -9,7 +9,7 @@ from tvtk.api import tvtk
 from mayavi.core.api import NullEngine
 from simphony.cuds.particles import Particles
 from simphony.cuds.mesh import Mesh
-from simphony.cuds.lattice import Lattice, make_cubic_lattice
+from simphony.cuds.lattice import make_cubic_lattice
 from simphony.io.h5_cuds import H5CUDS
 from simphony.io.h5_lattice import H5Lattice
 from simphony.io.h5_mesh import H5Mesh
