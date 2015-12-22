@@ -1,3 +1,4 @@
+import logging
 
 from traits.api import ListStr, Instance, Property, cached_property
 from traitsui.api import View, Group, Item, VGroup
@@ -6,6 +7,8 @@ from mayavi.core.trait_defs import DEnum
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 
 from .cuds_source import CUDSSource
+
+logger = logging.getLogger(__name__)
 
 
 class EngineSource(CUDSSource):
@@ -33,6 +36,8 @@ class EngineSource(CUDSSource):
                 Item(name="cell_vectors_name"),
                 Item(name="data"))))
 
+    # Property get/set/validate methods ######################################
+
     @cached_property
     def _get_engine(self):
         return self._engine
@@ -40,17 +45,27 @@ class EngineSource(CUDSSource):
     def _set_engine(self, value):
         self._engine = value
         self.datasets = value.get_dataset_names()
+        if len(self.datasets) == 0:
+            logger.warning("No datasets found in the given engine")
+
+    # Public interface #####################################################
 
     def start(self):
+        """ Load dataset from the engine and start the visualisation """
         if not self.running:
-            self.update()
+            # Load the dataset from engine
+            self.cuds = self.engine.get_dataset(self.dataset)
         super(EngineSource, self).start()
 
     def update(self):
-        self.cuds = self.engine.get_dataset(self.dataset)
+        self._set_vtk_cuds()  # from CUDSSource
+
+    # Trait Change Handlers ################################################
 
     def _dataset_changed(self):
-        self.update()
+        self.cuds = self.engine.get_dataset(self.dataset)
+
+    # Private interface ####################################################
 
     def _get_name(self):
         """ Returns the name to display on the tree view.  Note that
