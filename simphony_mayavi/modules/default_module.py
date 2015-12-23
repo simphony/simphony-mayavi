@@ -3,9 +3,8 @@ import logging
 from mayavi.modules.api import Surface, Glyph
 from tvtk.tvtk_classes.sphere_source import SphereSource
 
-from simphony.core.cuds_item import CUDSItem
 from simphony.core.keywords import KEYWORDS
-from simphony_mayavi.cuds.api import VTKLattice, VTKMesh, VTKParticles
+from simphony_mayavi.cuds.api import VTKMesh
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +14,7 @@ def default_vector_module():
     the scale_mode turned off
     '''
     module = Glyph()
-    module.glyph.scale_mode="data_scaling_off"
+    module.glyph.scale_mode = "data_scaling_off"
     return module
 
 
@@ -25,7 +24,7 @@ def default_point_module():
     with scalar data
     '''
     module = Glyph()
-    module.glyph.scale_mode="data_scaling_off"
+    module.glyph.scale_mode = "data_scaling_off"
     module.glyph.glyph_source.glyph_source = SphereSource()
     return module
 
