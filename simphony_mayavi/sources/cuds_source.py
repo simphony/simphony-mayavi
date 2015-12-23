@@ -112,7 +112,7 @@ class CUDSSource(VTKDataSource):
         return '{} ({})'.format(name, kind)
 
     def _set_vtk_cuds(self):
-        """ update _vtk_cuds.  Note that this is not a property getter """
+        """ update _vtk_cuds.  Note that this is not a property setter """
         value = self.cuds
         if isinstance(value, (VTKMesh, VTKParticles, VTKLattice)):
             vtk_cuds = value

@@ -27,7 +27,7 @@ class EngineSourceManager(HasTraits):
     >>> manager = EngineSourceManager(dem)
     >>> manager.show_config()   # GUI
 
-    One can still perform all functions of this manager withou
+    One can still perform all functions of this manager without
     opening up a GUI ::
 
     >>> from simphony_mayavi.plugins.api import EngineSourceManager
@@ -165,6 +165,10 @@ class EngineSourceManager(HasTraits):
            delay between each run
         ui : bool
            whether an UI is shown
+
+        Returns
+        -------
+        animator : mayavi.tools.animator.Animator
         '''
         from mayavi.mlab import animate
 
