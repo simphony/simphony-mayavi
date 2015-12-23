@@ -1,6 +1,7 @@
 import logging
 
-from traits.api import ListStr, Instance, Property, cached_property
+from traits.api import (ListStr, Instance, Property, cached_property,
+                        Event, on_trait_change)
 from traitsui.api import View, Group, Item, VGroup
 from mayavi.core.trait_defs import DEnum
 
@@ -13,6 +14,11 @@ logger = logging.getLogger(__name__)
 
 class EngineSource(CUDSSource):
     """ A mayavi source for reading data from a SimPhoNy Engine
+
+    Attributes
+    ----------
+    datasets : ListStr
+       list of dataset names in the engine
     """
     # the SimPhoNy Modeling Engine from which datasets are loaded
     engine = Property(depends_on="_engine")
@@ -21,9 +27,6 @@ class EngineSource(CUDSSource):
 
     # The name of the CUDS container that is currently loaded
     dataset = DEnum(values_name="datasets")
-
-    # The names of the datasets in the engine
-    datasets = ListStr
 
     view = View(
         VGroup(
@@ -44,9 +47,12 @@ class EngineSource(CUDSSource):
 
     def _set_engine(self, value):
         self._engine = value
-        self.datasets = value.get_dataset_names()
         if len(self.datasets) == 0:
             logger.warning("No datasets found in the given engine")
+
+    @property
+    def datasets(self):
+        return self.engine.get_dataset_names()
 
     # Public interface #####################################################
 
@@ -56,9 +62,6 @@ class EngineSource(CUDSSource):
             # Load the dataset from engine
             self.cuds = self.engine.get_dataset(self.dataset)
         super(EngineSource, self).start()
-
-    def update(self):
-        self._set_vtk_cuds()  # from CUDSSource
 
     # Trait Change Handlers ################################################
 
