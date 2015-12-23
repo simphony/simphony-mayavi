@@ -14,6 +14,28 @@ from simphony_mayavi.cuds.api import VTKParticles, VTKLattice, VTKMesh
 class CUDSSource(VTKDataSource):
     """ A mayavi source of a SimPhoNy CUDS container.
 
+    Attributes
+    ----------
+    cuds : instance of ABCParticle/ABCMesh/ABCLattice/H5Mesh
+         The CUDS container to be wrapped as VTK data source
+
+    The ``cuds`` attribute holds a reference to the CUDS instance it is
+    assigned to, as oppose to making a copy.  Therefore in any given time
+    after setting ``cuds``, the CUDS container could be modified internally
+    and divert from the VTK data source.  The ``update`` function can be
+    called to update the visualisation.
+
+    Examples
+    --------
+    >>> cuds = Particles("test")  # the container is empty
+    >>> source = CUDSSource(cuds=cuds)
+
+    # Add content to cuds after the source is initialised
+    >>> cuds.add_particles([...])
+
+    >>> from mayavi import mlab
+    >>> mlab.pipeline.glyph(source)   # scene is empty
+    >>> source.update()    # particles are shown!
     """
     #: The version of this class. Used for persistence.
     __version__ = 1
