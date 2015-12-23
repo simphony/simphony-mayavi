@@ -29,6 +29,9 @@ class DummyEngine(ABCModelingEngine):
         self.CM = DataContainer()
         self.SP = DataContainer()
         self.BC = DataContainer()
+        self.CM[CUBA.TIME_STEP] = 1.
+        self.CM[CUBA.NUMBER_OF_TIME_STEPS] = 10
+
         # add lattice
         lattice = make_tetragonal_lattice("lattice", 1., 1.1, (4, 5, 6))
         size = numpy.prod(lattice.size)
@@ -55,7 +58,8 @@ class DummyEngine(ABCModelingEngine):
         self.datasets["mesh"] = mesh
 
     def run(self):
-        self.time += 10.
+        delta_t = self.CM[CUBA.TIME_STEP]*self.CM[CUBA.NUMBER_OF_TIME_STEPS]
+        self.time += delta_t
 
         mappings = {
             ABCLattice:
