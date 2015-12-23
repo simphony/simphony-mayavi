@@ -3,6 +3,7 @@ import numpy
 from simphony.core.cuba import CUBA
 from simphony.core.cuds_item import CUDSItem
 
+from simphony.core.data_container import DataContainer
 from simphony.cuds.mesh import Mesh, Point
 from simphony.cuds.particles import Particles, Particle
 from simphony.cuds.lattice import make_tetragonal_lattice
@@ -25,7 +26,9 @@ class DummyEngine(ABCModelingEngine):
     def __init__(self):
         self.datasets = {}
         self.time = 0.
-
+        self.CM = DataContainer()
+        self.SP = DataContainer()
+        self.BC = DataContainer()
         # add lattice
         lattice = make_tetragonal_lattice("lattice", 1., 1.1, (4, 5, 6))
         size = numpy.prod(lattice.size)
