@@ -29,14 +29,15 @@ def default_point_module():
     return module
 
 
-def default_face_module():
-    module = Surface()
-    return module
-
-
 def default_module(vtk_cuds):
+    ''' Guess the most appropriate module for a given VTK dataset
+
+    Returns
+    -------
+    module : mayavi.modules to be added to the pipeline
+    '''
     if isinstance(vtk_cuds, VTKMesh) and vtk_cuds.element_data:
-        return default_face_module()
+        return Surface()
 
     if len(vtk_cuds.point_data) == 0:
         logger.warning("No point data. Default module is a glyph")
