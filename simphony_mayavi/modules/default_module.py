@@ -6,8 +6,6 @@ from tvtk.tvtk_classes.sphere_source import SphereSource
 from simphony.core.keywords import KEYWORDS
 from simphony_mayavi.cuds.api import VTKMesh
 
-logger = logging.getLogger(__name__)
-
 
 def default_vector_module():
     ''' Returns a Glyph in its original mayavi defaults plus
@@ -40,7 +38,7 @@ def default_module(vtk_cuds):
         return Surface()
 
     if len(vtk_cuds.point_data) == 0:
-        logger.warning("No point data. Default module is a glyph")
+        logging.warning("No point data. Default module is a glyph")
         return default_vector_module()
 
     data_shapes = (KEYWORDS[cuba.name].shape
