@@ -5,8 +5,9 @@ import logging
 from simphony.core.cuba import CUBA
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from simphony_mayavi.sources.api import EngineSource
-from traits.api import HasTraits, Instance, ListStr, Button, Str, Float, Int
-from traitsui.api import View, VGroup, HGroup, Item, EnumEditor
+from traits.api import (HasTraits, Instance, ListStr, Button, Str, Float, Int,
+                        Bool)
+from traitsui.api import View, VGroup, HGroup, Item, EnumEditor, message
 
 # This class is intended to be used as a standalone as well as an evisage
 # plugin for mayavi.  For the latter, mayavi imports cannot be put at the
@@ -14,7 +15,7 @@ from traitsui.api import View, VGroup, HGroup, Item, EnumEditor
 
 
 class EngineSourceManager(HasTraits):
-    ''' A basic tool for visualising CUDS datasets in a modeling
+    ''' A basic tool for visualising CUDS datasets from a modeling
     engine as well as performing basic operations on the engine
 
     Examples
@@ -67,6 +68,7 @@ class EngineSourceManager(HasTraits):
     _animate = Button("Animate")
     _animator = None
     _animate_delay = 20
+    _update_all_scenes = Bool(False)
 
     view = View(
         VGroup(
@@ -74,17 +76,17 @@ class EngineSourceManager(HasTraits):
                         editor=EnumEditor(name="datasets")),
                    Item("_add_to_scene", show_label=False)),
 
-            VGroup(Item(label="Engine Settings", emphasized=True),
-                   Item("_"),
-                   Item("time_step"),
-                   Item("number_of_time_steps"),
-                   HGroup(Item(name="_number_of_runs",
-                               label="Runs for"),
-                          Item(label="time(s)"))),
+            Item(label="Engine Settings", emphasized=True),
+            Item("_"),
+            Item("time_step"),
+            Item("number_of_time_steps"),
+            HGroup(Item(name="_number_of_runs",
+                        label="Runs for"),
+                   Item(label="time(s)")),
 
-            HGroup(Item("_animate", show_label=False))
-        )
-    )
+            HGroup(Item("_animate", show_label=False),
+                   Item(name="_update_all_scenes",
+                        label="Update all scenes"))))
 
     # ------------------------------------------------
     # Public property
@@ -133,12 +135,8 @@ class EngineSourceManager(HasTraits):
         self.add_dataset_to_scene(self._dataset)
 
     def __animate_fired(self):
-        if self._animator:
-            self._animate_delay = self._animator.delay
-        if self._animator and not self._animator.ui.destroyed:
-            self._animator.close()
-        self._animator = self.animate(self._number_of_runs,
-                                      delay=self._animate_delay)
+        self.animate(self._number_of_runs,
+                     update_all_scenes=self._update_all_scenes)
 
     # ----------------------------------------------------------
     # Trait handlers
@@ -153,7 +151,8 @@ class EngineSourceManager(HasTraits):
     # -----------------------------------------------------------
     # Public methods
     # -----------------------------------------------------------
-    def animate(self, number_of_runs, delay=20, ui=True):
+    def animate(self, number_of_runs, delay=None, ui=True,
+                update_all_scenes=False):
         ''' Run the modeling engine, update and thus animate the scene
         at the end of each run
 
@@ -162,28 +161,51 @@ class EngineSourceManager(HasTraits):
         number_of_runs : int
            the number of times the engine.run() is called
         delay : int
-           delay between each run
+           delay between each run.
+           If None, use last setting or Mayavi's default: 500
         ui : bool
            whether an UI is shown
-
-        Returns
-        -------
-        animator : mayavi.tools.animator.Animator
+        update_all_scenes : bool
+           whether all scenes are updated
         '''
         from mayavi.mlab import animate
+
+        # remember the last delay being set
+        if delay is None:
+            if self._animator:
+                delay = self._animator.delay
+            else:
+                delay = 500
+
+        # close the old window and start a new one
+        # FIXME: there should be a better way
+        if self._animator and not self._animator.ui.destroyed:
+            self._animator.close()
+
+        if update_all_scenes:
+            get_sources_func = self.get_all_sources
+        else:
+            get_sources_func = self.get_current_sources
+
+        try:
+            sources = get_sources_func()
+        except AttributeError:
+            text = "Nothing in scene.  Engine is not run."
+            message(text)
+            raise RuntimeError(text)
 
         @animate(delay=delay, ui=ui)
         def anim():
             for _ in xrange(number_of_runs):
                 self.modeling_engine.run()
-                self.update_current_sources()
+                self.update_sources(sources)
                 self.mayavi_engine.current_scene.render()
                 yield()
-        return anim()
+        self._animator = anim()
 
-    def update_current_sources(self):
-        ''' Update all the sources in the current scene '''
-        for source in self.get_current_sources():
+    def update_sources(self, sources):
+        ''' Update multiple sources'''
+        for source in sources:
             source.update()
 
     def add_dataset_to_scene(self, name, module=None):
@@ -200,13 +222,30 @@ class EngineSourceManager(HasTraits):
             self.mayavi_engine.add_module(default_module(source._vtk_cuds))
 
     def get_current_sources(self):
-        ''' Return a list of sources in the current scene
+        ''' Return the current scene's sources that are belong
+        to this manager's modeling engine
 
         Returns
         -------
-        sources : list of EngineSource
+        sources : set of EngineSource
         '''
-        return self.mayavi_engine.current_scene.children
+        sources = self.mayavi_engine.current_scene.children
+        return {source for source in sources
+                if source.engine == self.modeling_engine}
+
+    def get_all_sources(self):
+        ''' Return sources from all the scenes and that the sources
+        are belong to this manager's modeling engine
+
+        Returns
+        -------
+        sources : set of EngineSource
+        '''
+        sources = {source
+                   for scene in self.mayavi_engine.scenes
+                   for source in scene.children
+                   if source.engine == self.modeling_engine}
+        return sources
 
     def show_config(self):
         ''' Show the UI of this manager
