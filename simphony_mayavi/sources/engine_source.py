@@ -9,8 +9,6 @@ from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 
 from .cuds_source import CUDSSource
 
-logger = logging.getLogger(__name__)
-
 
 class EngineSource(CUDSSource):
     """ A mayavi source for reading data from a SimPhoNy Engine
@@ -48,7 +46,7 @@ class EngineSource(CUDSSource):
     def _set_engine(self, value):
         self._engine = value
         if len(self.datasets) == 0:
-            logger.warning("No datasets found in the given engine")
+            logging.warning("No datasets found in the given engine")
 
     @property
     def datasets(self):
