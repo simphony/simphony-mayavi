@@ -1,9 +1,7 @@
 import logging
 
-from traits.api import (ListStr, Instance, Property, cached_property,
-                        Event, on_trait_change)
+from traits.api import Instance, Property, cached_property, Enum
 from traitsui.api import View, Group, Item, VGroup
-from mayavi.core.trait_defs import DEnum
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 
@@ -24,7 +22,7 @@ class EngineSource(CUDSSource):
     _engine = Instance(ABCModelingEngine)
 
     # The name of the CUDS container that is currently loaded
-    dataset = DEnum(values_name="datasets")
+    dataset = Enum(values="datasets")
 
     view = View(
         VGroup(
@@ -33,7 +31,6 @@ class EngineSource(CUDSSource):
                 Item(name="point_scalars_name"),
                 Item(name="point_vectors_name"),
                 Item(name="cell_scalars_name"),
-                Item(name="cell_vectors_name"),
                 Item(name="cell_vectors_name"),
                 Item(name="data"))))
 
@@ -53,6 +50,8 @@ class EngineSource(CUDSSource):
         return self.engine.get_dataset_names()
 
     # Public interface #####################################################
+    def __init__(self, engine):
+        self.engine = engine
 
     def start(self):
         """ Load dataset from the engine and start the visualisation """
@@ -64,7 +63,12 @@ class EngineSource(CUDSSource):
     # Trait Change Handlers ################################################
 
     def _dataset_changed(self):
-        self.cuds = self.engine.get_dataset(self.dataset)
+        if self.dataset:
+            self.cuds = self.engine.get_dataset(self.dataset)
+        self.point_scalars_name = ""
+        self.point_vectors_name = ""
+        self.cell_scalars_name = ""
+        self.cell_vectors_name = ""
 
     # Private interface ####################################################
 

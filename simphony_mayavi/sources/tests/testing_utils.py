@@ -4,7 +4,7 @@ from simphony.core.cuba import CUBA
 from simphony.core.cuds_item import CUDSItem
 
 from simphony.core.data_container import DataContainer
-from simphony.cuds.mesh import Mesh, Point
+from simphony.cuds.mesh import Mesh, Face, Point
 from simphony.cuds.particles import Particles, Particle
 from simphony.cuds.lattice import make_tetragonal_lattice
 from simphony.cuds.abc_particles import ABCParticles
@@ -32,13 +32,15 @@ class DummyEngine(ABCModelingEngine):
         self.CM[CUBA.TIME_STEP] = 1.
         self.CM[CUBA.NUMBER_OF_TIME_STEPS] = 10
 
-        # add lattice
+        # add lattice with temperature, mass and velocity data
         lattice = make_tetragonal_lattice("lattice", 1., 1.1, (4, 5, 6))
         size = numpy.prod(lattice.size)
         new_node = []
         for node in lattice.iter_nodes():
             index = numpy.prod(numpy.array(node.index)) + 1.0
             node.data[CUBA.TEMPERATURE] = numpy.sin(index/size/2.)*size
+            node.data[CUBA.MASS] = index
+            node.data[CUBA.VELOCITY] = numpy.random.uniform(-0.1, 0.1, 3)
             new_node.append(node)
         lattice.update_nodes(new_node)
         self.datasets["lattice"] = lattice
@@ -50,11 +52,22 @@ class DummyEngine(ABCModelingEngine):
                                               data=node.data)])
         self.datasets["particles"] = particles
 
-        # add mesh from lattice
+        # add mesh
         mesh = Mesh("mesh")
-        for node in lattice.iter_nodes():
-            mesh.add_points([Point(coordinates=node.index,
-                                   data=node.data)])
+        points = numpy.array([
+            [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
+            [2, 0, 0], [3, 0, 0], [3, 1, 0], [2, 1, 0],
+            [2, 0, 1], [3, 0, 1], [3, 1, 1], [2, 1, 1]], 'f')
+        faces = [[2, 7, 11]]
+        # add points
+        point_iter = (Point(coordinates=point,
+                            data=DataContainer(TEMPERATURE=index))
+                      for index, point in enumerate(points))
+        uids = mesh.add_points(point_iter)
+        face_iter = (Face(points=[uids[index] for index in element],
+                          data=DataContainer(VELOCITY=(index, 0., 0.)))
+                     for index, element in enumerate(faces))
+        mesh.add_faces(face_iter)
         self.datasets["mesh"] = mesh
 
     def run(self):
@@ -88,7 +101,9 @@ class DummyEngine(ABCModelingEngine):
             if hasattr(item_list[0], "coordinates"):
                 new_items = []
                 for item in item_list:
-                    item.coordinates += numpy.random.uniform(-0.05, 0.05, 3)
+                    delta = numpy.random.uniform(-0.05, 0.05, 3)
+                    item.data[CUBA.VELOCITY] = delta
+                    item.coordinates += delta
                     new_items.append(item)
                 item_list = new_items
 
