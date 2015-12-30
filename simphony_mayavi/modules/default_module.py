@@ -45,17 +45,17 @@ def default_module(source):
 
     scale_factor = _typical_distance(source.data) * 0.3
 
-    if isinstance(source.cuds, ABCMesh) and source.point_scalars_name:
-        modules.append(Surface())
-    else:
-        if source.point_scalars_name:
-            modules.append(default_scalar_module(scale_factor))
-        if source.point_vectors_name:
-            modules.append(default_vector_module())
-        if source.cell_scalars_name:
+    if source.point_scalars_name:
+        if isinstance(source.cuds, ABCMesh):
             modules.append(Surface())
-        if source.cell_vectors_name:
-            modules.append(default_vector_module())
+        else:
+            modules.append(default_scalar_module(scale_factor))
+    if source.point_vectors_name:
+        modules.append(default_vector_module())
+    if source.cell_scalars_name:
+        modules.append(Surface())
+    if source.cell_vectors_name:
+        modules.append(default_vector_module())
 
     if modules:
         return modules

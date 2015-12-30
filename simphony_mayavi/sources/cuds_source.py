@@ -1,5 +1,5 @@
 
-from traits.api import Either, Instance, TraitError, Property, cached_property
+from traits.api import Either, Instance, TraitError, Property
 from traitsui.api import View, Group, Item
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
@@ -72,23 +72,24 @@ class CUDSSource(VTKDataSource):
 
     # Property get/set/validate methods ######################################
 
-    @cached_property
     def _get_cuds(self):
         return self._cuds
 
     def _set_cuds(self, value):
         self._cuds = value
-        self._set_vtk_cuds()
+        self._set_vtk_cuds(value)
 
     # Traits change handlers ###############################################
 
     def __vtk_cuds_changed(self, value):
         self.data = value.data_set
 
-    # Public methods #######################################################
+    # Public method ########################################################
 
     def update(self):
-        self._set_vtk_cuds()
+        """ Recalculate the VTK data from the CUDS dataset
+        Useful when ``cuds`` is modified after assignment """
+        self._set_vtk_cuds(self.cuds)
 
     # Private interface ####################################################
 
@@ -111,9 +112,8 @@ class CUDSSource(VTKDataSource):
             kind = u'Unknown'
         return '{} ({})'.format(name, kind)
 
-    def _set_vtk_cuds(self):
+    def _set_vtk_cuds(self, value):
         """ update _vtk_cuds.  Note that this is not a property setter """
-        value = self.cuds
         if isinstance(value, (VTKMesh, VTKParticles, VTKLattice)):
             vtk_cuds = value
         else:
