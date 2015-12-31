@@ -1,6 +1,4 @@
-import logging
-
-from traits.api import Instance, Property, cached_property, ListStr, Enum, Str
+from traits.api import Instance, Enum, Str
 from traitsui.api import View, Group, Item, VGroup
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -21,7 +19,7 @@ class EngineSource(CUDSSource):
 
     # Name of the engine
     engine_name = Str
-    
+
     # The name of the CUDS container that is currently loaded
     dataset = Enum(values="datasets")
 
