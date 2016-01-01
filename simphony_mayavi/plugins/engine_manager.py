@@ -8,7 +8,7 @@ from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from .basic_panel import BasicPanel
 
 
-class EngineManager(HasTraits):
+class EngineManager(BasicPanel):
     ''' A basic container of Simphony Engine that comes with a GUI.
 
     Additional panel can be added to support more operations related
@@ -17,15 +17,7 @@ class EngineManager(HasTraits):
     Attributes
     ----------
     engines : dict
-        { name_of_engine: ModelingEngine }
-    current_engine : ModelingEngine
-        Simphony Modeling Engine Wrapper
-    engine_name : str
-        Name for the engine currently selected (unique for each engine)
-    engine_names : list
-        All of the engine names
-    panels : list
-        List of addons
+        Mappings of Simphony Modeling Engines in this manager
 
     Examples
     ---------
@@ -48,7 +40,7 @@ class EngineManager(HasTraits):
     >>> from simphony_mayavi.plugins.api import AddSourcePanel
     >>> from mayavi import mlab
     >>> manager.add_addon(AddSourcePanel(manager.engine_name,
-                                         manager.current_engine,
+                                         manager.engine,
                                          mlab.get_engine()))
 
     >>> # AddSourcePanel comes with a public method ``add_dataset_to_scene``
@@ -67,82 +59,29 @@ class EngineManager(HasTraits):
     engines = Dict(Str, Instance(ABCModelingEngine))
 
     # Names of engines in the Manager
-    engine_names = ListStr
+    _engine_names = ListStr
 
-    # Selected engine
-    current_engine = Property(depends_on="engine_name")
+    # Selected engine (overloaded BasicPanel)
+    engine = Property(depends_on="engine_name")
 
     # Selected engine name
-    engine_name = DEnum(values_name="engine_names")
+    engine_name = DEnum(values_name="_engine_names")
 
     # Traits view
-    traits_view = View(Group(Item("engine_name", label="Engine Wrapper")),
-                       resizable=True)
-
-    # addon panels
-    panels = List(Instance(BasicPanel))
-
+    trait_view = View(Group(Item("engine_name", label="Engine Wrapper")),
+                      resizable=True)
     # ----------------------------------------------------
     # Traits Property
     # ----------------------------------------------------
 
-    def _get_current_engine(self):
+    def _get_engine(self):
         return self.engines[self.engine_name]
-
-    # ----------------------------------------------------
-    # Traits Handler
-    # ----------------------------------------------------
-
-    def _engine_name_changed(self):
-        for panel in self.panels:
-            panel.engine = self.current_engine
-            panel.engine_name = self.engine_name
-
-    # ----------------------------------------------------
-    # Initialization
-    # ----------------------------------------------------
-
-    def __init__(self, engine_name, modeling_engine):
-        '''
-        Parameters
-        ----------
-        engine_name : str
-            Name of the engine
-        modeling_engine : Instance of ABCModelingEngine
-            Simphony Modeling Engine Wrapper
-        '''
-        self.add_engine(engine_name, modeling_engine)
-
-    # -----------------------------------------------------------
-    # Public methods
-    # -----------------------------------------------------------
-
-    def add_addon(self, panel):
-        ''' Add a panel to the EngineManager
-
-        Public methods from the panel would be added to the EngineManager.
-        Methods of the same name would be overloaded.  The default trait_view
-        of the panel would be added as a tab in the EngineManager.
-
-        Parameter
-        ---------
-        panel : Instance of BasicPanel
-            Example: AddSourcePanel, RunAndAnimatePanel
-        '''
-        panel.engine = self.current_engine
-        panel.engine_name = self.engine_name
-        self.panels.append(panel)
-
-        # add public method
-        # methods with the same name would be overloaded
-        for public_method in panel.public_methods:
-            setattr(self, public_method.__name__, public_method)
 
     def add_engine(self, name, modeling_engine):
         if name in self.engines:
             raise ValueError("{} is already added".format(name))
         self.engines[name] = modeling_engine
-        self.engine_names = self.engines.keys()
+        self._engine_names = self.engines.keys()
         self.engine_name = name
 
     def remove_engine(self, name):
@@ -157,7 +96,7 @@ class EngineManager(HasTraits):
             raise IndexError(msg.format(name))
 
         self.engines.pop(name)
-        self.engine_names = self.engines.keys()
+        self._engine_names = self.engines.keys()
 
     # --------------------------------------------------------
     # Integrate panels' UI

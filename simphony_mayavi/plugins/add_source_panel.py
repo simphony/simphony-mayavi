@@ -1,4 +1,4 @@
-from traits.api import Bool, Button, Int, Enum, List, Instance
+from traits.api import Bool, Button, Int, Enum, List, Instance, Property
 from traitsui.api import (View, VGroup, HGroup, Item, Action, Handler,
                           ListStrEditor, message)
 from traitsui.list_str_adapter import ListStrAdapter
@@ -69,7 +69,7 @@ class AddSourcePanel(BasicPanel):
     _pending_source = Enum(values="_pending_engine_sources")
     _pending_source_index = Int
 
-    trait_view = View(
+    panel_view = View(
         VGroup(
             HGroup(
                 Item("_add_dataset", show_label=False),
@@ -84,19 +84,7 @@ class AddSourcePanel(BasicPanel):
                      editable=False,
                      selected="_pending_source",
                      selected_index="_pending_source_index")),
-            label="Add Source(s)"))
-
-    # ------------------------------------------------
-    # Read only attributes
-    # ------------------------------------------------
-    @property
-    def datasets(self):
-        """ Datasets (list) in the modeling engines """
-        return self.engine.get_dataset_names()
-
-    def _get_public_methods(self):
-        return (self.add_source_to_scene,
-                self.add_dataset_to_scene)
+            label="Visualize"))
 
     # -------------------------------------------------
     # Functions relevant to the UI

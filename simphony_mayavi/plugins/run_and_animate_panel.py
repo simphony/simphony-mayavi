@@ -8,16 +8,10 @@ from simphony.core.cuba import CUBA
 from .basic_panel import BasicPanel
 
 
-class RunAndAnimatePanel(BasicPanel, HasTraits):
+class RunAndAnimatePanel(BasicPanel):
     '''
     Attributes
     ----------
-    engine : ABCModelingEngine
-        Simphony Engine Wrapper
-    engine_name : str
-        Name of the Engine Wrapper
-    visual_tool : mayavi.core.engine.Engine
-        Engine for visualisation
     time_step : float
         CUBA.TIME_STEP of the Simphony Engine
     number_of_time_steps : float
@@ -40,7 +34,7 @@ class RunAndAnimatePanel(BasicPanel, HasTraits):
     _animate_delay = 20
     _update_all_scenes = Bool(False)
 
-    trait_view = View(VGroup(
+    panel_view = View(VGroup(
         Item("time_step"),
         Item("number_of_time_steps"),
         HGroup(Item(name="_number_of_runs", label="Runs for"),
@@ -49,9 +43,6 @@ class RunAndAnimatePanel(BasicPanel, HasTraits):
                Item(name="_update_all_scenes", label="Update all scenes")),
         label="Run/Animate"))
 
-    # ----------------------------------------------------------
-    # Initialization
-    # ----------------------------------------------------------
     def __animate_fired(self):
         self.animate(self._number_of_runs,
                      update_all_scenes=self._update_all_scenes)
@@ -67,7 +58,7 @@ class RunAndAnimatePanel(BasicPanel, HasTraits):
         value = self.number_of_time_steps
         self.engine.CM[CUBA.NUMBER_OF_TIME_STEPS] = value
 
-    def _engine_changed(self):
+    def _engine_name_changed(self):
         self._setup_run_parameters()
 
     # ---------------------------------------------------------
