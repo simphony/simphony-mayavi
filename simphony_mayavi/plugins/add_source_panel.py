@@ -52,12 +52,9 @@ class PendingEngineSourceHandler(Handler):
         info.ui.dispose()
 
 
-class AddSourcePanel(BasicPanel):
+class AddSourceMixin(BasicPanel):
 
-    # ----------------------------------------------
-    # For adding sources to scences
-    # (Only relevant to UI)
-    # ----------------------------------------------
+    # Buttons for the UI
     _add_dataset = Button("+")
     _remove_dataset = Button("-")
     _add_to_scene = Button("Add to Scene")
@@ -84,8 +81,25 @@ class AddSourcePanel(BasicPanel):
                      editable=False,
                      selected="_pending_source",
                      selected_index="_pending_source_index")),
-            label="Visualize"))
+            label="Add to Mayavi"),
+        title="Visualize")
 
+    def __init__(self, engine_name, engine, visual_tool):
+        ''' Initialization
+
+        Parameters
+        ----------
+        engine : Instance of ABCModelingEngine
+            Simphony Modeling Engine wrapper
+        engine_name : str
+            Name of the modeling engine
+        visual_tool : mayavi.core.engine.Engine
+            for visualization
+        '''
+        self.engine = engine
+        self.engine_name = engine_name
+        self.visual_tool = visual_tool
+    
     # -------------------------------------------------
     # Functions relevant to the UI
     # -------------------------------------------------
@@ -121,8 +135,14 @@ class AddSourcePanel(BasicPanel):
     # ---------------------------------------------------
 
     def add_source_to_scene(self, source):
+        ''' Add a source to Mayavi
+
+        Parameters
+        ----------
+        source : Instance of VTKDataSource
+        '''
         if self.visual_tool is None:
-            text = "AddSourcePanel.visual_tool is undefined"
+            text = "visual_tool is undefined"
             message(text)
             raise AttributeError(text)
 
@@ -165,3 +185,6 @@ class AddSourcePanel(BasicPanel):
         if cell_vectors_name is not None:
             source.cell_vectors_name = cell_vectors_name
         self.add_source_to_scene(source)
+
+    def show_config(self):
+        self.edit_traits("panel_view", kind="live")
