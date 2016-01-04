@@ -1,7 +1,6 @@
 from collections import namedtuple
 
 from mayavi import mlab
-from traits.api import on_trait_change
 from traitsui.api import View, VGroup, Group, Item
 
 from .engine_manager import EngineManager
@@ -34,8 +33,9 @@ class EngineManagerStandaloneUI(EngineManager):
         # Add panels
         Panels = namedtuple("Panels",
                             ("add_source", "run_and_animate"))
-        
-        self.panels = Panels(AddSourcePanel(engine_name, engine, mayavi_engine),
+
+        self.panels = Panels(AddSourcePanel(engine_name, engine,
+                                            mayavi_engine),
                              RunAndAnimatePanel(engine, mayavi_engine))
 
         self.add_engine(engine_name, engine)
@@ -45,11 +45,11 @@ class EngineManagerStandaloneUI(EngineManager):
         for panel in self.panels:
             panel.engine = self.engine
         self.panels.add_source.engine_name = self.engine_name
-        
+
     # --------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------
-    
+
     def show_config(self):
         ''' Show the GUI with all the panels '''
         panel_views = []
@@ -69,5 +69,5 @@ class EngineManagerStandaloneUI(EngineManager):
         for index, inner_group in enumerate(all_panels.content[1].content):
             inner_group.object = "object{}".format(index)
 
-        self.configure_traits(view=View(all_panels), context=panel_mapping)
-
+        self.configure_traits(view=View(all_panels, resizable=True),
+                              context=panel_mapping)

@@ -1,5 +1,3 @@
-import logging
-
 import mayavi.core.engine
 from traits.api import Float, Int, Button, Bool, HasTraits, Instance
 from traitsui.api import View, VGroup, HGroup, Item, message

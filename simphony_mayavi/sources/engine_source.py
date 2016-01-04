@@ -60,4 +60,4 @@ class EngineSource(CUDSSource):
         """ Returns the name to display on the tree view.  Note that
         this is not a property getter.
         """
-        return 'CUDS {} from engine'.format(self.dataset)
+        return 'Engine CUDS: {}'.format(self.dataset)

@@ -1,7 +1,7 @@
 import logging
 
 from mayavi.mlab import animate
-from simphony.core.cuba import CUBA
+
 
 class RunAndAnimate(object):
 

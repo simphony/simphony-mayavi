@@ -47,9 +47,9 @@ class DummyEngine(ABCModelingEngine):
         # add particles from lattice
         particles = Particles("particles")
         for node in lattice.iter_nodes():
-            new_particle = Particle(coordinates=node.index, data=node.data)
-            new_particle.data[CUBA.VELOCITY] = numpy.random.uniform(-0.1, 0.1, 3)
-            particles.add_particles([new_particle])
+            particle = Particle(coordinates=node.index, data=node.data)
+            particle.data[CUBA.VELOCITY] = numpy.random.uniform(-0.1, 0.1, 3)
+            particles.add_particles([particle])
         self.datasets["particles"] = particles
 
         # add mesh

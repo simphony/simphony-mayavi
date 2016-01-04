@@ -1,5 +1,5 @@
-from traits.api import HasTraits, Instance, ListStr, Str, List, Dict, Property
-from traitsui.api import View, Group, VGroup, Item
+from traits.api import HasTraits, Instance, ListStr, Str, Dict, Property
+from traitsui.api import View, Group, Item
 
 from mayavi.core.trait_defs import DEnum
 
@@ -73,11 +73,14 @@ class EngineManager(HasTraits):
     # ----------------------------------------------------
 
     def _get_engine(self):
-        return self.engines[self.engine_name]
+        if self.engine_name:
+            return self.engines[self.engine_name]
+        else:
+            return None
 
     def _set_engine(self, value):
         if value not in self.engines.values():
-            msg = "{} is not yet an engine in the manager.  Use ``add_engine()``"
+            msg = "{} is not an engine in the manager.  Use ``add_engine()``"
             raise ValueError(msg.format(value))
 
         for name, engine in self.engines.items():
@@ -98,13 +101,13 @@ class EngineManager(HasTraits):
             Simphony Modeling Engine
         '''
         self.add_engine(engine_name, engine)
-    
+
     def add_engine(self, name, modeling_engine):
         if name in self.engines:
             raise ValueError("{} is already added".format(name))
         self.engines[name] = modeling_engine
         self._engine_names = self.engines.keys()
-        if self.engine_name is None:
+        if not self.engine_name:
             self.engine_name = name
 
     def remove_engine(self, name):

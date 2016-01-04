@@ -8,8 +8,9 @@ from .run_and_animate import RunAndAnimate
 
 
 class EngineManagerStandalone(object):
-    ''' Standalone non-GUI manager for (1) visualising datasets from a Simphony Modeling
-    Engine, (2) running the engine and (3) animating the results
+    ''' Standalone non-GUI manager for (1) visualising datasets from
+    a Simphony Modeling Engine, (2) running the engine and (3) animating
+    the results
     '''
 
     def __init__(self, engine, mayavi_engine=None):
@@ -30,7 +31,8 @@ class EngineManagerStandalone(object):
         Addons = namedtuple("Addons",
                             ("add_source", "run_and_animate"))
 
-        self.addons = Addons(AddEngineSourceToMayavi(self.engine, self.mayavi_engine),
+        self.addons = Addons(AddEngineSourceToMayavi(self.engine,
+                                                     self.mayavi_engine),
                              RunAndAnimate(self.engine, self.mayavi_engine))
 
     @wraps(AddEngineSourceToMayavi.add_dataset_to_scene)
@@ -42,4 +44,3 @@ class EngineManagerStandalone(object):
     def animate(self, *args, **kwargs):
         self.addons.run_and_animate.engine = self.engine
         self.addons.run_and_animate.animate(*args, **kwargs)
-    

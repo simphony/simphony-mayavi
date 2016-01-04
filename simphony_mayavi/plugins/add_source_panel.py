@@ -1,6 +1,5 @@
 import mayavi.core.engine
-from traits.api import (HasTraits, Bool, Button, Int, Enum, List, Instance,
-                        Property, Str)
+from traits.api import HasTraits, Bool, Button, Int, Enum, List, Instance, Str
 from traitsui.api import (View, VGroup, HGroup, Item, Action, Handler,
                           ListStrEditor, message)
 from traitsui.list_str_adapter import ListStrAdapter
@@ -128,7 +127,7 @@ class AddSourcePanel(HasTraits):
     def __add_dataset_fired(self):
         source = EngineSource(self.engine)
         source._dataset_changed()
-    
+
         # Default trait view of EngineSource
         source_view = source.trait_view()
 
@@ -173,4 +172,3 @@ class AddSourcePanel(HasTraits):
         # Keep the sources failed to be added
         for index in added_source_indices[::-1]:
             self._pending_engine_sources.pop(index)
-
