@@ -1,64 +1,45 @@
-from traitsui.api import View, VGroup, Group, Item
+from collections import namedtuple
+from functools import wraps
 
-from .engine_manager import EngineManager
-from .add_source_panel import AddSourcePanel
-from .run_and_animate_panel import RunAndAnimatePanel
-from .basic_panel import BasicPanel
+from mayavi import mlab
 
-class EngineManagerStandalone(EngineManager, AddSourcePanel, RunAndAnimatePanel):
-    ''' Standalone Mayavi plugin for visualising CUDS from a Simphony Modeling
-    Engine, running the engine and animating the results
+from .add_engine_source_to_mayavi import AddEngineSourceToMayavi
+from .run_and_animate import RunAndAnimate
 
-    Attributes
-    ----------
-    engine : Instance of ABCModelingEngine
-        Currently selected Simphony Modeling Engine wrapper
-    engine_name : str
-        Name of engine
-    visual_tool : mayavi.core.engine.Engine
-        Default to be mayavi.mlab.get_engine()
-    engines : dict
-        All Simphony Modeling Engine wrappers in the manager
-    time_step : float
-        CUBA.TIME_STEP of the Simphony Engine
-    number_of_time_steps : float
-        CUBA.NUMBER_OF_TIME_STEPS of the Simphony Engine
+
+class EngineManagerStandalone(object):
+    ''' Standalone non-GUI manager for (1) visualising datasets from a Simphony Modeling
+    Engine, (2) running the engine and (3) animating the results
     '''
-    def __init__(self, engine_name, engine, visual_tool=None):
+
+    def __init__(self, engine, mayavi_engine=None):
         '''
         Parameters
         ----------
-        engine_name : str
-            Name of the Simphony Modeling Engine wrapper
         engine : Instance of ABCModelingEngine
-            Simphony Modeling Engine wrapper
-        visual_tool : mayavi.core.engine.Engine
-            Default to be mayavi.mlab.get_engine()
-        
+        mayavi_engine : mayavi.core.engine.Engine
+            default to be mayavi.mlab.get_engine()
         '''
-        # EngineManager.add_engine
-        self.add_engine(engine_name, engine)
+        self.engine = engine
 
-        if visual_tool is None:
-            # Standalone Mayavi Engine
-            from mayavi import mlab
-            self.visual_tool = mlab.get_engine()
+        if mayavi_engine is None:
+            self.mayavi_engine = mlab.get_engine()
+        else:
+            self.mayavi_engine = mayavi_engine
 
-    def show_config(self):
-        ''' Show the GUI with all the panels '''
-        panel_views = []
+        Addons = namedtuple("Addons",
+                            ("add_source", "run_and_animate"))
 
-        # Collect all the "panel_view" View object
-        for cls in self.__class__.__mro__[2:]:
-            if not issubclass(cls, BasicPanel):
-                continue
+        self.addons = Addons(AddEngineSourceToMayavi(self.engine, self.mayavi_engine),
+                             RunAndAnimate(self.engine, self.mayavi_engine))
 
-            view = cls.class_trait_view("panel_view")
+    @wraps(AddEngineSourceToMayavi.add_dataset_to_scene)
+    def add_dataset_to_scene(self, *args, **kwargs):
+        self.addons.add_source.engine = self.engine
+        self.addons.add_source.add_dataset_to_scene(*args, **kwargs)
 
-            if view is not None:
-                panel_views.append(view.content.content[0])
-
-        all_panels = VGroup(Item("engine_name", label="Engine Wrapper"),
-                            Group(*panel_views, layout="tabbed"))
-        self.edit_traits(view=View(all_panels))
-
+    @wraps(RunAndAnimate.animate)
+    def animate(self, *args, **kwargs):
+        self.addons.run_and_animate.engine = self.engine
+        self.addons.run_and_animate.animate(*args, **kwargs)
+    

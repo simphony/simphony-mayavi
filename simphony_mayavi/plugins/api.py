@@ -1,4 +1,4 @@
-from .engine_manager import EngineManager
+from .engine_manager_standalone_ui import EngineManagerStandaloneUI
 from .engine_manager_standalone import EngineManagerStandalone
 
-__all__ = ["EngineManager", "EngineManagerStandalone"]
+__all__ = ["EngineManagerStandaloneUI", "EngineManagerStandalone"]

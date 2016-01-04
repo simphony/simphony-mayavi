@@ -17,9 +17,6 @@ class EngineSource(CUDSSource):
     # the SimPhoNy Modeling Engine from which datasets are loaded
     engine = Instance(ABCModelingEngine)
 
-    # Name of the engine
-    engine_name = Str
-
     # The name of the CUDS container that is currently loaded
     dataset = Enum(values="datasets")
 
@@ -43,8 +40,7 @@ class EngineSource(CUDSSource):
 
     # Public interface #####################################################
 
-    def __init__(self, engine_name, engine):
-        self.engine_name = engine_name
+    def __init__(self, engine):
         self.engine = engine
 
     def start(self):
@@ -64,4 +60,4 @@ class EngineSource(CUDSSource):
         """ Returns the name to display on the tree view.  Note that
         this is not a property getter.
         """
-        return 'CUDS {} from engine {}'.format(self.dataset, self.engine_name)
+        return 'CUDS {} from engine'.format(self.dataset)

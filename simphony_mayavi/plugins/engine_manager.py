@@ -5,10 +5,8 @@ from mayavi.core.trait_defs import DEnum
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 
-from .basic_panel import BasicPanel
 
-
-class EngineManager(BasicPanel):
+class EngineManager(HasTraits):
     ''' A basic container of Simphony Engine that comes with a GUI.
 
     Additional panel can be added to support more operations related
@@ -77,12 +75,37 @@ class EngineManager(BasicPanel):
     def _get_engine(self):
         return self.engines[self.engine_name]
 
+    def _set_engine(self, value):
+        if value not in self.engines.values():
+            msg = "{} is not yet an engine in the manager.  Use ``add_engine()``"
+            raise ValueError(msg.format(value))
+
+        for name, engine in self.engines.items():
+            if value is engine:
+                self.engine_name = name
+
+    # ------------------------------------------------------
+    # Public methods
+    # ------------------------------------------------------
+
+    def __init__(self, engine_name, engine):
+        '''
+        Parameters
+        ----------
+        engine_name : str
+            Name of the Simphony Modeling Engine (frop drop-down menu)
+        engine : Instance of ABCModelingEngine
+            Simphony Modeling Engine
+        '''
+        self.add_engine(engine_name, engine)
+    
     def add_engine(self, name, modeling_engine):
         if name in self.engines:
             raise ValueError("{} is already added".format(name))
         self.engines[name] = modeling_engine
         self._engine_names = self.engines.keys()
-        self.engine_name = name
+        if self.engine_name is None:
+            self.engine_name = name
 
     def remove_engine(self, name):
         ''' Remove a modeling engine from the manager'''
@@ -97,25 +120,3 @@ class EngineManager(BasicPanel):
 
         self.engines.pop(name)
         self._engine_names = self.engines.keys()
-
-    # --------------------------------------------------------
-    # Integrate panels' UI
-    # --------------------------------------------------------
-
-    def show_config(self):
-        ''' Show the GUI for interactive control '''
-        panel_mapping = {"object{}".format(index): panel
-                         for index, panel in enumerate(self.panels)}
-        panel_mapping["object"] = self
-
-        panel_views = []
-        for index, panel in enumerate(self.panels):
-            view = panel.trait_view().content.content[0]
-            panel_views.append(view)
-
-        all_panels = VGroup(Item("engine_name", label="Engine Wrapper"),
-                            Group(*panel_views, layout="tabbed"))
-        for index, inner_group in enumerate(all_panels.content[1].content):
-            inner_group.object = "object{}".format(index)
-
-        self.edit_traits(view=View(all_panels), context=panel_mapping)
