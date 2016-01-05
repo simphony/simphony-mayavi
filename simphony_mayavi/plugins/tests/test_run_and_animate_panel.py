@@ -7,9 +7,10 @@ from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
 from traitsui.tests._tools import is_current_backend_qt4
 
 from simphony.core.cuba import CUBA
-from simphony_mayavi.sources.api import EngineSource
 from simphony_mayavi.sources.tests import testing_utils
-from simphony_mayavi.plugins.add_engine_source_to_mayavi import AddEngineSourceToMayavi
+
+from simphony_mayavi.plugins.add_engine_source_to_mayavi import (
+    AddEngineSourceToMayavi)
 from simphony_mayavi.plugins.run_and_animate_panel import RunAndAnimatePanel
 from simphony_mayavi.plugins.tests import testing_utils as ui_test_utils
 
@@ -40,14 +41,16 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
             return self.engine.time >= 20.
 
         # animate as the engine ran for 2 times
-        with self.assertTraitChangesInEventLoop(self.engine_source, "data_changed",
+        with self.assertTraitChangesInEventLoop(self.engine_source,
+                                                "data_changed",
                                                 count=2,
                                                 condition=engine_ran_twice):
             ui_test_utils.press_button_by_label(ui, "Animate")
 
     def test_error_animate_fired_with_nothing_in_scene(self):
         # given
-        self.panel = RunAndAnimatePanel(testing_utils.DummyEngine(), NullEngine())
+        self.panel = RunAndAnimatePanel(testing_utils.DummyEngine(),
+                                        NullEngine())
 
         # when
         def animate():
@@ -66,7 +69,8 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         self.panel._number_of_runs = 100
 
         # when
-        with self.event_loop_until_traits_change(self.engine_source, "data_changed"):
+        with self.event_loop_until_traits_change(self.engine_source,
+                                                 "data_changed"):
             self.panel._RunAndAnimatePanel__animate_fired()
 
         self.panel.engine = testing_utils.DummyEngine()
@@ -86,20 +90,20 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         # given
         self._setUp()
         engine_source1 = self.mayavi_engine.current_scene.children[0]
-        
+
         self.mayavi_engine.new_scene()
         self.add_source_handler.add_dataset_to_scene("lattice", "TEMPERATURE")
         engine_source2 = self.mayavi_engine.current_scene.children[0]
-        
+
         # when
         self.panel._update_all_scenes = True
 
         # then
         with self.assertTraitChangesInEventLoop(engine_source1, "data_changed",
-                                                lambda obj: obj.engine.time > 5.):
+                                                lambda x: x.engine.time > 5.):
             self.panel._RunAndAnimatePanel__animate_fired()
         with self.assertTraitChangesInEventLoop(engine_source2, "data_changed",
-                                                lambda obj: obj.engine.time > 15.):
+                                                lambda x: x.engine.time > 15.):
             self.panel._RunAndAnimatePanel__animate_fired()
 
     def test_engine_parameters_update(self):

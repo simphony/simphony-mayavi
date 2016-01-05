@@ -5,7 +5,6 @@ from mayavi.core.api import NullEngine
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
 from traitsui.tests._tools import is_current_backend_qt4
 
-from simphony_mayavi.sources.api import EngineSource
 from simphony_mayavi.sources.tests import testing_utils
 from simphony_mayavi.plugins.add_source_panel import AddSourcePanel
 from simphony_mayavi.plugins.tests import testing_utils as ui_test_utils
@@ -38,7 +37,7 @@ class TestAddSourcePanel(unittest.TestCase):
 
         # then
         self.assertEqual(len(self.panel._pending_engine_sources), 0)
-        
+
     def test_add_to_scene(self):
         # given
         ui = self.panel._AddSourcePanel__add_dataset_fired()
@@ -53,7 +52,8 @@ class TestAddSourcePanel(unittest.TestCase):
         self.assertEqual(len(sources), 1)
         self.assertEqual(sources[0].dataset, "particles")
 
-    @unittest.skipIf(not is_current_backend_qt4(), "this test requires backend==qt4")
+    @unittest.skipIf(not is_current_backend_qt4(),
+                     "this test requires backend==qt4")
     def test_warning_mayavi_engine_invalid(self):
         # given
         ui = self.panel._AddSourcePanel__add_dataset_fired()
@@ -73,4 +73,4 @@ class TestAddSourcePanel(unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=True))
         self.assertTrue(tester.result)
         # number of EngineSource is unchanged
-        self.assertEqual(len(self.panel._pending_engine_sources), 1)        
+        self.assertEqual(len(self.panel._pending_engine_sources), 1)

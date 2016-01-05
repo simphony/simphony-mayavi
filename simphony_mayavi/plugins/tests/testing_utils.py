@@ -12,7 +12,7 @@ def press_button_by_label(ui, label):
     '''
     if is_current_backend_wx():
         import wx
-        
+
         button = ui.control.FindWindowByLabel(label)
         click_event = wx.CommandEvent(wx.wxEVT_COMMAND_BUTTON_CLICKED,
                                       button.GetId())
@@ -21,9 +21,7 @@ def press_button_by_label(ui, label):
         from pyface import qt
 
         buttons = ui.control.findChildren(qt.QtGui.QPushButton)
-        button_texts = (button.text() for button in buttons)
         for button in buttons:
             if button.text() == label:
                 button.click()
                 break
-

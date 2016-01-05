@@ -15,7 +15,6 @@ class TestAddEngineSourceToMayavi(unittest.TestCase):
         self.engine_source = EngineSource(self.engine)
         self.mayavi_engine = NullEngine()
 
-    
     def test_add_source_with_point_scalars_and_vectors(self):
         # when
         self.engine_source.dataset = "particles"
@@ -46,7 +45,6 @@ class TestAddEngineSourceToMayavi(unittest.TestCase):
         # then
         with self.assertRaises(RuntimeError):
             add_source_and_modules_to_scene(None, self.engine_source)
-        
 
     def test_add_lattice_from_engine(self):
         # given

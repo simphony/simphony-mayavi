@@ -2,7 +2,8 @@ import unittest
 
 import numpy
 
-from pyface.toolkit import toolkit_object
+from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
+from traitsui.tests._tools import is_current_backend_qt4
 
 from simphony_mayavi.show import show
 from simphony.cuds.lattice import make_cubic_lattice
@@ -10,16 +11,10 @@ from simphony.cuds.mesh import Mesh, Point
 from simphony.cuds.particles import Particles, Particle
 
 
-# If backend is wx, ModalDialogTest is not implemented
-# Most of the tests would be skipped
-ModalDialogTester = toolkit_object("util.modal_dialog_tester:ModalDialogTester")
-no_modal_dialog_tester = (ModalDialogTester.__name__ == 'Unimplemented')
-
-
 class TestShow(unittest.TestCase):
 
-    @unittest.skipIf(no_modal_dialog_tester,
-                     "ModalDialogTester is unavailable for the current backend")
+    @unittest.skipIf(not is_current_backend_qt4(),
+                     "this testcase requires backend == qt4")
     def test_lattice_show(self):
         lattice = make_cubic_lattice(
             'test', 0.2, (10, 10, 1), origin=(0.2, -2.4, 0.))
@@ -32,8 +27,8 @@ class TestShow(unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
 
-    @unittest.skipIf(no_modal_dialog_tester,
-                     "ModalDialogTester is unavailable for the current backend")
+    @unittest.skipIf(not is_current_backend_qt4(),
+                     "this testcase requires backend == qt4")
     def test_mesh_show(self):
         points = numpy.array([
             [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
@@ -52,9 +47,9 @@ class TestShow(unittest.TestCase):
         tester = ModalDialogTester(function)
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
-        
-    @unittest.skipIf(no_modal_dialog_tester,
-                     "ModalDialogTester is unavailable for the current backend")
+
+    @unittest.skipIf(not is_current_backend_qt4(),
+                     "this testcase requires backend == qt4")
     def test_particles_snapshot(self):
         coordinates = numpy.array([
             [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],

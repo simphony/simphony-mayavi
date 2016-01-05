@@ -1,7 +1,7 @@
 import mayavi.core.engine
 
 from pyface.api import MessageDialog
-from traits.api import HasTraits, Bool, Button, Int, Enum, List, Instance, Str, Any
+from traits.api import HasTraits, Bool, Button, Int, Enum, List, Instance, Str
 from traitsui.api import (View, VGroup, HGroup, Item, Action, Handler,
                           ListStrEditor)
 from traitsui.list_str_adapter import ListStrAdapter
@@ -77,7 +77,7 @@ class AddSourcePanel(HasTraits):
     # Selected pending EngineSource (as an index of the list)
     _pending_source = Enum(values="_pending_engine_sources")
     _pending_source_index = Int
-    
+
     panel_view = View(
         VGroup(
             HGroup(
