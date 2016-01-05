@@ -1,6 +1,8 @@
 import mayavi.core.engine
+
+from pyface.api import MessageDialog
 from traits.api import Float, Int, Button, Bool, HasTraits, Instance
-from traitsui.api import View, VGroup, HGroup, Item, message
+from traitsui.api import View, VGroup, HGroup, Item
 
 from simphony.core.cuba import CUBA
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -39,7 +41,6 @@ class RunAndAnimatePanel(HasTraits):
     # ----------------------------------------------
     _number_of_runs = Int(1)
     _animate = Button("Animate")
-    _animate_delay = 20
     _update_all_scenes = Bool(False)
 
     panel_view = View(
@@ -62,7 +63,8 @@ class RunAndAnimatePanel(HasTraits):
             self.handler.animate(self._number_of_runs,
                                  update_all_scenes=self._update_all_scenes)
         except RuntimeError as exception:
-            message(exception.message)
+            message_dialog = MessageDialog()
+            message_dialog.error(exception.message)
 
     # ----------------------------------------------------------
     # Trait handlers
@@ -106,7 +108,7 @@ class RunAndAnimatePanel(HasTraits):
 
     def show_config(self):
         ''' Show the GUI '''
-        self.configure_traits("panel_view", kind="live")
+        return self.edit_traits(view="panel_view", kind="live")
 
     # ------------------------------------------------------------
     # Private methods
@@ -120,7 +122,8 @@ class RunAndAnimatePanel(HasTraits):
             self.time_step = CM[CUBA.TIME_STEP]
         else:
             text = "engine.CM[TIME_STEP] is not found."
-            message(text)
+            message_dialog = MessageDialog()
+            message_dialog.error(text)
             raise ValueError(text)
 
         if CUBA.NUMBER_OF_TIME_STEPS in CM:
@@ -128,5 +131,6 @@ class RunAndAnimatePanel(HasTraits):
             self.number_of_time_steps = value
         else:
             text = "engine.CM[NUMBER_OF_TIME_STEPS] is not found."
-            message(text)
+            message_dialog = MessageDialog()
+            message_dialog.error(text)
             raise ValueError(text)

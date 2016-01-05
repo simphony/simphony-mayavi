@@ -1,7 +1,9 @@
 import mayavi.core.engine
-from traits.api import HasTraits, Bool, Button, Int, Enum, List, Instance, Str
+
+from pyface.api import MessageDialog
+from traits.api import HasTraits, Bool, Button, Int, Enum, List, Instance, Str, Any
 from traitsui.api import (View, VGroup, HGroup, Item, Action, Handler,
-                          ListStrEditor, message)
+                          ListStrEditor)
 from traitsui.list_str_adapter import ListStrAdapter
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -27,16 +29,10 @@ class EngineSourceAdapter(ListStrAdapter):
                                                  source.cell_scalars_name,
                                                  source.cell_vectors_name)
                                if name])
-        # name of the engine the source is from
-        try:
-            engine_name = object.engine_name
-        except AttributeError:
-            engine_name = "engine"
-
         text = "{source}({data}) from {engine}"
         return text.format(source=source.dataset,
                            data=data_names,
-                           engine=engine_name)
+                           engine=object.engine_name)
 
 
 class PendingEngineSourceHandler(Handler):
@@ -81,7 +77,7 @@ class AddSourcePanel(HasTraits):
     # Selected pending EngineSource (as an index of the list)
     _pending_source = Enum(values="_pending_engine_sources")
     _pending_source_index = Int
-
+    
     panel_view = View(
         VGroup(
             HGroup(
@@ -118,7 +114,7 @@ class AddSourcePanel(HasTraits):
 
     def show_config(self):
         ''' Show the GUI '''
-        self.configure_traits("panel_view", kind="live")
+        return self.edit_traits(view="panel_view", kind="live")
 
     # -------------------------------------------------
     # UI Operations
@@ -139,9 +135,9 @@ class AddSourcePanel(HasTraits):
                               action="append_list")
         source_view.buttons = [AddToPending, "Cancel"]
 
-        self.edit_traits(view=source_view,
-                         context={"object": source,
-                                  "manager": self})
+        return self.edit_traits(view=source_view,
+                                context={"object": source,
+                                         "manager": self})
 
     def __remove_dataset_fired(self):
         if len(self._pending_engine_sources) > self._pending_source_index:
@@ -167,7 +163,8 @@ class AddSourcePanel(HasTraits):
 
         # Display error messages if there is any
         if len(err_messages) > 0:
-            message("\n".join(err_messages))
+            message_dialog = MessageDialog()
+            message_dialog.error("\n".join(err_messages))
 
         # Keep the sources failed to be added
         for index in added_source_indices[::-1]:

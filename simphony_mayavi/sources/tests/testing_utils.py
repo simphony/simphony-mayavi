@@ -65,7 +65,8 @@ class DummyEngine(ABCModelingEngine):
                       for index, point in enumerate(points))
         uids = mesh.add_points(point_iter)
         face_iter = (Face(points=[uids[index] for index in element],
-                          data=DataContainer(VELOCITY=(index, 0., 0.)))
+                          data=DataContainer(TEMPERATURE=index,
+                                             VELOCITY=(index, 0., 0.)))
                      for index, element in enumerate(faces))
         mesh.add_faces(face_iter)
         self.datasets["mesh"] = mesh

@@ -2,8 +2,7 @@ import unittest
 
 import numpy
 
-from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
-from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
+from pyface.toolkit import toolkit_object
 
 from simphony_mayavi.show import show
 from simphony.cuds.lattice import make_cubic_lattice
@@ -11,8 +10,16 @@ from simphony.cuds.mesh import Mesh, Point
 from simphony.cuds.particles import Particles, Particle
 
 
-class TestShow(unittest.TestCase, GuiTestAssistant):
+# If backend is wx, ModalDialogTest is not implemented
+# Most of the tests would be skipped
+ModalDialogTester = toolkit_object("util.modal_dialog_tester:ModalDialogTester")
+no_modal_dialog_tester = (ModalDialogTester.__name__ == 'Unimplemented')
 
+
+class TestShow(unittest.TestCase):
+
+    @unittest.skipIf(no_modal_dialog_tester,
+                     "ModalDialogTester is unavailable for the current backend")
     def test_lattice_show(self):
         lattice = make_cubic_lattice(
             'test', 0.2, (10, 10, 1), origin=(0.2, -2.4, 0.))
@@ -25,6 +32,8 @@ class TestShow(unittest.TestCase, GuiTestAssistant):
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
 
+    @unittest.skipIf(no_modal_dialog_tester,
+                     "ModalDialogTester is unavailable for the current backend")
     def test_mesh_show(self):
         points = numpy.array([
             [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
@@ -43,7 +52,9 @@ class TestShow(unittest.TestCase, GuiTestAssistant):
         tester = ModalDialogTester(function)
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
-
+        
+    @unittest.skipIf(no_modal_dialog_tester,
+                     "ModalDialogTester is unavailable for the current backend")
     def test_particles_snapshot(self):
         coordinates = numpy.array([
             [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],

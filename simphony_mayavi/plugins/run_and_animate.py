@@ -16,13 +16,6 @@ class RunAndAnimate(object):
         self.mayavi_engine = mayavi_engine
 
         self._animator = None
-        self._isrunning = False
-
-    @property
-    def isrunning(self):
-        ''' Status of the animator '''
-        return (self._isrunning and
-                self._animator and self._animator.timer.IsRunning())
 
     def animate(self, number_of_runs, delay=None, ui=True,
                 update_all_scenes=False):
@@ -80,8 +73,6 @@ class RunAndAnimate(object):
 
         @animate(delay=delay, ui=ui)
         def anim():
-            self._isrunning = True
-
             # keep a reference to the engine being run
             engine_on_start = self.engine
 
@@ -94,7 +85,6 @@ class RunAndAnimate(object):
                 self._update_sources(sources)
                 self.mayavi_engine.current_scene.render()
                 yield
-            self._isrunning = False
 
         self._animator = anim()
 
