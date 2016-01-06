@@ -5,8 +5,7 @@ from mayavi.core.api import NullEngine
 from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
 from traitsui.tests._tools import is_current_backend_qt4
 
-from simphony_mayavi.plugins.engine_manager_standalone import (
-    EngineManagerStandalone)
+from simphony_mayavi.plugins.api import EngineManagerStandalone
 from simphony_mayavi.sources.tests import testing_utils
 
 

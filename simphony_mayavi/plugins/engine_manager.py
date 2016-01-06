@@ -60,6 +60,15 @@ class EngineManager(HasTraits):
     # ------------------------------------------------------
 
     def add_engine(self, name, modeling_engine):
+        ''' Add a Simphony Engine to the manager
+
+        Parameters
+        ----------
+        name : str
+            Name to be associated with the modeling engine
+        modeling_engine : Instance of ABCModelingEngine
+            Simphony Engine Wrapper
+        '''
         if name in self.engines:
             raise ValueError("{} is already added".format(name))
         self.engines[name] = modeling_engine
@@ -68,7 +77,13 @@ class EngineManager(HasTraits):
             self.engine_name = name
 
     def remove_engine(self, name):
-        ''' Remove a modeling engine from the manager'''
+        ''' Remove a modeling engine from the manager
+
+        Parameter
+        ---------
+        name : str
+            Name associated with the engine to be removed
+        '''
         if name not in self.engines:
             msg = "{} is not an engine in this manager"
             raise KeyError(msg.format(name))
