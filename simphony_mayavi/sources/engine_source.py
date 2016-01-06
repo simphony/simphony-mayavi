@@ -1,4 +1,4 @@
-from traits.api import Instance, Enum, Str
+from traits.api import Instance, Enum
 from traitsui.api import View, Group, Item, VGroup
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -14,6 +14,9 @@ class EngineSource(CUDSSource):
     datasets : ListStr
        list of dataset names in the engine
     """
+    # The version of this class.  Used for persistence
+    __version__ = 0
+
     # the SimPhoNy Modeling Engine from which datasets are loaded
     engine = Instance(ABCModelingEngine)
 
@@ -30,18 +33,12 @@ class EngineSource(CUDSSource):
                 Item(name="cell_vectors_name"),
                 Item(name="data"))))
 
-    def _get_cuds(self):
-        return self._cuds
-
     # Read-only attribute ##################################################
     @property
     def datasets(self):
         return self.engine.get_dataset_names()
 
     # Public interface #####################################################
-
-    def __init__(self, engine):
-        self.engine = engine
 
     def start(self):
         """ Load dataset from the engine and start the visualisation """

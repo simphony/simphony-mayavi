@@ -42,6 +42,7 @@ class EngineManagerStandaloneUI(EngineManager):
         self.panels = TraitNamedTuple(
             add_source=AddSourcePanel(engine_name, engine, mayavi_engine),
             run_and_animate=RunAndAnimatePanel(engine, mayavi_engine))
+
         self.add_engine(engine_name, engine)
 
     def _engine_name_changed(self):

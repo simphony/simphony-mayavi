@@ -16,42 +16,10 @@ class EngineManager(HasTraits):
     ----------
     engines : dict
         Mappings of Simphony Modeling Engines in this manager
-
-    Examples
-    ---------
-    >>> from simphony.engine import lammps   # LAMMPS
-
-    >>> # Setup the engine so it is ready to run
-    >>> dem = lammps.LammpsWrapper(...)   # experiment 1
-    >>> dem2 = lammps.LammpsWrapper(...)  # experiment 2
-
-    >>> # Setup for visualization
-    >>> from simphony_mayavi.plugins.api import EngineManager
-    >>> manager = EngineManager("exp1", dem)
-    >>> manager.add_engine("exp2", dem2)
-
-    >>> # ``engine_name`` is auto set as the last one being added
-    >>> manager.engine_name
-    "exp2"
-
-    >>> # Add visualisation panel using mayavi
-    >>> from simphony_mayavi.plugins.api import AddSourcePanel
-    >>> from mayavi import mlab
-    >>> manager.add_addon(AddSourcePanel(manager.engine_name,
-                                         manager.engine,
-                                         mlab.get_engine()))
-
-    >>> # AddSourcePanel comes with a public method ``add_dataset_to_scene``
-    >>> # Visualise the Engine's CUDS dataset "particles" in Mayavi
-    >>> manager.add_dataset_to_scene("particles")  # from ``dem2``
-
-    >>> # when a different engine is selected, the added panel can see
-    >>> # it too
-    >>> manager.engine_name = "exp1"
-    >>> manager.add_dataset_to_scene("particles")  # from ``dem``
-
-    >>> # GUI for interactive control
-    >>> manager.show_config()
+    engine_name : str
+        Name of the Simphony Modeling Engine (frop drop-down menu)
+    engine : Instance of ABCModelingEngine
+        Simphony Modeling Engine
     '''
     # Engines that are added to the manager
     engines = Dict(Str, Instance(ABCModelingEngine))
@@ -90,17 +58,6 @@ class EngineManager(HasTraits):
     # ------------------------------------------------------
     # Public methods
     # ------------------------------------------------------
-
-    def __init__(self, engine_name, engine):
-        '''
-        Parameters
-        ----------
-        engine_name : str
-            Name of the Simphony Modeling Engine (frop drop-down menu)
-        engine : Instance of ABCModelingEngine
-            Simphony Modeling Engine
-        '''
-        self.add_engine(engine_name, engine)
 
     def add_engine(self, name, modeling_engine):
         if name in self.engines:

@@ -38,7 +38,7 @@ class CUDSSource(VTKDataSource):
     >>> source.update()    # particles are shown!
     """
     #: The version of this class. Used for persistence.
-    __version__ = 1
+    __version__ = 0
 
     #: The CUDS container
     cuds = Property(depends_on='_cuds')

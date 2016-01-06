@@ -64,7 +64,7 @@ class AddEngineSourceToMayavi(object):
         To turn off visualisation of a point/cell data, assign
         [point/cell]_[scalars/vectors]_name to an empty string (i.e. "")
         '''
-        source = EngineSource(self.engine)
+        source = EngineSource(engine=self.engine)
         source.dataset = name
         if point_scalars_name is not None:
             source.point_scalars_name = point_scalars_name

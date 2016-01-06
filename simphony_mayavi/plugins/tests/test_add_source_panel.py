@@ -45,7 +45,7 @@ class TestAddSourcePanel(unittest.TestCase):
 
         # when
         ui = self.panel.show_config()
-        ui_test_utils.press_button_by_label(ui, "Add to Scene")
+        ui_test_utils.press_button_by_label(ui, "Send to Scene")
 
         # then
         sources = self.mayavi_engine.current_scene.children
@@ -64,7 +64,7 @@ class TestAddSourcePanel(unittest.TestCase):
         self.panel.mayavi_engine = None
 
         def function():
-            ui_test_utils.press_button_by_label(ui, "Add to Scene")
+            ui_test_utils.press_button_by_label(ui, "Send to Scene")
             return True
 
         # then

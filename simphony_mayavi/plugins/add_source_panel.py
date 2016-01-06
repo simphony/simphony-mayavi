@@ -1,5 +1,3 @@
-import mayavi.core.engine
-
 from pyface.api import MessageDialog
 from traits.api import HasTraits, Bool, Button, Int, Enum, List, Instance, Str
 from traitsui.api import (View, VGroup, HGroup, Item, Action, Handler,
@@ -64,12 +62,12 @@ class AddSourcePanel(HasTraits):
     '''
     engine = Instance(ABCModelingEngine)
     engine_name = Str
-    mayavi_engine = Instance(mayavi.core.engine.Engine)
+    mayavi_engine = Instance("mayavi.core.engine.Engine")
 
     # Buttons for the UI
     _add_dataset = Button("+")
     _remove_dataset = Button("-")
-    _add_to_scene = Button("Add to Scene")
+    _add_to_scene = Button("Send to Scene")
 
     # Pending EngineSource to be added to Mayavi
     _pending_engine_sources = List(Instance(EngineSource))
@@ -121,7 +119,7 @@ class AddSourcePanel(HasTraits):
     # -------------------------------------------------
 
     def __add_dataset_fired(self):
-        source = EngineSource(self.engine)
+        source = EngineSource(engine=self.engine)
         source._dataset_changed()
 
         # Default trait view of EngineSource

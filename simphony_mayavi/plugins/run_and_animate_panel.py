@@ -1,5 +1,3 @@
-import mayavi.core.engine
-
 from pyface.api import MessageDialog
 from traits.api import Float, Int, Button, Bool, HasTraits, Instance
 from traitsui.api import View, VGroup, HGroup, Item
@@ -26,7 +24,8 @@ class RunAndAnimatePanel(HasTraits):
         CUBA.NUMBER_OF_TIME_STEPS of the Simphony Engine
     '''
     engine = Instance(ABCModelingEngine)
-    mayavi_engine = Instance(mayavi.core.engine.Engine)
+    mayavi_engine = Instance("mayavi.core.engine.Engine")
+
     handler = Instance(RunAndAnimate)
 
     # -------------------------------------------------------
