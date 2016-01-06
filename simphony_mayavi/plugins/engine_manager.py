@@ -66,8 +66,8 @@ class EngineManager(HasTraits):
     engine_name = DEnum(values_name="_engine_names")
 
     # Traits view
-    trait_view = View(Group(Item("engine_name", label="Engine Wrapper")),
-                      resizable=True)
+    traits_view = View(Group(Item("engine_name", label="Engine Wrapper")),
+                       resizable=True)
     # ----------------------------------------------------
     # Traits Property
     # ----------------------------------------------------

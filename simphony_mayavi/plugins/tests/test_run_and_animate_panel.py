@@ -33,12 +33,13 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         self.panel = RunAndAnimatePanel(self.engine, self.mayavi_engine)
 
     def test_animate_fired(self):
+        # given
         self._setUp()
         self.panel._number_of_runs = 2
         ui = self.panel.show_config()
 
-        def engine_ran_twice(dummy):
-            return self.engine.time >= 20.
+        def engine_ran_twice(source):
+            return source.engine.time >= 20.
 
         # animate as the engine ran for 2 times
         with self.assertTraitChangesInEventLoop(self.engine_source,
@@ -86,7 +87,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
             # engine time should not advance
             self.assertAlmostEqual(self.engine.time, engine_time)
 
-    def test_update_all_sources(self):
+    def test_update_all_scenes(self):
         # given
         self._setUp()
         engine_source1 = self.mayavi_engine.current_scene.children[0]
