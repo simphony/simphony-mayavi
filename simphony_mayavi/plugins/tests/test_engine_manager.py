@@ -18,8 +18,11 @@ class TestEngineManager(unittest.TestCase):
 
         manager = EngineManager()
         manager.add_engine("test", engine1)
-        manager.add_engine("test2", engine2)
+        self.assertEqual(manager.engine_name, "test")
+        self.assertEqual(manager.engine, engine1)
 
+        manager.add_engine("test2", engine2)
+        # engine is unchanged
         self.assertEqual(manager.engine_name, "test")
         self.assertEqual(manager.engine, engine1)
 
