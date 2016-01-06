@@ -41,14 +41,11 @@ class PendingEngineSourceHandler(Handler):
         # default point/cell scalar/vector data
         # is the first available value
         source = info.object
-        if source._point_scalars_list:
-            source.point_scalars_name = source._point_scalars_list[0]
-        if source._point_vectors_list:
-            source.point_vectors_name = source._point_vectors_list[0]
-        if source._cell_scalars_list:
-            source.cell_scalars_name = source._cell_scalars_list[0]
-        if source._cell_vectors_list:
-            source.cell_vectors_name = source._cell_vectors_list[0]
+        # default _*_*_list is [""]
+        source.point_scalars_name = source._point_scalars_list[0]
+        source.point_vectors_name = source._point_vectors_list[0]
+        source.cell_scalars_name = source._cell_scalars_list[0]
+        source.cell_vectors_name = source._cell_vectors_list[0]
 
     def append_list(self, info):
         ''' Confirm and add the EngineSource to the pending list '''

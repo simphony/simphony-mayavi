@@ -98,6 +98,9 @@ class EngineManagerMayavi2Plugin(Plugin):
     @on_trait_change("application.gui:started")
     def _on_application_gui_started(self, obj, trait_name, old, new):
 
+        if trait_name != "started" or not new:
+            return
+
         # Bind the EngineManagerMayavi2 instance to ``simphony_panel``
 
         SHELL_VIEW = "envisage.plugins.python_shell_view"

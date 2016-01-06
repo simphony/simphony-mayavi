@@ -38,6 +38,10 @@ class TestAddSourcePanel(unittest.TestCase):
         # then
         self.assertEqual(len(self.panel._pending_engine_sources), 0)
 
+    def test_pass_remove_dataset_when_nothing_selected(self):
+        ui = self.panel.show_config()
+        ui_test_utils.press_button_by_label(ui, "-")
+
     def test_add_to_scene(self):
         # given
         ui = self.panel._AddSourcePanel__add_dataset_fired()
@@ -51,6 +55,10 @@ class TestAddSourcePanel(unittest.TestCase):
         sources = self.mayavi_engine.current_scene.children
         self.assertEqual(len(sources), 1)
         self.assertEqual(sources[0].dataset, "particles")
+
+    def test_pass_add_nothing_to_scene(self):
+        ui = self.panel.show_config()
+        ui_test_utils.press_button_by_label(ui, "Send to Scene")
 
     @unittest.skipIf(not is_current_backend_qt4(),
                      "this test requires backend==qt4")

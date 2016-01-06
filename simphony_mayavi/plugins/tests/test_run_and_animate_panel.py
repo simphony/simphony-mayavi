@@ -133,3 +133,18 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
                                self.panel.time_step)
         self.assertAlmostEqual(self.panel.engine.CM[CUBA.NUMBER_OF_TIME_STEPS],
                                self.panel.number_of_time_steps)
+
+    def test_error_if_time_step_not_found(self):
+        engine = testing_utils.DummyEngine()
+        mayavi_engine = NullEngine()
+        engine.CM.pop(CUBA.TIME_STEP)
+
+        # when
+        def init():
+            RunAndAnimatePanel(engine, mayavi_engine)
+            return True
+
+        # then
+        tester = ModalDialogTester(init)
+        tester.open_and_run(when_opened=lambda x: x.close(accept=True))
+        self.assertTrue(tester.result)

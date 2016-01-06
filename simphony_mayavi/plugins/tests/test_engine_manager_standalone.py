@@ -1,5 +1,6 @@
 import unittest
 
+from mayavi import mlab
 from mayavi.core.api import NullEngine
 from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
 from traitsui.tests._tools import is_current_backend_qt4
@@ -18,6 +19,10 @@ class TestEngineManagerStandalone(GuiTestAssistant, unittest.TestCase):
         self.mayavi_engine = NullEngine()
         self.manager = EngineManagerStandalone(self.engine,
                                                self.mayavi_engine)
+
+    def test_init_default_mayavi_engine(self):
+        manager = EngineManagerStandalone(testing_utils.DummyEngine())
+        self.assertEqual(manager.mayavi_engine, mlab.get_engine())
 
     def test_add_dataset_to_scene(self):
         # given

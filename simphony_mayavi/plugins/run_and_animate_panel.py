@@ -123,7 +123,6 @@ class RunAndAnimatePanel(HasTraits):
             text = "engine.CM[TIME_STEP] is not found."
             message_dialog = MessageDialog()
             message_dialog.error(text)
-            raise ValueError(text)
 
         if CUBA.NUMBER_OF_TIME_STEPS in CM:
             value = CM[CUBA.NUMBER_OF_TIME_STEPS]
@@ -132,4 +131,3 @@ class RunAndAnimatePanel(HasTraits):
             text = "engine.CM[NUMBER_OF_TIME_STEPS] is not found."
             message_dialog = MessageDialog()
             message_dialog.error(text)
-            raise ValueError(text)
