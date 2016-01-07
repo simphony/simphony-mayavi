@@ -73,11 +73,12 @@ View CUDS in Mayavi2
 Interact with Simphony Engine within Mayavi2
 --------------------------------------------
 
-A Mayavi2 plugin similar to the :class:`~simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI`
- described in :ref:`engine-manager-standalone-label` is provided. 
-In order to use it, one needs to first activate the plugin in ``Preferences``,
-following the instructions in `Open CUDS Files in Mayavi2`_.
-**Restart** Mayavi2. Then the EngineManager panel can be added by selecting
+A Mayavi2 plugin similar to the
+:class:`~simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI`
+described in :ref:`engine-manager-standalone-label` is provided. In order to use it,
+one needs to first activate the plugin in ``Preferences``, following the instructions
+in `Open CUDS Files in Mayavi2`_. **Restart** Mayavi2. Then the EngineManager panel
+can be added by selecting
 ``View`` --> ``Other...`` --> ``Simphony Engine to Mayavi2``.
 
 .. figure:: _images/engine_manager_mayavi2_setup.png

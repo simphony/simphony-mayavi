@@ -19,7 +19,7 @@ class EngineSource(CUDSSource):
        Selected dataset name in the engine
 
     Examples
-    -------
+    --------
     >>> source = EngineSource(engine=some_engine)
     >>> source.datasets
     ["particles", "lattice"]

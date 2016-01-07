@@ -12,17 +12,23 @@ class RunAndAnimate(object):
 
     Parameters
     ----------
-    engine : Instance of ABCModelingEngine
+    engine : Instance
+        base class: ABCModelingEngine
         Simphony Modeling Engine
-    mayavi_engine : Instance of mayavi.core.engine.Engine
-        For retrieving scenes and visible datasets
+
+    mayavi_engine : Instance
+        mayavi.core.engine.Engine; for retrieving scenes and visible
+        datasets
     '''
     def __init__(self, engine, mayavi_engine):
         '''
         Parameters
         ----------
-        engine : Instance of ABCModelingEngine
-        mayavi_engine : Instance of mayavi.core.engine.Engine
+        engine : Instance
+           base class : ABCModelingEngine
+
+        mayavi_engine : Instance
+           mayavi.core.engine.Engine
         '''
         self.engine = engine
         self.mayavi_engine = mayavi_engine
@@ -31,8 +37,7 @@ class RunAndAnimate(object):
 
     def animate(self, number_of_runs, delay=None, ui=False,
                 update_all_scenes=False):
-        ''' Run the modeling engine, and animate the scene
-
+        ''' Run the modeling engine, and animate the scene.
         If there is no source in the scene or none of the sources
         belongs to the selected Engine ``engine``, a RuntimeError
         is raised.
@@ -40,20 +45,24 @@ class RunAndAnimate(object):
         Parameters
         ----------
         number_of_runs : int
-           the number of times the engine.run() is called
+            the number of times the engine.run() is called
+
         delay : int, optional
-           delay between each run.
-           If None, use previous setting or Mayavi's default: 500
+            delay between each run.
+            If None, use previous setting or Mayavi's default: 500
+
         ui : bool, optional
-           whether an UI is shown, default is False
+            whether an UI is shown, default is False
+
         update_all_scenes : bool, optional
-           whether all scenes are updated, default is False: i.e. only
-           the current scene is updated
+            whether all scenes are updated, default is False: i.e. only
+            the current scene is updated
 
         Raises
         ------
         RuntimeError
             if nothing in scene(s) belongs to ``engine``
+
         '''
         # remember the last delay being set
         if delay is None:
