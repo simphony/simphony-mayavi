@@ -58,22 +58,19 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
         source.dataset = "particles"
 
         # then
-        self.assertEqual(source.name,
-                         'Engine CUDS: particles')
+        self.assertEqual(source.name, "particles (CUDS from engine)")
 
         # when
         source.dataset = "mesh"
 
         # then
-        self.assertEqual(source.name,
-                         'Engine CUDS: mesh')
+        self.assertEqual(source.name, "mesh (CUDS from engine)")
 
         # when
         source.dataset = 'lattice'
 
         # then
-        self.assertEqual(source.name,
-                         'Engine CUDS: lattice')
+        self.assertEqual(source.name, "lattice (CUDS from engine)")
 
     def test_add_to_engine(self):
         source = EngineSource(engine=self.engine)

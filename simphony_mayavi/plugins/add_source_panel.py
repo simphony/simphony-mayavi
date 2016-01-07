@@ -30,7 +30,7 @@ class EngineSourceAdapter(ListStrAdapter):
         text = "{source}({data}) from {engine}"
         return text.format(source=source.dataset,
                            data=data_names,
-                           engine=object.engine_name)
+                           engine=source.engine_name)
 
 
 class PendingEngineSourceHandler(Handler):
@@ -126,7 +126,8 @@ class AddSourcePanel(HasTraits):
             message_dialog.error("No engine is selected")
             return
 
-        source = EngineSource(engine=self.engine)
+        source = EngineSource(engine=self.engine,
+                              engine_name=self.engine_name)
         source._dataset_changed()
 
         # Default trait view of EngineSource

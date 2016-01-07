@@ -29,7 +29,7 @@ class RunAndAnimate(object):
 
         self._animator = None
 
-    def animate(self, number_of_runs, delay=None, ui=True,
+    def animate(self, number_of_runs, delay=None, ui=False,
                 update_all_scenes=False):
         ''' Run the modeling engine, and animate the scene
 
@@ -45,7 +45,7 @@ class RunAndAnimate(object):
            delay between each run.
            If None, use previous setting or Mayavi's default: 500
         ui : bool, optional
-           whether an UI is shown, default is True
+           whether an UI is shown, default is False
         update_all_scenes : bool, optional
            whether all scenes are updated, default is False: i.e. only
            the current scene is updated

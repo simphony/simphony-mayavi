@@ -19,8 +19,8 @@ class EngineManagerStandaloneUI(EngineManager):
     traits_view = View(
         VGroup(
             Group(Item("engine_name", label="Engine Wrapper")),
-            Group(Item("panels", style="custom", show_label=False)))
-    )
+            Group(Item("panels", style="custom", show_label=False))),
+        title="Engine Manager")
 
     def __init__(self, engine_name, engine, mayavi_engine=None):
         '''
@@ -58,4 +58,4 @@ class EngineManagerStandaloneUI(EngineManager):
 
     def show_config(self):
         ''' Show the GUI with all the panels '''
-        self.configure_traits()
+        return self.edit_traits()
