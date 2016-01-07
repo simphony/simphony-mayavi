@@ -1,4 +1,4 @@
-from traits.api import Instance, Enum
+from traits.api import Instance, Enum, Str
 from traitsui.api import View, Group, Item, VGroup
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -19,6 +19,9 @@ class EngineSource(CUDSSource):
 
     # the SimPhoNy Modeling Engine from which datasets are loaded
     engine = Instance(ABCModelingEngine)
+
+    # Label for the engine (for representation purposes)
+    engine_name = Str
 
     # The name of the CUDS container that is currently loaded
     dataset = Enum(values="datasets")
@@ -57,4 +60,5 @@ class EngineSource(CUDSSource):
         """ Returns the name to display on the tree view.  Note that
         this is not a property getter.
         """
-        return 'Engine CUDS: {}'.format(self.dataset)
+        engine_name = self.engine_name or "engine"
+        return '{} (CUDS from {})'.format(self.dataset, engine_name)
