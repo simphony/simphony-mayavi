@@ -60,6 +60,8 @@ class AddSourcePanel(HasTraits):
     engine_name = Str
     mayavi_engine = Instance("mayavi.core.engine.Engine")
 
+    label = "Add to Mayavi"
+
     # Buttons for the UI
     _add_dataset = Button("+")
     _remove_dataset = Button("-")
@@ -87,7 +89,7 @@ class AddSourcePanel(HasTraits):
                      editable=False,
                      selected="_pending_source",
                      selected_index="_pending_source_index")),
-            label="Add to Mayavi"),
+            ),
         title="Visualize")
 
     # --------------------------------------------------

@@ -6,7 +6,8 @@ from envisage.api import Plugin, ServiceOffer
 
 # EngineManager imports mayavi.core.trait_defs in the module level
 from simphony_mayavi.plugins.engine_manager import EngineManager
-from simphony_mayavi.plugins.trait_namedtuple import TraitNamedTuple
+from simphony_mayavi.plugins.tabbed_panel_collection import (
+    TabbedPanelCollection)
 
 # More internal mayavi imports are done within EngineManagerMayavi2 to
 # avoid import cycles when the class is imported as a Mayavi2 plugin
@@ -17,7 +18,7 @@ logger = logging.getLogger()
 class EngineManagerMayavi2(EngineManager):
 
     window = Instance("pyface.workbench.api.WorkbenchWindow")
-    panels = Instance(TraitNamedTuple)
+    panels = Instance(TabbedPanelCollection)
 
     view = View(
         VGroup(
@@ -41,7 +42,7 @@ class EngineManagerMayavi2(EngineManager):
         mayavi_engine = self.get_mayavi()
 
         # Add panels
-        self.panels = TraitNamedTuple(
+        self.panels = TabbedPanelCollection(
             add_source=AddSourcePanel(self.engine_name, self.engine,
                                       mayavi_engine),
             run_and_animate=RunAndAnimatePanel(self.engine,

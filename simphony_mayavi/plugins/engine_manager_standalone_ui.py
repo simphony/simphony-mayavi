@@ -5,7 +5,8 @@ from traits.api import Instance
 from simphony_mayavi.plugins.engine_manager import EngineManager
 from simphony_mayavi.plugins.add_source_panel import AddSourcePanel
 from simphony_mayavi.plugins.run_and_animate_panel import RunAndAnimatePanel
-from simphony_mayavi.plugins.trait_namedtuple import TraitNamedTuple
+from simphony_mayavi.plugins.tabbed_panel_collection import (
+    TabbedPanelCollection)
 
 
 class EngineManagerStandaloneUI(EngineManager):
@@ -13,7 +14,7 @@ class EngineManagerStandaloneUI(EngineManager):
     Engine, (2) running the engine and (3) animating the results
     '''
 
-    panels = Instance(TraitNamedTuple)
+    panels = Instance(TabbedPanelCollection)
 
     traits_view = View(
         VGroup(
@@ -39,7 +40,7 @@ class EngineManagerStandaloneUI(EngineManager):
             mayavi_engine = mayavi_engine
 
         # Add panels
-        self.panels = TraitNamedTuple(
+        self.panels = TabbedPanelCollection(
             add_source=AddSourcePanel(engine_name, engine, mayavi_engine),
             run_and_animate=RunAndAnimatePanel(engine, mayavi_engine))
 

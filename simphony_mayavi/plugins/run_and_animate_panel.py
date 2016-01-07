@@ -28,6 +28,8 @@ class RunAndAnimatePanel(HasTraits):
 
     handler = Instance(RunAndAnimate)
 
+    label = "Run/Animate"
+
     # -------------------------------------------------------
     # Basic time step parameters to interact with the engine
     # -------------------------------------------------------
@@ -50,7 +52,7 @@ class RunAndAnimatePanel(HasTraits):
                    Item(label="time(s)")),
             HGroup(Item("_animate", show_label=False),
                    Item(name="_update_all_scenes", label="Update all scenes")),
-            label="Run/Animate"),
+            ),
         title="Run and Animate")
 
     # ------------------------------------------------------------
