@@ -11,14 +11,19 @@ class EngineManagerStandalone(object):
     ''' Standalone non-GUI manager for (1) visualising datasets from
     a Simphony Modeling Engine, (2) running the engine and (3) animating
     the results
-    '''
 
+    Parameters
+    ----------
+    engine : Instance of ABCModelingEngine
+    mayavi_engine : mayavi.core.engine.Engine
+        default to be mayavi.mlab.get_engine()
+   '''
     def __init__(self, engine, mayavi_engine=None):
         '''
         Parameters
         ----------
         engine : Instance of ABCModelingEngine
-        mayavi_engine : mayavi.core.engine.Engine
+        mayavi_engine : mayavi.core.engine.Engine (option)
             default to be mayavi.mlab.get_engine()
         '''
         self.engine = engine

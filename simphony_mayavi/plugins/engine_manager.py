@@ -17,7 +17,7 @@ class EngineManager(HasTraits):
     engines : dict
         Mappings of Simphony Modeling Engines in this manager
     engine_name : str
-        Name of the Simphony Modeling Engine (frop drop-down menu)
+        Name of the Simphony Modeling Engine
     engine : Instance of ABCModelingEngine
         Simphony Modeling Engine
     '''
@@ -28,7 +28,8 @@ class EngineManager(HasTraits):
     _engine_names = ListStr
 
     # Selected engine (overloaded BasicPanel)
-    engine = Property(depends_on="engine_name")
+    engine = Property
+    _engine = Instance(ABCModelingEngine)
 
     # Selected engine name
     engine_name = DEnum(values_name="_engine_names")
@@ -41,7 +42,7 @@ class EngineManager(HasTraits):
     # ----------------------------------------------------
 
     def _get_engine(self):
-        if self.engine_name:
+        if self.engine_name in self.engines:
             return self.engines[self.engine_name]
         else:
             return None
@@ -50,10 +51,10 @@ class EngineManager(HasTraits):
         if value not in self.engines.values():
             msg = "{} is not an engine in the manager.  Use ``add_engine()``"
             raise ValueError(msg.format(value))
-
         for name, engine in self.engines.items():
             if value is engine:
                 self.engine_name = name
+                break
 
     # ------------------------------------------------------
     # Public methods
@@ -73,8 +74,9 @@ class EngineManager(HasTraits):
             raise ValueError("{} is already added".format(name))
         self.engines[name] = modeling_engine
         self._engine_names = self.engines.keys()
-        if not self.engine_name:
+        if self.engine_name == "" or self.engine_name is None:
             self.engine_name = name
+            self._engine = modeling_engine
 
     def remove_engine(self, name):
         ''' Remove a modeling engine from the manager

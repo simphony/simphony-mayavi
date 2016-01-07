@@ -59,7 +59,7 @@ class RunAndAnimatePanel(HasTraits):
 
     def __animate_fired(self):
         try:
-            self.handler.animate(self._number_of_runs,
+            self.handler.animate(self._number_of_runs, ui=True,
                                  update_all_scenes=self._update_all_scenes)
         except RuntimeError as exception:
             message_dialog = MessageDialog()
@@ -99,7 +99,9 @@ class RunAndAnimatePanel(HasTraits):
         Parameters
         ----------
         engine : Instance of ABCModelingEngine
+            Simphony Modeling Engine wrapper
         mayavi_engine : Instance of mayavi.core.engine.Engine
+            for visualization
         '''
         self.handler = RunAndAnimate(engine, mayavi_engine)
         self.engine = engine

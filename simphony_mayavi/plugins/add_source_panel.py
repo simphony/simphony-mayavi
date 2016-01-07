@@ -37,16 +37,6 @@ class PendingEngineSourceHandler(Handler):
     ''' UI Handler for adding dataset as a source in EngineSourceManager
     The source is appended to the ``_pending_engine_sources`` list '''
 
-    def object_data_changed(self, info):
-        # default point/cell scalar/vector data
-        # is the first available value
-        source = info.object
-        # default _*_*_list is [""]
-        source.point_scalars_name = source._point_scalars_list[0]
-        source.point_vectors_name = source._point_vectors_list[0]
-        source.cell_scalars_name = source._cell_scalars_list[0]
-        source.cell_vectors_name = source._cell_vectors_list[0]
-
     def append_list(self, info):
         ''' Confirm and add the EngineSource to the pending list '''
         info.manager._pending_engine_sources.append(info.object)
@@ -56,6 +46,15 @@ class PendingEngineSourceHandler(Handler):
 class AddSourcePanel(HasTraits):
     ''' Standalone UI for adding datasets from a modeling engine to
     a Mayavi scene
+
+    Parameters
+    ----------
+    engine : Instance of ABCModelingEngine
+        Simphony Modeling Engine wrapper
+    engine_name : str
+        Name of the modeling engine
+    mayavi_engine : Instance of mayavi.core.engine.Engine
+        for visualization
     '''
     engine = Instance(ABCModelingEngine)
     engine_name = Str
@@ -91,6 +90,10 @@ class AddSourcePanel(HasTraits):
             label="Add to Mayavi"),
         title="Visualize")
 
+    # --------------------------------------------------
+    # Public methods
+    # --------------------------------------------------
+
     def __init__(self, engine_name, engine, mayavi_engine):
         ''' Initialization
 
@@ -100,7 +103,7 @@ class AddSourcePanel(HasTraits):
             Simphony Modeling Engine wrapper
         engine_name : str
             Name of the modeling engine
-        mayavi_engine : mayavi.core.engine.Engine
+        mayavi_engine : Instance of mayavi.core.engine.Engine
             for visualization
         '''
         self.engine = engine
@@ -116,6 +119,11 @@ class AddSourcePanel(HasTraits):
     # -------------------------------------------------
 
     def __add_dataset_fired(self):
+        if self.engine is None:
+            message_dialog = MessageDialog()
+            message_dialog.error("No engine is selected")
+            return
+
         source = EngineSource(engine=self.engine)
         source._dataset_changed()
 

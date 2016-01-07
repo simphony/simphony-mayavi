@@ -4,7 +4,19 @@ from mayavi.mlab import animate
 
 
 class RunAndAnimate(object):
+    ''' Standalone non-GUI based controller for running a Simphony
+    Modeling Engine and animating the CUDS dataset in Mayavi.
 
+    Precondition: The required CUDS datasets are already visible
+    in the Mayavi scene(s)
+
+    Parameters
+    ----------
+    engine : Instance of ABCModelingEngine
+        Simphony Modeling Engine
+    mayavi_engine : Instance of mayavi.core.engine.Engine
+        For retrieving scenes and visible datasets
+    '''
     def __init__(self, engine, mayavi_engine):
         '''
         Parameters
@@ -21,9 +33,9 @@ class RunAndAnimate(object):
                 update_all_scenes=False):
         ''' Run the modeling engine, and animate the scene
 
-        If there is no source in the scene or none of the sources is
-        an EngineSource representing a dataset from ``engine``,
-        a RuntimeError is raised.
+        If there is no source in the scene or none of the sources
+        belongs to the selected Engine ``engine``, a RuntimeError
+        is raised.
 
         Parameters
         ----------
@@ -35,12 +47,13 @@ class RunAndAnimate(object):
         ui : bool, optional
            whether an UI is shown, default is True
         update_all_scenes : bool, optional
-           whether all scenes are updated, default is False
+           whether all scenes are updated, default is False: i.e. only
+           the current scene is updated
 
         Raises
         ------
         RuntimeError
-            if no EngineSource belongs to ``engine`` is found
+            if nothing in scene(s) belongs to ``engine``
         '''
         # remember the last delay being set
         if delay is None:

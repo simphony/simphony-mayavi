@@ -29,7 +29,7 @@ class TestEngineManager(unittest.TestCase):
         self.assertIn(engine2, manager.engines.values())
         self.assertIn("test2", manager.engines.keys())
 
-    def test_change_engine(self):
+    def test_change_engine_name(self):
         engine1 = testing_utils.DummyEngine()
         engine2 = testing_utils.DummyEngine()
 
@@ -39,6 +39,20 @@ class TestEngineManager(unittest.TestCase):
 
         manager.engine_name = "test2"
         self.assertEqual(manager.engine, engine2)
+
+        manager.engine_name = "test"
+        self.assertEqual(manager.engine, engine1)
+
+    def test_change_engine(self):
+        engine1 = testing_utils.DummyEngine()
+        engine2 = testing_utils.DummyEngine()
+
+        manager = EngineManager()
+        manager.add_engine("test", engine1)
+        manager.add_engine("test2", engine2)
+
+        manager.engine = engine2
+        self.assertEqual(manager.engine_name, "test2")
 
         manager.engine = engine1
         self.assertEqual(manager.engine_name, "test")
