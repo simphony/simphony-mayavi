@@ -3,26 +3,22 @@ from functools import wraps
 
 from mayavi import mlab
 
-from .add_engine_source_to_mayavi import AddEngineSourceToMayavi
-from .run_and_animate import RunAndAnimate
+from simphony_mayavi.plugins.add_engine_source_to_mayavi import (
+    AddEngineSourceToMayavi)
+from simphony_mayavi.plugins.run_and_animate import RunAndAnimate
 
 
 class EngineManagerStandalone(object):
-    ''' Standalone non-GUI manager for (1) visualising datasets from
-    a Simphony Modeling Engine, (2) running the engine and (3) animating
-    the results
-
-    Parameters
-    ----------
-    engine : Instance of ABCModelingEngine
-    mayavi_engine : mayavi.core.engine.Engine
-        default to be mayavi.mlab.get_engine()
-   '''
+    '''Standalone non-GUI manager for visualising datasets from
+    a Simphony Modeling Engine, running the engine and animating
+    the results.
+    '''
     def __init__(self, engine, mayavi_engine=None):
         '''
         Parameters
         ----------
         engine : Instance of ABCModelingEngine
+
         mayavi_engine : mayavi.core.engine.Engine (option)
             default to be mayavi.mlab.get_engine()
         '''

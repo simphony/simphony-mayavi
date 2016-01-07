@@ -9,6 +9,7 @@ def add_source_and_modules_to_scene(mayavi_engine, source):
     Parameters
     ----------
     mayavi_engine : mayavi.core.engine.Engine instance
+
     source : VTKDataSource
         '''
     if mayavi_engine is None:
@@ -31,6 +32,7 @@ class AddEngineSourceToMayavi(object):
         ---------
         engine : Instance of ABCModelingEngine
            where dataset is extracted
+
         mayavi_engine : mayavi.core.engine.Engine
            for visualizing data
         '''
@@ -48,15 +50,19 @@ class AddEngineSourceToMayavi(object):
             name of the CUDS dataset to be added
             Check self.engine.get_dataset_names() to see available
             dataset names.
+
         point_scalars_name : str, optional
             CUBA name of the data to be selected as point scalars.
             default is the first available point scalars data
+
         point_vectors_name : str, optional
             CUBA name of the data to be selected as point vectors
             default is the first available point vectors data
+
         cell_scalars_name : str, optional
             CUBA name of the data to be selected as cell scalars
             default is the first available cell scalars data
+
         cell_vectors_name : str, optional
             CUBA name of the data to be selected as cell vectors
             default is the first available cell vectors data

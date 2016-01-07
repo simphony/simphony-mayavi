@@ -13,7 +13,7 @@ module to access the provided tools.
 
     ~cuds_source.CUDSSource
     ~cuds_file_source.CUDSFileSource
-
+    ~engine_source.EngineSource
 
 Description
 -----------
@@ -25,6 +25,11 @@ Description
      :show-inheritance:
 
 .. autoclass:: simphony_mayavi.sources.cuds_file_source.CUDSFileSource
+     :members:
+     :undoc-members:
+     :show-inheritance:
+
+.. autoclass:: simphony_mayavi.sources.engine_source.EngineSource
      :members:
      :undoc-members:
      :show-inheritance:

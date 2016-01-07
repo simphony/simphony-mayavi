@@ -11,8 +11,25 @@ class EngineSource(CUDSSource):
 
     Attributes
     ----------
-    datasets : ListStr
-       list of dataset names in the engine
+    engine : Instance
+       Simphony modeling engine wrapper
+       (Base class: ABCModelingEngine)
+
+    dataset : str
+       Selected dataset name in the engine
+
+    Examples
+    -------
+    >>> source = EngineSource(engine=some_engine)
+    >>> source.datasets
+    ["particles", "lattice"]
+    >>> source.dataset = "particles"
+
+    >>> # Alternatively
+    >>> source = EngineSource(engine=some_engine, dataset="particles")
+
+    >>> from mayavi import mlab
+    >>> mlab.pipline.glypy(source)
     """
     # The version of this class.  Used for persistence
     __version__ = 0
@@ -39,6 +56,7 @@ class EngineSource(CUDSSource):
     # Read-only attribute ##################################################
     @property
     def datasets(self):
+        '''Available dataset names in the engine'''
         return self.engine.get_dataset_names()
 
     # Public interface #####################################################

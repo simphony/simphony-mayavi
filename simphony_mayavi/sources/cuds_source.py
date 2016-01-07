@@ -30,7 +30,7 @@ class CUDSSource(VTKDataSource):
     >>> cuds = Particles("test")  # the container is empty
     >>> source = CUDSSource(cuds=cuds)
 
-    # Add content to cuds after the source is initialised
+    >>> # Add content to cuds after the source is initialised
     >>> cuds.add_particles([...])
 
     >>> from mayavi import mlab

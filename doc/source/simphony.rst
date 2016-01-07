@@ -92,6 +92,8 @@ supported formats.
 
 .. _mayavi operations: http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html?highlight=toolbar#changing-object-properties-interactively
 
+.. _engine-manager-standalone-label:
+
 Interacting with Simphony Engine
 --------------------------------
 
