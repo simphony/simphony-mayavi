@@ -29,7 +29,6 @@ class EngineManager(HasTraits):
 
     # Selected engine (overloaded BasicPanel)
     engine = Property
-    _engine = Instance(ABCModelingEngine)
 
     # Selected engine name
     engine_name = DEnum(values_name="_engine_names")
@@ -74,9 +73,6 @@ class EngineManager(HasTraits):
             raise ValueError("{} is already added".format(name))
         self.engines[name] = modeling_engine
         self._engine_names = self.engines.keys()
-        if self.engine_name == "" or self.engine_name is None:
-            self.engine_name = name
-            self._engine = modeling_engine
 
     def remove_engine(self, name):
         ''' Remove a modeling engine from the manager

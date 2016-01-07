@@ -10,8 +10,8 @@ class TabbedPanelCollection(HasTraits):
     def __init__(self, **kwargs):
         for key, panel in kwargs.items():
             if hasattr(self, key):
-                message = "{} is a predefined attributes"
-                raise KeyError(message.format(key))
+                message = "'{}' is a predefined attribute"
+                raise AttributeError(message.format(key))
             setattr(self, key, panel)
 
         self.panels = kwargs.values()

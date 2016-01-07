@@ -28,3 +28,7 @@ class TestTabbedPannelCollection(unittest.TestCase):
     def test_configure_traits(self):
         ui = self.tabs.edit_traits()
         ui.dispose()
+
+    def test_error_init_predefined_attributes(self):
+        with self.assertRaises(AttributeError):
+            TabbedPanelCollection(get=self.tab1)
