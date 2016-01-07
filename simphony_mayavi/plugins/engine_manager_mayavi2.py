@@ -12,7 +12,7 @@ from simphony_mayavi.plugins.tabbed_panel_collection import (
 # More internal mayavi imports are done within EngineManagerMayavi2 to
 # avoid import cycles when the class is imported as a Mayavi2 plugin
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class EngineManagerMayavi2(EngineManager):
@@ -31,9 +31,9 @@ class EngineManagerMayavi2(EngineManager):
         return self.window.get_service(Engine)
 
     def _window_changed(self):
-        self.set_panels()
+        self._set_panels()
 
-    def set_panels(self):
+    def _set_panels(self):
         # mayavi imports here to avoid import cycle
         from simphony_mayavi.plugins.add_source_panel import AddSourcePanel
         from simphony_mayavi.plugins.run_and_animate_panel import (
@@ -47,6 +47,7 @@ class EngineManagerMayavi2(EngineManager):
                                       mayavi_engine),
             run_and_animate=RunAndAnimatePanel(self.engine,
                                                mayavi_engine))
+        logger.info("Simphony EngineManagerMayavi2 panel setup completed")
 
     def _engine_name_changed(self):
         for panel in self.panels:
@@ -123,3 +124,5 @@ class EngineManagerMayavi2Plugin(Plugin):
             except AttributeError as exception:
                 logger.warn(exception.message)
                 logger.warn("Cannot bind simphony_panel to the Python shell")
+            else:
+                logger.info("binded ``simphony_panel`` to the Python shell")
