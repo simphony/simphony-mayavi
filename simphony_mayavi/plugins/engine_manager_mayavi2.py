@@ -90,7 +90,7 @@ class EngineManagerMayavi2Plugin(Plugin):
             obj=worker,
             view='view',
             id='user_mayavi.EngineManagerMayavi2.view',
-            name='Simphony Engine to Mayavi',
+            name='Simphony Engine to Mayavi2',
             window=window,
             position='left',
             **traits
