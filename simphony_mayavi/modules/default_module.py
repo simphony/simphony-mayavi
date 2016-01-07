@@ -43,7 +43,7 @@ def default_module(source):
     '''
     modules = []
 
-    scale_factor = _typical_distance(source.data) * 0.3
+    scale_factor = _typical_distance(source.data) * 0.5
 
     if source.point_scalars_name:
         if isinstance(source.cuds, ABCMesh):
