@@ -91,3 +91,48 @@ supported formats.
 
 
 .. _mayavi operations: http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html?highlight=toolbar#changing-object-properties-interactively
+
+Interacting with Simphony Engine
+--------------------------------
+
+The :class:`~simphony_mayavi.plugins.engine_manager_standalone.EngineManagerStandalone`
+and :class:`~simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI`
+are available for the user to select and visualise datasets from a
+Simphony Modeling Engine via the Python shell (EngineManagerStandalone)
+or via an interactive GUI (EngineManagerStandaloneUI).
+
+.. rubric:: Example (Script-able: EngineManagerStandalone)
+
+.. literalinclude:: ../../examples/engine_manager_standalone_example.py
+
+.. figure:: _images/engine_manager_standalone_animate.png
+	    
+One can visualise multiple datasets in different scenes and animate all
+of them as the engine runs.
+
+.. literalinclude:: ../../examples/engine_manager_standalone_scenes_example.py
+
+.. figure:: _images/engine_manager_standalone_scenes_animate.png
+
+.. rubric:: Example (Interactive: EngineManagerStandaloneUI)
+	    
+.. literalinclude:: ../../examples/engine_manager_standalone_ui.py
+
+.. figure:: _images/engine_manager_standalone_ui.png
+
+   Use `EngineManagerStandaloneUI` to add datasets to Mayavi.
+   
+.. figure:: _images/engine_manager_standalone_ui_2.png
+
+   Use `EngineManagerStandaloneUI` to run the engine and animate the results.
+
+   Multiple engines can be added to the manager and be selected for
+   visualisation and animations.
+   
+.. literalinclude:: ../../examples/engine_manager_standalone_ui_add_engine.py
+
+.. figure:: _images/engine_manager_standalone_ui_add_engine.png
+
+
+ 
+   
