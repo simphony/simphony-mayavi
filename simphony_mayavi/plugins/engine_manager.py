@@ -28,7 +28,7 @@ class EngineManager(HasTraits):
     _engine_names = ListStr
 
     # Selected engine (overloaded BasicPanel)
-    engine = Property
+    engine = Property(depends_on="engine_name")
 
     # Selected engine name
     engine_name = DEnum(values_name="_engine_names")
@@ -75,7 +75,9 @@ class EngineManager(HasTraits):
         self._engine_names = self.engines.keys()
 
     def remove_engine(self, name):
-        ''' Remove a modeling engine from the manager
+        ''' Remove a modeling engine from the manager.
+        If modeling engine to be removed is currently selected,
+        select the one of the remaining engines
 
         Parameter
         ---------
@@ -92,4 +94,6 @@ class EngineManager(HasTraits):
             raise IndexError(msg.format(name))
 
         self.engines.pop(name)
+        if self.engine_name == name:
+            self.engine_name = self.engines.keys()[0]
         self._engine_names = self.engines.keys()

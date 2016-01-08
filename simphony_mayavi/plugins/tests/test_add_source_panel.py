@@ -1,23 +1,24 @@
 import unittest
 
 from mayavi.core.api import NullEngine
-
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
 from traitsui.tests._tools import is_current_backend_qt4
+from traits.testing.api import UnittestTools
 
 from simphony_mayavi.sources.tests import testing_utils
 from simphony_mayavi.plugins.add_source_panel import AddSourcePanel
 from simphony_mayavi.plugins.tests import testing_utils as ui_test_utils
 
 
-class TestAddSourcePanel(unittest.TestCase):
+class TestAddSourcePanel(UnittestTools, unittest.TestCase):
 
     def setUp(self):
         self.engine = testing_utils.DummyEngine()
         self.engine_name = "testing"
         self.mayavi_engine = NullEngine()
-        self.panel = AddSourcePanel(self.engine_name, self.engine,
-                                    self.mayavi_engine)
+        self.panel = AddSourcePanel(engine_name=self.engine_name,
+                                    engine=self.engine,
+                                    mayavi_engine=self.mayavi_engine)
 
     def test_add_dataset(self):
         # when
@@ -67,9 +68,12 @@ class TestAddSourcePanel(unittest.TestCase):
 
         # when
         ui = self.panel.show_config()
-        ui_test_utils.press_button_by_label(ui, "Send to Scene")
+        source = self.panel._pending_source
 
         # then
+        with self.assertTraitChanges(source, "data"):
+            ui_test_utils.press_button_by_label(ui, "Send to Scene")
+
         sources = self.mayavi_engine.current_scene.children
         self.assertEqual(len(sources), 1)
         self.assertEqual(sources[0].dataset, "particles")
