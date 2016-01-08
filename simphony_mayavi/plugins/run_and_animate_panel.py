@@ -23,11 +23,14 @@ class RunAndAnimatePanel(HasTraits):
     number_of_time_steps : float
         CUBA.NUMBER_OF_TIME_STEPS of the Simphony Engine
     '''
+
     engine = Instance(ABCModelingEngine)
+
     mayavi_engine = Instance("mayavi.core.engine.Engine")
 
     handler = Instance(RunAndAnimate)
 
+    # Label to be displayed in tab
     label = "Run/Animate"
 
     # -------------------------------------------------------
@@ -71,6 +74,9 @@ class RunAndAnimatePanel(HasTraits):
     # Trait handlers
     # ----------------------------------------------------------
 
+    def _handler_default(self):
+        return RunAndAnimate(self.engine, self.mayavi_engine)
+
     def _engine_changed(self):
         self.handler.engine = self.engine
 
@@ -95,19 +101,6 @@ class RunAndAnimatePanel(HasTraits):
     # ----------------------------------------------------------
     # Public methods
     # ----------------------------------------------------------
-
-    def __init__(self, engine, mayavi_engine):
-        '''
-        Parameters
-        ----------
-        engine : Instance of ABCModelingEngine
-            Simphony Modeling Engine wrapper
-        mayavi_engine : Instance of mayavi.core.engine.Engine
-            for visualization
-        '''
-        self.handler = RunAndAnimate(engine, mayavi_engine)
-        self.engine = engine
-        self.mayavi_engine = mayavi_engine
 
     def show_config(self):
         ''' Show the GUI '''

@@ -30,7 +30,8 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         self.engine_source = self.mayavi_engine.current_scene.children[0]
 
         # RunAndAnimatePanel
-        self.panel = RunAndAnimatePanel(self.engine, self.mayavi_engine)
+        self.panel = RunAndAnimatePanel(engine=self.engine,
+                                        mayavi_engine=self.mayavi_engine)
 
     def test_animate_fired(self):
         # given
@@ -48,10 +49,24 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
                                                 condition=engine_ran_twice):
             ui_test_utils.press_button_by_label(ui, "Animate")
 
+    def test_error_animate_fired_with_mayavi_engine_undefined(self):
+        # given
+        self.panel = RunAndAnimatePanel(engine=testing_utils.DummyEngine())
+
+        # when
+        def animate():
+            self.panel._RunAndAnimatePanel__animate_fired()
+            return True
+
+        # then
+        tester = ModalDialogTester(animate)
+        tester.open_and_run(when_opened=lambda x: x.close(accept=True))
+        self.assertTrue(tester.result)
+
     def test_error_animate_fired_with_nothing_in_scene(self):
         # given
-        self.panel = RunAndAnimatePanel(testing_utils.DummyEngine(),
-                                        NullEngine())
+        self.panel = RunAndAnimatePanel(engine=testing_utils.DummyEngine(),
+                                        mayavi_engine=NullEngine())
 
         # when
         def animate():
@@ -141,7 +156,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
 
         # when
         def init():
-            RunAndAnimatePanel(engine, mayavi_engine)
+            RunAndAnimatePanel(engine=engine, mayavi_engine=mayavi_engine)
             return True
 
         # then
@@ -156,7 +171,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
 
         # when
         def init():
-            RunAndAnimatePanel(engine, mayavi_engine)
+            RunAndAnimatePanel(engine=engine, mayavi_engine=mayavi_engine)
             return True
 
         # then
