@@ -2,6 +2,8 @@ import logging
 
 from mayavi.mlab import animate
 
+logger = logging.getLogger(__name__)
+
 
 class RunAndAnimate(object):
     ''' Standalone non-GUI based controller for running a Simphony
@@ -32,7 +34,6 @@ class RunAndAnimate(object):
         '''
         self.engine = engine
         self.mayavi_engine = mayavi_engine
-
         self._animator = None
 
     def animate(self, number_of_runs, delay=None, ui=False,
@@ -85,8 +86,9 @@ class RunAndAnimate(object):
         try:
             sources = get_sources_func()
         except AttributeError:
-            message = "Nothing in scene. Engine is not run"
-            raise RuntimeError(message)
+            message = ("Cannot find sources in {!r} that belong "
+                       "to this engine. Engine is not run.")
+            raise RuntimeError(message.format(type(self.mayavi_engine)))
 
         if len(sources) == 0:
             message = ("Nothing in scene belongs to the Engine.\n"
@@ -96,12 +98,14 @@ class RunAndAnimate(object):
         @animate(delay=delay, ui=ui)
         def anim():
             # keep a reference to the engine being run
+            # if the engine is changed during animation
+            # the animation would terminate
             engine_on_start = self.engine
 
             for _ in xrange(number_of_runs):
                 if self.engine is not engine_on_start:
                     message = "Engine changed while animating. Stop running"
-                    logging.warning(message)
+                    logger.warning(message)
                     break
                 self.engine.run()
                 self._update_sources(sources)
