@@ -27,6 +27,7 @@ class EngineManagerMayavi2(EngineManager):
         resizable=True)
 
     def get_mayavi(self):
+        '''Get the mayavi engine in Mayavi2'''
         from mayavi.core.engine import Engine
         return self.window.get_service(Engine)
 
@@ -39,14 +40,17 @@ class EngineManagerMayavi2(EngineManager):
         from simphony_mayavi.plugins.run_and_animate_panel import (
             RunAndAnimatePanel)
 
+        # Mayavi engine from the Mayavi2
         mayavi_engine = self.get_mayavi()
 
         # Add panels
-        self.panels = TabbedPanelCollection(
-            add_source=AddSourcePanel(self.engine_name, self.engine,
-                                      mayavi_engine),
-            run_and_animate=RunAndAnimatePanel(self.engine,
-                                               mayavi_engine))
+        self.panels = TabbedPanelCollection.create(
+            add_source=AddSourcePanel(engine_name=self.engine_name,
+                                      engine=self.engine,
+                                      mayavi_engine=mayavi_engine),
+            run_and_animate=RunAndAnimatePanel(engine=self.engine,
+                                               mayavi_engine=mayavi_engine))
+
         logger.info("Simphony EngineManagerMayavi2 panel setup completed")
 
     def _engine_name_changed(self):
@@ -67,10 +71,8 @@ class EngineManagerMayavi2Plugin(Plugin):
     def _service_offers_default(self):
         """ Trait initializer. """
         worker_service_offer = ServiceOffer(
-            protocol=('simphony_mayavi.plugins.engine_manager_mayavi2.'
-                      'EngineManagerMayavi2'),
-            factory=('simphony_mayavi.plugins.engine_manager_mayavi2.'
-                     'EngineManagerMayavi2')
+            protocol='simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2',  # noqa
+            factory='simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2'  # noqa
         )
         return [worker_service_offer]
 

@@ -7,14 +7,18 @@ class TabbedPanelCollection(HasTraits):
     panels = List
     selected_panel = Any
 
-    def __init__(self, **kwargs):
+    @classmethod
+    def create(cls, **kwargs):
+        instance = cls()
+
         for key, panel in kwargs.items():
-            if hasattr(self, key):
+            if hasattr(instance, key):
                 message = "'{}' is a predefined attribute"
                 raise AttributeError(message.format(key))
-            setattr(self, key, panel)
+            setattr(instance, key, panel)
 
-        self.panels = kwargs.values()
+        instance.panels = kwargs.values()
+        return instance
 
     def __iter__(self):
         return iter(self.panels)
@@ -46,13 +50,13 @@ if __name__ == "__main__":
 
         view = View(Item("items", style="custom"))
 
-        def __init__(self):
-            self.items = TabbedPanelCollection(a=A(), b=B())
+        def _items_default(self):
+            return TabbedPanelCollection.create(a=A(), b=B())
 
     c = C()
     c.configure_traits()
 
-    d = TabbedPanelCollection(a=A(), b=B())
+    d = TabbedPanelCollection.create(a=A(), b=B())
     d.configure_traits(view="traits_view")
 
     d.a.configure_traits()

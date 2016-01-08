@@ -15,8 +15,8 @@ class TestTabbedPannelCollection(unittest.TestCase):
         engine2 = testing_utils.DummyEngine()
         self.tab2 = EngineSource(engine=engine2)
 
-        self.tabs = TabbedPanelCollection(tab1=self.tab1,
-                                          tab2=self.tab2)
+        self.tabs = TabbedPanelCollection.create(tab1=self.tab1,
+                                                 tab2=self.tab2)
 
     def test_attributes(self):
         self.assertEqual(self.tabs.tab1, self.tab1)
@@ -31,4 +31,4 @@ class TestTabbedPannelCollection(unittest.TestCase):
 
     def test_error_init_predefined_attributes(self):
         with self.assertRaises(AttributeError):
-            TabbedPanelCollection(get=self.tab1)
+            TabbedPanelCollection.create(get=self.tab1)
