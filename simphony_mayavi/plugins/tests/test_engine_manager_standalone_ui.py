@@ -2,7 +2,7 @@ import unittest
 
 from mayavi import mlab
 from mayavi.core.api import NullEngine
-
+from traits.testing.api import UnittestTools
 
 from simphony_mayavi.sources.tests import testing_utils
 from simphony_mayavi.plugins.api import EngineManagerStandaloneUI
@@ -10,7 +10,7 @@ from simphony_mayavi.plugins.add_source_panel import AddSourcePanel
 from simphony_mayavi.plugins.run_and_animate_panel import RunAndAnimatePanel
 
 
-class TestEngineManagerStandaloneUI(unittest.TestCase):
+class TestEngineManagerStandaloneUI(UnittestTools, unittest.TestCase):
 
     def test_init_default_mayavi_engine(self):
         # given
@@ -57,9 +57,13 @@ class TestEngineManagerStandaloneUI(unittest.TestCase):
 
         # when
         manager.add_engine("test2", engine2)
-        manager.engine = engine2
 
         # then
+        with self.assertMultiTraitChanges([manager.panels.add_source,
+                                           manager.panels.run_and_animate],
+                                          ["engine"], []):
+            manager.engine = engine2
+
         self.assertEqual(manager.panels.add_source.engine, engine2)
         self.assertEqual(manager.panels.run_and_animate.engine, engine2)
 
@@ -71,10 +75,18 @@ class TestEngineManagerStandaloneUI(unittest.TestCase):
         manager.engine_name = "test"
         manager.add_engine("test2", engine2)
 
-        # when
-        manager.engine_name = "test2"
-
         # then
+        with self.assertMultiTraitChanges([manager.panels.add_source,
+                                           manager.panels.run_and_animate],
+                                          ["engine"], []):
+            manager.engine_name = "test2"
+
         self.assertEqual(manager.engine, engine2)
         self.assertEqual(manager.panels.add_source.engine, engine2)
         self.assertEqual(manager.panels.run_and_animate.engine, engine2)
+
+    def test_show_config(self):
+        manager = EngineManagerStandaloneUI("test",
+                                            testing_utils.DummyEngine(),
+                                            NullEngine())
+        manager.show_config()
