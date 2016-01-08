@@ -1,10 +1,12 @@
 import unittest
 
+from traits.testing.api import UnittestTools
+
 from simphony_mayavi.plugins.engine_manager import EngineManager
 from simphony_mayavi.sources.tests import testing_utils
 
 
-class TestEngineManager(unittest.TestCase):
+class TestEngineManager(UnittestTools, unittest.TestCase):
 
     def test_empty_init(self):
         manager = EngineManager()
@@ -13,16 +15,24 @@ class TestEngineManager(unittest.TestCase):
         self.assertEqual(manager.engine, None)
 
     def test_add_engine(self):
+        # given
         engine1 = testing_utils.DummyEngine()
         engine2 = testing_utils.DummyEngine()
-
         manager = EngineManager()
-        manager.add_engine("test", engine1)
+
+        # First initialisation
+        with self.assertMultiTraitChanges([manager],
+                                          [], ["engine", "engine_name"]):
+            manager.add_engine("test", engine1)
+
         self.assertEqual(manager.engine_name, "test")
         self.assertEqual(manager.engine, engine1)
 
-        manager.add_engine("test2", engine2)
-        # engine is unchanged
+        # engine/engine_name are unchanged
+        with self.assertMultiTraitChanges([manager],
+                                          [], ["engine", "engine_name"]):
+            manager.add_engine("test2", engine2)
+
         self.assertEqual(manager.engine_name, "test")
         self.assertEqual(manager.engine, engine1)
 
@@ -37,10 +47,16 @@ class TestEngineManager(unittest.TestCase):
         manager.add_engine("test", engine1)
         manager.add_engine("test2", engine2)
 
-        manager.engine_name = "test2"
+        # Both engine and engine_name change together
+        with self.assertMultiTraitChanges([manager],
+                                          ["engine", "engine_name"], []):
+            manager.engine_name = "test2"
         self.assertEqual(manager.engine, engine2)
 
-        manager.engine_name = "test"
+        # Both engine and engine_name change together
+        with self.assertMultiTraitChanges([manager],
+                                          ["engine", "engine_name"], []):
+            manager.engine_name = "test"
         self.assertEqual(manager.engine, engine1)
 
     def test_change_engine(self):
@@ -51,13 +67,21 @@ class TestEngineManager(unittest.TestCase):
         manager.add_engine("test", engine1)
         manager.add_engine("test2", engine2)
 
-        manager.engine = engine2
+        # Both engine and engine_name change together
+        with self.assertMultiTraitChanges([manager],
+                                          ["engine", "engine_name"], []):
+            manager.engine = engine2
+
         self.assertEqual(manager.engine_name, "test2")
 
-        manager.engine = engine1
+        # Both engine and engine_name change together
+        with self.assertMultiTraitChanges([manager],
+                                          ["engine", "engine_name"], []):
+            manager.engine = engine1
+
         self.assertEqual(manager.engine_name, "test")
 
-    def test_remove_engine(self):
+    def test_remove_engine_currently_selected(self):
         engine1 = testing_utils.DummyEngine()
         engine2 = testing_utils.DummyEngine()
 
@@ -65,9 +89,29 @@ class TestEngineManager(unittest.TestCase):
         manager.add_engine("test", engine1)
         manager.add_engine("test2", engine2)
 
-        manager.remove_engine("test")
+        # Both engine and engine_name change together
+        with self.assertMultiTraitChanges([manager],
+                                          ["engine", "engine_name"], []):
+            manager.remove_engine("test")
+
         self.assertEqual(manager.engine_name, "test2")
         self.assertEqual(manager.engine, engine2)
+
+    def test_remove_engine_not_currently_selected(self):
+        engine1 = testing_utils.DummyEngine()
+        engine2 = testing_utils.DummyEngine()
+
+        manager = EngineManager()
+        manager.add_engine("test", engine1)
+        manager.add_engine("test2", engine2)
+
+        # Neither of engine and engine_name changes
+        with self.assertMultiTraitChanges([manager],
+                                          [], ["engine", "engine_name"]):
+            manager.remove_engine("test2")
+
+        self.assertEqual(manager.engine_name, "test")
+        self.assertEqual(manager.engine, engine1)
 
     def test_error_remove_last_engine(self):
         engine = testing_utils.DummyEngine()
