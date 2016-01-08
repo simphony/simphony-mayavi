@@ -95,8 +95,8 @@ and :func:`~simphony_mayavi.plugins.engine_manager.remove_engine`.
 .. code-block:: python
 
    from simphony_mayavi.sources.tests import testing_utils
-   engine = testing_utils.DummyEngine()
-   simphony_panel.add_engine("Test", engine)
+   engine_wrapper = testing_utils.DummyEngine()
+   simphony_panel.add_engine("Test", engine_wrapper)
 
 .. figure:: _images/engine_manager_mayavi2.png
 	   
