@@ -8,6 +8,8 @@ from simphony.cuds.abc_mesh import ABCMesh
 from simphony.cuds.abc_particles import ABCParticles
 from simphony.core.cuds_item import CUDSItem
 
+logger = logging.getLogger(__name__)
+
 
 def default_vector_module(scale_factor=1.):
     ''' Returns a Glyph in its original mayavi defaults plus
@@ -81,5 +83,5 @@ def default_module(source):
         return modules
     else:
         message = "Unknown scalar/vector data for setting default module"
-        logging.warning(message)
-        return [default_scalar_module(scale_factor)]
+        logger.warning(message)
+        return []
