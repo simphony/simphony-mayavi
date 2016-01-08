@@ -1,7 +1,7 @@
 from pyface.api import MessageDialog
-from traits.api import HasTraits, Bool, Button, Int, Enum, List, Instance, Str
+from traits.api import HasTraits, Bool, Event, Int, Enum, List, Instance, Str
 from traitsui.api import (View, VGroup, HGroup, Item, Action, Handler,
-                          ListStrEditor)
+                          ListStrEditor, ButtonEditor)
 from traitsui.list_str_adapter import ListStrAdapter
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -54,7 +54,7 @@ class AddSourcePanel(HasTraits):
     engine_name : str
         Name of the modeling engine
     mayavi_engine : Instance of mayavi.core.engine.Engine
-        for visualization
+        for visualisation
     '''
     engine = Instance(ABCModelingEngine)
     engine_name = Str
@@ -62,10 +62,10 @@ class AddSourcePanel(HasTraits):
 
     label = "Add to Mayavi"
 
-    # Buttons for the UI
-    _add_dataset = Button("+")
-    _remove_dataset = Button("-")
-    _add_to_scene = Button("Send to Scene")
+    # UI functions
+    _add_dataset = Event
+    _remove_dataset = Event
+    _add_to_scene = Event
 
     # Pending EngineSource to be added to Mayavi
     _pending_engine_sources = List(Instance(EngineSource))
@@ -77,11 +77,14 @@ class AddSourcePanel(HasTraits):
     panel_view = View(
         VGroup(
             HGroup(
-                Item("_add_dataset", show_label=False),
+                Item("_add_dataset", show_label=False,
+                     editor=ButtonEditor(label="+")),
                 Item("_remove_dataset", show_label=False,
-                     enabled_when="_pending_source"),
+                     enabled_when="_pending_source",
+                     editor=ButtonEditor(label="-")),
                 Item("_add_to_scene", show_label=False,
-                     enabled_when="_pending_engine_sources")),
+                     enabled_when="_pending_engine_sources",
+                     editor=ButtonEditor(label="Send to Scene"))),
             Item("_pending_engine_sources",
                  show_label=False,
                  editor=ListStrEditor(
@@ -90,27 +93,11 @@ class AddSourcePanel(HasTraits):
                      selected="_pending_source",
                      selected_index="_pending_source_index")),
             ),
-        title="Visualize")
+        title="Visualise")
 
     # --------------------------------------------------
     # Public methods
     # --------------------------------------------------
-
-    def __init__(self, engine_name, engine, mayavi_engine):
-        ''' Initialization
-
-        Parameters
-        ----------
-        engine : Instance of ABCModelingEngine
-            Simphony Modeling Engine wrapper
-        engine_name : str
-            Name of the modeling engine
-        mayavi_engine : Instance of mayavi.core.engine.Engine
-            for visualization
-        '''
-        self.engine = engine
-        self.engine_name = engine_name
-        self.mayavi_engine = mayavi_engine
 
     def show_config(self):
         ''' Show the GUI '''
