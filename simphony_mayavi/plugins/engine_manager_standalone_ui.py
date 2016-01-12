@@ -23,7 +23,7 @@ class EngineManagerStandaloneUI(EngineManager):
             Group(Item("panels", style="custom", show_label=False))),
         title="Engine Manager")
 
-    def __init__(self, engine_name="", engine=None, mayavi_engine=None,
+    def __init__(self, engine_name, engine, mayavi_engine=None,
                  **metadata):
         '''
         Parameters
