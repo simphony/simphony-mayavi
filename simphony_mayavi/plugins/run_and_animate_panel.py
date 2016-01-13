@@ -1,6 +1,6 @@
 from pyface.api import MessageDialog
-from traits.api import Float, Int, Button, Bool, HasTraits, Instance
-from traitsui.api import View, VGroup, HGroup, Item
+from traits.api import Float, Int, Bool, HasTraits, Instance, Event
+from traitsui.api import View, VGroup, HGroup, Item, ButtonEditor
 
 from simphony.core.cuba import CUBA
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -44,7 +44,7 @@ class RunAndAnimatePanel(HasTraits):
     # (Only relevant to UI)
     # ----------------------------------------------
     _number_of_runs = Int(1)
-    _animate = Button("Animate")
+    _animate = Event
     _update_all_scenes = Bool(False)
 
     panel_view = View(
@@ -53,7 +53,9 @@ class RunAndAnimatePanel(HasTraits):
             Item("number_of_time_steps"),
             HGroup(Item(name="_number_of_runs", label="Runs for"),
                    Item(label="time(s)")),
-            HGroup(Item("_animate", show_label=False),
+            HGroup(Item("_animate", show_label=False,
+                        enabled_when="engine",
+                        editor=ButtonEditor(label="Animate")),
                    Item(name="_update_all_scenes", label="Update all scenes")),
             ),
         title="Run and Animate")
