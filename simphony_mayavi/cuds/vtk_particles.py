@@ -198,9 +198,8 @@ class VTKParticles(ABCParticles):
         checks = []
 
         # Check for cell related attributes
-        checks.append(
-            not hasattr(data_set, 'lines')
-            and not hasattr(data_set, 'get_cells'))
+        checks.append(not hasattr(data_set, 'lines') and
+                      not hasattr(data_set, 'get_cells'))
 
         # Check that the data set contains only lines and polyline cells
         if hasattr(data_set, 'lines'):

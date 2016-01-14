@@ -125,6 +125,9 @@ class CUBADataAccumulator(object):
         dimensional vectors are supported.
 
         """
+        def replacer(data):
+            return nan if data is None else data
+            
         for cuba in self.keys:
             default = dummy_cuba_value(cuba)
             if isinstance(default, (float, int)):
@@ -133,7 +136,6 @@ class CUBADataAccumulator(object):
                 vtk_data.get_array(index).name = cuba.name
             elif isinstance(default, numpy.ndarray) and len(default) == 3:
                 nan = numpy.array([None, None, None], dtype=float)
-                replacer = lambda x: nan if x is None else x
                 data = numpy.array(
                     tuple(replacer(data) for data in self._data[cuba]),
                     dtype=numpy.float)
