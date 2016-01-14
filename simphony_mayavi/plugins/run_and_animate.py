@@ -65,6 +65,27 @@ class RunAndAnimate(object):
             if nothing in scene(s) belongs to ``engine``
 
         '''
+        if self.mayavi_engine is None:
+            message = "Mayavi engine is not defined in the manager"
+            raise RuntimeError(message)
+
+        if (not hasattr(self.mayavi_engine, "scenes") or
+                len(self.mayavi_engine.scenes) == 0):
+            message = "No active scene.  Engine is not run"
+            raise RuntimeError(message)
+
+        if update_all_scenes:
+            get_sources_func = self._get_all_sources
+        else:
+            get_sources_func = self._get_current_sources
+
+        sources = get_sources_func()
+
+        if len(sources) == 0:
+            message = ("Nothing in scene belongs to the Engine.\n"
+                       "Engine is not run.")
+            raise RuntimeError(message)
+
         # remember the last delay being set
         if delay is None:
             if self._animator:
@@ -77,23 +98,6 @@ class RunAndAnimate(object):
         if (self._animator and self._animator.ui and
                 not self._animator.ui.destroyed):
             self._animator.close()
-
-        if update_all_scenes:
-            get_sources_func = self._get_all_sources
-        else:
-            get_sources_func = self._get_current_sources
-
-        try:
-            sources = get_sources_func()
-        except AttributeError:
-            message = ("Cannot find sources in {!r} that belong "
-                       "to this engine. Engine is not run.")
-            raise RuntimeError(message.format(type(self.mayavi_engine)))
-
-        if len(sources) == 0:
-            message = ("Nothing in scene belongs to the Engine.\n"
-                       "Engine is not run.")
-            raise RuntimeError(message)
 
         @animate(delay=delay, ui=ui)
         def anim():

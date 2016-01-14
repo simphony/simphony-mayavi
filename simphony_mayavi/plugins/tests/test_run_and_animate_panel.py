@@ -78,6 +78,21 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=True))
         self.assertTrue(tester.result)
 
+    def test_error_animate_fired_with_objects_not_from_current_engine(self):
+        # given
+        self._setUp()
+        self.panel.engine = testing_utils.DummyEngine()
+
+        # when
+        def animate():
+            self.panel._RunAndAnimatePanel__animate_fired()
+            return True
+
+        # then
+        tester = ModalDialogTester(animate)
+        tester.open_and_run(when_opened=lambda x: x.close(accept=True))
+        self.assertTrue(tester.result)
+
     def test_engine_changed(self):
         ''' Ensure that the run would stop if the engine is changed'''
         # given
