@@ -127,7 +127,7 @@ class CUBADataAccumulator(object):
         """
         def replacer(data):
             return nan if data is None else data
-            
+
         for cuba in self.keys:
             default = dummy_cuba_value(cuba)
             if isinstance(default, (float, int)):
