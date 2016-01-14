@@ -113,6 +113,11 @@ class AddSourcePanel(HasTraits):
             message_dialog.error("No engine is selected")
             return
 
+        if len(self.engine.get_dataset_names()) == 0:
+            message_dialog = MessageDialog()
+            message_dialog.error("The engine has no dataset")
+            return
+
         source = EngineSource(engine=self.engine,
                               engine_name=self.engine_name)
         source._dataset_changed()

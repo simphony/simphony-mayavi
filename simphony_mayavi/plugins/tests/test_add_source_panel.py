@@ -45,6 +45,24 @@ class TestAddSourcePanel(UnittestTools, unittest.TestCase):
         # number of EngineSource is unchanged
         self.assertEqual(len(self.panel._pending_engine_sources), 0)
 
+    @unittest.skipIf(not is_current_backend_qt4(),
+                     "this test requires backend==qt4")
+    def test_error_add_dataset_when_engine_is_empty(self):
+        # when
+        self.engine.datasets = {}
+
+        def function():
+            self.panel._AddSourcePanel__add_dataset_fired()
+            return True
+
+        # then
+        # a message dialog is displayed and the pending
+        tester = ModalDialogTester(function)
+        tester.open_and_run(when_opened=lambda x: x.close(accept=True))
+        self.assertTrue(tester.result)
+        # number of EngineSource is unchanged
+        self.assertEqual(len(self.panel._pending_engine_sources), 0)
+
     def test_remove_dataset(self):
         # given
         ui = self.panel._AddSourcePanel__add_dataset_fired()
