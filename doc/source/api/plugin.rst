@@ -12,3 +12,9 @@ plug-in to the simphony library.
 .. autofunction:: simphony_mayavi.adapt2cuds.adapt2cuds
 
 .. autofunction:: simphony_mayavi.load.load
+
+.. autoclass:: simphony_mayavi.plugins.engine_manager_standalone.EngineManagerStandalone
+   :members:
+
+.. autoclass:: simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI	   
+   :members:

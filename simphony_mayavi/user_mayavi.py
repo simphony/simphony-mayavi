@@ -1,6 +1,8 @@
 from mayavi.core.registry import registry
 from mayavi.core.pipeline_info import PipelineInfo
 from mayavi.core.metadata import SourceMetadata
+from simphony_mayavi.plugins.engine_manager_mayavi2 import (
+    EngineManagerMayavi2Plugin)
 
 cuds_reader_info = SourceMetadata(
     id="CUDSReader",
@@ -17,3 +19,7 @@ cuds_reader_info = SourceMetadata(
         attributes=['scalars', 'vectors']))
 
 registry.sources.append(cuds_reader_info)
+
+
+def get_plugins():
+    return [EngineManagerMayavi2Plugin()]

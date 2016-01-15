@@ -1,5 +1,5 @@
 
-from traits.api import Either, Instance, TraitError, Property, cached_property
+from traits.api import Either, Instance, TraitError, Property
 from traitsui.api import View, Group, Item
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
@@ -14,6 +14,28 @@ from simphony_mayavi.cuds.api import VTKParticles, VTKLattice, VTKMesh
 class CUDSSource(VTKDataSource):
     """ A mayavi source of a SimPhoNy CUDS container.
 
+    Attributes
+    ----------
+    cuds : instance of ABCParticle/ABCMesh/ABCLattice/H5Mesh
+         The CUDS container to be wrapped as VTK data source
+
+    The ``cuds`` attribute holds a reference to the CUDS instance it is
+    assigned to, as oppose to making a copy.  Therefore in any given time
+    after setting ``cuds``, the CUDS container could be modified internally
+    and divert from the VTK data source.  The ``update`` function can be
+    called to update the visualisation.
+
+    Examples
+    --------
+    >>> cuds = Particles("test")  # the container is empty
+    >>> source = CUDSSource(cuds=cuds)
+
+    >>> # Add content to cuds after the source is initialised
+    >>> cuds.add_particles([...])
+
+    >>> from mayavi import mlab
+    >>> mlab.pipeline.glyph(source)   # scene is empty
+    >>> source.update()    # particles are shown!
     """
     #: The version of this class. Used for persistence.
     __version__ = 0
@@ -50,32 +72,24 @@ class CUDSSource(VTKDataSource):
 
     # Property get/set/validate methods ######################################
 
-    @cached_property
     def _get_cuds(self):
         return self._cuds
 
     def _set_cuds(self, value):
-        if isinstance(value, (VTKMesh, VTKParticles, VTKLattice)):
-            cuds = value
-            vtk_cuds = value
-        else:
-            cuds = value
-            if isinstance(value, (ABCMesh, H5Mesh)):
-                vtk_cuds = VTKMesh.from_mesh(value)
-            elif isinstance(value, ABCParticles):
-                vtk_cuds = VTKParticles.from_particles(value)
-            elif isinstance(value, ABCLattice):
-                vtk_cuds = VTKLattice.from_lattice(value)
-            else:
-                msg = 'Provided object {} is not of any known cuds type'
-                raise TraitError(msg.format(type(value)))
-        self._cuds = cuds
-        self._vtk_cuds = vtk_cuds
+        self._cuds = value
+        self._set_vtk_cuds(value)
 
     # Traits change handlers ###############################################
 
     def __vtk_cuds_changed(self, value):
         self.data = value.data_set
+
+    # Public method ########################################################
+
+    def update(self):
+        """ Recalculate the VTK data from the CUDS dataset
+        Useful when ``cuds`` is modified after assignment """
+        self._set_vtk_cuds(self.cuds)
 
     # Private interface ####################################################
 
@@ -97,3 +111,19 @@ class CUDSSource(VTKDataSource):
             name = u'Uninitialised'
             kind = u'Unknown'
         return '{} ({})'.format(name, kind)
+
+    def _set_vtk_cuds(self, value):
+        """ update _vtk_cuds.  Note that this is not a property setter """
+        if isinstance(value, (VTKMesh, VTKParticles, VTKLattice)):
+            vtk_cuds = value
+        else:
+            if isinstance(value, (ABCMesh, H5Mesh)):
+                vtk_cuds = VTKMesh.from_mesh(value)
+            elif isinstance(value, ABCParticles):
+                vtk_cuds = VTKParticles.from_particles(value)
+            elif isinstance(value, ABCLattice):
+                vtk_cuds = VTKLattice.from_lattice(value)
+            else:
+                msg = 'Provided object {} is not of any known cuds type'
+                raise TraitError(msg.format(type(value)))
+        self._vtk_cuds = vtk_cuds
