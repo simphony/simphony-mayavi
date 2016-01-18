@@ -4,11 +4,12 @@ User Manual
 ===========
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   SimPhoNy <simphony>
+   SimPhoNy<simphony>
    Mayavi2 <mayavi2>
-
+   Interacting with Simphony Engine <engine>
+   
 API Reference
 =============
 

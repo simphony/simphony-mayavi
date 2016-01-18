@@ -5,7 +5,7 @@ from simphony_mayavi.sources.tests import testing_utils
 engine1 = testing_utils.DummyEngine()
 engine2 = testing_utils.DummyEngine()
 
-# GUI for Interacting with the engine and mayavi
+# GUI can be initialised with an engine defined
 # "test" is used as a label for representing the engine in the GUI
 gui = mayavi_tools.EngineManagerStandaloneUI("test", engine1)
 
