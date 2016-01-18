@@ -46,13 +46,13 @@ class AddEnginePanel(HasTraits):
     factory_name = Str
 
     # user needs to name the engine before adding
-    # it to the EngineManager
-    # check if the name is valid and display a message
     new_engine_name = Str
+    # check if the name is valiud
     engine_name_is_invalid = Property(Bool,
                                       depends_on="new_engine_name")
-
+    # display a message if the engine_name is invalid
     status = Property(Str, depends_on="new_engine,new_engine_name")
+    # last sanity check before the "Add engine" button is enabled
     ready_to_add = Property(Bool, depends_on="new_engine,new_engine_name")
 
     panel_view = View(
@@ -124,12 +124,14 @@ class AddEnginePanel(HasTraits):
                                      if isinstance(value, ABCModelingEngine)}
             self.loaded_variables_names = self.loaded_variables.keys()
 
-            # None of the loaded local variables are ABCModelingEngine
+            # None of the loaded local variables is ABCModelingEngine
             if len(self.loaded_variables_names) == 0:
                 self._display_message("No instance of ABCModelingEngine found")
                 self._reset_load_file_panel()
 
     def _reset_load_file_panel(self):
+        ''' Reset all inputs and variables for loading from file
+        '''
         self.file_name = ""
         self.loaded_variables_names = []
         self.loaded_variables = {}
@@ -173,23 +175,29 @@ class AddEnginePanel(HasTraits):
     # ------------------------------------------------------
 
     def _factory_name_changed(self):
+        ''' Use selected factory for creating a new engine
+        and assign the engine to self.new_engine
+        If the factory_name is unselected and no engine is defined by
+        loading a file, set new_engine to None'''
         if self.factory_name:
             self.new_engine = self.factories[self.factory_name]()
             self._reset_load_file_panel()
-        else:
+        elif not self.selected_variable_name:
             self.new_engine = None
+            self._reset_load_file_panel()
 
     def _selected_variable_name_changed(self):
+        ''' Set self.new_engine to the local variable loaded and selected
+        '''
         if self.selected_variable_name:
             key = self.selected_variable_name
             self.new_engine = self.loaded_variables[key]
-        self._reset_create_from_factory_panel()
-
-    # ------------------------------------------------------
-    # Traits properties
-    # ------------------------------------------------------
+            # new_engine is modified, anything in the
+            # 'create from factory' section is irrelevant now
+            self._reset_create_from_factory_panel()
 
     def _get_status(self):
+        ''' Message to tell the user what is wrong with the inputs'''
         if self.engine_manager is None:
             return "engine_manager is undefined"
         elif self.new_engine is None and self.new_engine_name:
@@ -201,13 +209,18 @@ class AddEnginePanel(HasTraits):
             return ""
 
     def _get_ready_to_add(self):
+        ''' Boolean to activate the "Add Engine" button '''
         return (self.engine_manager and self.new_engine and
                 not self.engine_name_is_invalid)
 
     def _get_engine_name_is_invalid(self):
-        valid = (self.new_engine_name and
-                 self.new_engine_name not in self.engine_manager.engines)
-        return not valid
+        ''' If invalid, the TextEditor of engine_name would be red '''
+        return (not self.new_engine_name or
+                self.new_engine_name in self.engine_manager.engines)
+
+    # ------------------------------------------------------
+    # Default values for Traits
+    # ------------------------------------------------------
 
     def _factories_default(self):
         return loader.get_factories()
