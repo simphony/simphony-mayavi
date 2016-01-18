@@ -141,7 +141,7 @@ class TestAddEnginePanel(UnittestTools, unittest.TestCase):
 
         # The script contains no local variable that is an instance
         # of ABCModelingEngine
-        with self.write_file("", NO_ENGINE_PYTHON_SCRIPT) as tmp_path:
+        with self.write_file(".py", NO_ENGINE_PYTHON_SCRIPT) as tmp_path:
             tester.open_and_run(when_opened=lambda x: x.close(accept=True))
 
         self.assertTrue(tester.result)
