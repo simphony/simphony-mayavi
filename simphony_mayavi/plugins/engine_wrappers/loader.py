@@ -28,8 +28,8 @@ def get_factories(submodules=("lammps_md", "kratos", "openfoam", "jyulb"),
     factories = dict()
 
     for submodule in submodules:
-        # look for ``submodule`` in the same module as loader
-        module = __name__.replace("loader", submodule)
+        # look for ``name.submodule``
+        module = ".".join((name, submodule))
         try:
             importlib.import_module(module)
         except ImportError as exception:
