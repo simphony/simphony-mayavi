@@ -3,6 +3,7 @@ from traitsui.api import View, VGroup, Group, Item
 from traits.api import HasTraits, Instance
 
 from simphony_mayavi.plugins.engine_manager import EngineManager
+from simphony_mayavi.plugins.add_engine_panel import AddEnginePanel
 from simphony_mayavi.plugins.add_source_panel import AddSourcePanel
 from simphony_mayavi.plugins.run_and_animate_panel import RunAndAnimatePanel
 from simphony_mayavi.plugins.tabbed_panel_collection import (
@@ -21,10 +22,10 @@ class EngineManagerStandaloneUI(EngineManager):
         VGroup(
             Group(Item("engine_name", label="Engine Wrapper")),
             Group(Item("panels", style="custom", show_label=False))),
-        title="Engine Manager")
+        title="Engine Manager",
+        resizable=True)
 
-    def __init__(self, engine_name, engine, mayavi_engine=None,
-                 **metadata):
+    def __init__(self, engine_name="", engine=None, mayavi_engine=None):
         '''
         Parameters
         ----------
@@ -39,7 +40,7 @@ class EngineManagerStandaloneUI(EngineManager):
 
         '''
         # Traits initialisation
-        HasTraits.__init__(self, **metadata)
+        HasTraits.__init__(self)
 
         if mayavi_engine is None:
             # Standalone Mayavi Engine
@@ -49,18 +50,21 @@ class EngineManagerStandaloneUI(EngineManager):
 
         # Add panels
         self.panels = TabbedPanelCollection.create(
+            add_engine=AddEnginePanel(engine_manager=self),
             add_source=AddSourcePanel(engine_name=engine_name,
                                       engine=engine,
                                       mayavi_engine=mayavi_engine),
             run_and_animate=RunAndAnimatePanel(engine=engine,
                                                mayavi_engine=mayavi_engine))
 
-        self.add_engine(engine_name, engine)
+        if engine and engine_name:
+            self.add_engine(engine_name, engine)
 
     def _engine_name_changed(self):
         # Sync panels when engine_name (i.e. engine) changes
         for panel in self.panels:
-            panel.engine = self.engine
+            if hasattr(panel, "engine"):
+                panel.engine = self.engine
         self.panels.add_source.engine_name = self.engine_name
 
     # --------------------------------------------------------------

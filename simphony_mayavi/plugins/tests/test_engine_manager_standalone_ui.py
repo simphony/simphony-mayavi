@@ -12,6 +12,12 @@ from simphony_mayavi.plugins.run_and_animate_panel import RunAndAnimatePanel
 
 class TestEngineManagerStandaloneUI(UnittestTools, unittest.TestCase):
 
+    def test_init_no_engine(self):
+        manager = EngineManagerStandaloneUI()
+        self.assertEqual(manager.engine_name, "")
+        self.assertIs(manager.engine, None)
+        self.assertEqual(manager.engines, {})
+
     def test_init_default_mayavi_engine(self):
         # given
         engine = testing_utils.DummyEngine()
@@ -22,7 +28,8 @@ class TestEngineManagerStandaloneUI(UnittestTools, unittest.TestCase):
             self.mayavi_engine
 
         for panel in manager.panels:
-            self.assertEqual(panel.mayavi_engine, mlab.get_engine())
+            if hasattr(panel, "mayavi_engine"):
+                self.assertEqual(panel.mayavi_engine, mlab.get_engine())
 
     def test_init_given_mayavi_engine(self):
         # given
@@ -32,7 +39,8 @@ class TestEngineManagerStandaloneUI(UnittestTools, unittest.TestCase):
 
         # then
         for panel in manager.panels:
-            self.assertEqual(panel.mayavi_engine, null_engine)
+            if hasattr(panel, "mayavi_engine"):
+                self.assertEqual(panel.mayavi_engine, null_engine)
 
     def test_init_panels(self):
         # given
