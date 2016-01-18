@@ -130,7 +130,8 @@ class CUBADataAccumulator(object):
 
         for cuba in self.keys:
             default = dummy_cuba_value(cuba)
-            if isinstance(default, (float, int)):
+            if (numpy.issubdtype(type(default), numpy.float) or
+                    numpy.issubdtype(type(default), numpy.int)):
                 data = numpy.array(self._data[cuba], dtype=float)
                 index = vtk_data.add_array(data)
                 vtk_data.get_array(index).name = cuba.name
