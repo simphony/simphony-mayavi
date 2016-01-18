@@ -90,6 +90,13 @@ After installation the user should be able to import the ``mayavi`` visualizatio
   from simphony.visualisation import mayavi_tools
   mayavi_tools.show(cuds)
 
+.. note::
+
+   - It is also recommended that the user uses qt4 as the user interface backends by setting the
+     environment variable ``ETS_TOOLKIT``.  In Bash, that is::
+
+       export ETS_TOOLKIT=qt4
+
 
 Directory structure
 -------------------
