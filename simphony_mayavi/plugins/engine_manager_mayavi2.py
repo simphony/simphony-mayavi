@@ -39,12 +39,14 @@ class EngineManagerMayavi2(EngineManager):
         from simphony_mayavi.plugins.add_source_panel import AddSourcePanel
         from simphony_mayavi.plugins.run_and_animate_panel import (
             RunAndAnimatePanel)
+        from simphony_mayavi.plugins.add_engine_panel import AddEnginePanel
 
         # Mayavi engine from the Mayavi2
         mayavi_engine = self.get_mayavi()
 
         # Add panels
         self.panels = TabbedPanelCollection.create(
+            add_engine=AddEnginePanel(engine_manager=self),
             add_source=AddSourcePanel(engine_name=self.engine_name,
                                       engine=self.engine,
                                       mayavi_engine=mayavi_engine),
@@ -92,7 +94,7 @@ class EngineManagerMayavi2Plugin(Plugin):
             obj=worker,
             view='view',
             id='user_mayavi.EngineManagerMayavi2.view',
-            name='Simphony Engine to Mayavi2',
+            name='Simphony',
             window=window,
             position='left',
             **traits
