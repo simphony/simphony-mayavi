@@ -33,7 +33,6 @@ Optional requirements
 To support testing, you will need the following packages:
 
 - PIL
-- nose
 - mock
 
 Alternatively unning :command:`pip install -r dev-requirements.txt` should install the
