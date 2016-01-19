@@ -22,6 +22,7 @@ PYTHON_SCRIPT = '''
 from simphony_mayavi.sources.tests import testing_utils
 
 temp_engine = testing_utils.DummyEngine()
+file_path = __file__
 not_an_engine = 1
 '''
 
@@ -30,7 +31,7 @@ ERROR_PYTHON_SCRIPT = '''
 from simphony_mayavi.sources.tests import testing_utils
 
 temp_engine = testing_utils.DummyEngine()
-not_an_engine = __file__
+not_an_engine =
 
 '''
 
