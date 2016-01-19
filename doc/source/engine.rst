@@ -47,11 +47,14 @@ datasets from a particular engine, locally run an engine and animate the results
 
    Use `EngineManagerStandaloneUI` to run the engine and animate the results.
 
-   Multiple engines can be added to or removed from (
+   Multiple engines can be added to or removed from the manager using
    :func:`~simphony_mayavi.plugins.engine_manager.add_engine` and
-   :func:`~simphony_mayavi.plugins.engine_manager.remove_engine`) the
-   manager.  User can also add an engine by loading a python
-   script file.  Only local variables are loaded.
+   :func:`~simphony_mayavi.plugins.engine_manager.remove_engine`.
+   User can also add an engine by loading a python script file.
+   Only local variables are loaded.  Example scripts using
+   :download:`Lammps <../../examples/lammps_engine_example.py>` and
+   :download:`Kratos <../../examples/krato-cfd-example.py>` engine wrappers
+   are provided.
    
 .. literalinclude:: ../../examples/engine_manager_standalone_ui_add_engine.py
 
