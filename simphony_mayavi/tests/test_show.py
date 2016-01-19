@@ -3,7 +3,7 @@ import unittest
 import numpy
 
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
-from traitsui.tests._tools import is_current_backend_qt4
+from traits.etsconfig.api import ETSConfig
 
 from simphony_mayavi.show import show
 from simphony.cuds.lattice import make_cubic_lattice
@@ -13,7 +13,7 @@ from simphony.cuds.particles import Particles, Particle
 
 class TestShow(unittest.TestCase):
 
-    @unittest.skipIf(not is_current_backend_qt4(),
+    @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
     def test_lattice_show(self):
         lattice = make_cubic_lattice(
@@ -27,7 +27,7 @@ class TestShow(unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
 
-    @unittest.skipIf(not is_current_backend_qt4(),
+    @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
     def test_mesh_show(self):
         points = numpy.array([
@@ -48,7 +48,7 @@ class TestShow(unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
 
-    @unittest.skipIf(not is_current_backend_qt4(),
+    @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
     def test_particles_snapshot(self):
         coordinates = numpy.array([
