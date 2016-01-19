@@ -166,8 +166,11 @@ class AddEnginePanel(HasTraits):
         '''
         global_vars = {}
         local_vars = {}
-        with open(file_name, "r") as f:
-            exec(f, global_vars, local_vars)
+        with open(file_name, "r") as file_obj:
+            # scripts often need __file__ to identify the path
+            # for reading external data
+            global_vars["__file__"] = file_obj.name
+            exec(file_obj, global_vars, local_vars)
         return local_vars
 
     # ------------------------------------------------------
