@@ -225,3 +225,16 @@ class TestDefaultModule(unittest.TestCase):
         self.assertEqual(sum((isinstance(module, Surface)
                               for module in modules)),
                          2, message.format(data_names, modules))
+
+    def test_default_module_empty_data(self):
+        # given
+        lattice = make_cubic_lattice("test", 0.2, (10, 10, 1))
+        source = CUDSSource(cuds=lattice)
+
+        # when
+        modules = default_module(source)
+
+        # then
+        # one Glyph as default when no data is found
+        self.assertEqual(len(modules), 1)
+        self.assertIsInstance(modules[0], Glyph)

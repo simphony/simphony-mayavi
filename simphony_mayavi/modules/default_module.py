@@ -84,4 +84,4 @@ def default_module(source):
     else:
         message = "Unknown scalar/vector data for setting default module"
         logger.warning(message)
-        return []
+        return [default_scalar_module(scale_factor)]
