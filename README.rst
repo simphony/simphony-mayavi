@@ -82,6 +82,25 @@ After installation the user should be able to import the ``mayavi`` visualizatio
   mayavi_tools.show(cuds)
 
 
+Known Issues
+------------
+
+- *Segmentation fault during loading or running test suites*
+
+  This may be caused by installing BOTH simphony-paraview_ and simphony-mayavi in the same environment.
+  Since paraview and mayavi use different versions of VTK, work-around is limited.  Here are two possible
+  solutions.
+  
+  - If you don't need both simphony-mayavi and simphony-paraview, uninstall one of them, e.g.::
+  
+      pip uninstall simphony-paraview
+  
+  - If you must retain both plugins, choose to remove one of them from the ``simphony.visualisation`` entry points.
+    The plugin removed from ``simphony.visualisation`` is still accessible via ``import simphony_paraview.plugin`` or ``import simphony_mayavi.plugin``.  Notice that this change would cause plugin loading tests to fail.
+  
+  
+.. _simphony-paraview: http://github.com/simphony/simphony-paraview
+
 Directory structure
 -------------------
 
