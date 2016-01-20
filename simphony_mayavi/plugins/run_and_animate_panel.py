@@ -37,7 +37,7 @@ class RunAndAnimatePanel(HasTraits):
     # Basic time step parameters to interact with the engine
     # -------------------------------------------------------
     time_step = Float(allow_none=False)
-    number_of_time_steps = Float(allow_none=False)
+    number_of_time_steps = Int(allow_none=False)
 
     # ----------------------------------------------
     # For running the engine and animating scenes
