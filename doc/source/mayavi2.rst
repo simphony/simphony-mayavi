@@ -6,7 +6,9 @@ create mayavi ``Source`` instances from SimPhoNy CUDS containers and
 files. With the provided tools one can use the SimPhoNy libraries to
 work inside the Mayavi2 application, as it is demonstrated in the
 examples.
- 
+
+.. _mayavi-plugin-setup-label:
+
 Open CUDS Files in Mayavi2
 --------------------------
 
@@ -68,35 +70,3 @@ View CUDS in Mayavi2
 
    Use the provided example to create a CUDS Particles and visualise
    directly in Mayavi2.
-
-
-Interact with Simphony Engine within Mayavi2
---------------------------------------------
-
-A Mayavi2 plugin similar to the
-:class:`~simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI`
-described in :ref:`engine-manager-standalone-label` is provided. In order to use it,
-one needs to first activate the plugin in ``Preferences``, following the instructions
-in `Open CUDS Files in Mayavi2`_. **Restart** Mayavi2. Then the EngineManager panel
-can be added by selecting
-``View`` --> ``Other...`` --> ``Simphony Engine to Mayavi2``.
-
-.. figure:: _images/engine_manager_mayavi2_setup.png
-
-   Add the Simphony Engine Manager panel
-
-The Engine Manager is binded to the Python shell within Mayavi2 as
-``simphony_panel``.  Simphony modeling engines can be added or
-removed from the panel using :func:`~simphony_mayavi.plugins.engine_manager.add_engine`
-and :func:`~simphony_mayavi.plugins.engine_manager.remove_engine`.
-
-.. rubric:: Inside the Mayavi2 Python shell
-
-.. code-block:: python
-
-   from simphony_mayavi.sources.tests import testing_utils
-   engine_wrapper = testing_utils.DummyEngine()
-   simphony_panel.add_engine("Test", engine_wrapper)
-
-.. figure:: _images/engine_manager_mayavi2.png
-	   
