@@ -1,4 +1,4 @@
-""" Modified from simphony-kratos/simkratos/tests/cfd/example.py
+""" Modified from simphony-kratos/simkratos/tests/cfd/test_kratos_cfd.py
 """
 import os
 
