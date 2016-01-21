@@ -1,6 +1,7 @@
 import unittest
 
 from mayavi.core.api import NullEngine
+from mayavi.sources.vtk_data_source import VTKDataSource
 
 from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
@@ -82,6 +83,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         # given
         self._setUp()
         self.panel.engine = testing_utils.DummyEngine()
+        self.panel.mayavi_engine.add_source(VTKDataSource())
 
         # when
         def animate():
