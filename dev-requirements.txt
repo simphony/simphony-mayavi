@@ -1,6 +1,4 @@
---allow-external PIL
---allow-unverified PIL
-PIL
+Pillow
 coverage
 flake8
 
