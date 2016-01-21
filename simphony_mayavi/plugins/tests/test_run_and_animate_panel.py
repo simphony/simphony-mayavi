@@ -143,11 +143,11 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
 
         # when
         self.panel.time_step = 99.
-        self.panel.number_of_time_steps = 999.
+        self.panel.number_of_time_steps = 999
 
         # then
         self.assertAlmostEqual(self.engine.CM[CUBA.TIME_STEP], 99.)
-        self.assertAlmostEqual(self.engine.CM[CUBA.NUMBER_OF_TIME_STEPS], 999.)
+        self.assertAlmostEqual(self.engine.CM[CUBA.NUMBER_OF_TIME_STEPS], 999)
 
     def test_engine_parameters_update_on_engine_changed(self):
         # given
@@ -155,14 +155,15 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
 
         # when
         self.panel.time_step = 99.
-        self.panel.number_of_time_steps = 999.
+        self.panel.number_of_time_steps = 999
         self.panel.engine = testing_utils.DummyEngine()
+        default_engine = testing_utils.DummyEngine()
 
         # then
         self.assertAlmostEqual(self.panel.engine.CM[CUBA.TIME_STEP],
-                               self.panel.time_step)
-        self.assertAlmostEqual(self.panel.engine.CM[CUBA.NUMBER_OF_TIME_STEPS],
-                               self.panel.number_of_time_steps)
+                               default_engine.CM[CUBA.TIME_STEP])
+        self.assertEqual(self.panel.engine.CM[CUBA.NUMBER_OF_TIME_STEPS],
+                         default_engine.CM[CUBA.NUMBER_OF_TIME_STEPS])
 
     def test_error_if_time_step_not_found(self):
         engine = testing_utils.DummyEngine()
