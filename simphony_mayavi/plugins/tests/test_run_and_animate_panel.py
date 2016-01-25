@@ -4,7 +4,6 @@ from mayavi.core.api import NullEngine
 
 from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
-from traitsui.tests._tools import is_current_backend_qt4
 
 from simphony.core.cuba import CUBA
 from simphony_mayavi.sources.tests import testing_utils
@@ -12,10 +11,11 @@ from simphony_mayavi.sources.tests import testing_utils
 from simphony_mayavi.plugins.add_engine_source_to_mayavi import (
     AddEngineSourceToMayavi)
 from simphony_mayavi.plugins.run_and_animate_panel import RunAndAnimatePanel
-from simphony_mayavi.plugins.tests import testing_utils as ui_test_utils
+from simphony_mayavi.plugins.tests.testing_utils import (press_button_by_label,
+                                                         is_current_backend)
 
 
-@unittest.skipIf(not is_current_backend_qt4(),
+@unittest.skipIf(not is_current_backend("qt4"),
                  "this testcase requires backend == qt4")
 class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
 
@@ -47,7 +47,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
                                                 "data_changed",
                                                 count=2,
                                                 condition=engine_ran_twice):
-            ui_test_utils.press_button_by_label(ui, "Animate")
+            press_button_by_label(ui, "Animate")
 
     def test_error_animate_fired_with_mayavi_engine_undefined(self):
         # given

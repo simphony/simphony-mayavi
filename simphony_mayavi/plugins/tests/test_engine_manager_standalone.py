@@ -3,13 +3,13 @@ import unittest
 from mayavi import mlab
 from mayavi.core.api import NullEngine
 from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
-from traitsui.tests._tools import is_current_backend_qt4
 
-from simphony_mayavi.plugins.api import EngineManagerStandalone
 from simphony_mayavi.sources.tests import testing_utils
+from simphony_mayavi.plugins.api import EngineManagerStandalone
+from simphony_mayavi.plugins.tests.testing_utils import is_current_backend
 
 
-@unittest.skipIf(not is_current_backend_qt4(),
+@unittest.skipIf(not is_current_backend("qt4"),
                  "this testcase requires backend == qt4")
 class TestEngineManagerStandalone(GuiTestAssistant, unittest.TestCase):
 

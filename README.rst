@@ -30,14 +30,22 @@ Requirements
 Optional requirements
 ~~~~~~~~~~~~~~~~~~~~~
 
+To support testing, you will need the following packages:
+
+- PIL
+- mock
+
+Alternatively unning :command:`pip install -r dev-requirements.txt` should install the
+packages needed for development purposes.
+
+
 To support the documentation built you need the following packages:
 
 - sphinx >= 1.2.3
 - sectiondoc commit 8a0c2be, https://github.com/enthought/sectiondoc
 - trait-documenter, https://github.com/enthought/trait-documenter
-- mock
 
-Alternative running :command:`pip install -r doc_requirements` should install the
+Alternative running :command:`pip install -r doc_requirements.txt` should install the
 minimum necessary components for the documentation built.
 
 Installation
@@ -80,6 +88,13 @@ After installation the user should be able to import the ``mayavi`` visualizatio
 
   from simphony.visualisation import mayavi_tools
   mayavi_tools.show(cuds)
+
+.. note::
+
+   - It is also recommended that the user uses qt4 as the user interface backends by setting the
+     environment variable ``ETS_TOOLKIT``.  In Bash, that is::
+
+       export ETS_TOOLKIT=qt4
 
 
 Known Issues
