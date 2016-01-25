@@ -195,24 +195,24 @@ class VTKParticles(ABCParticles):
             When the sanity checks fail.
 
         """
-        checks = []
+        message = 'Dataset {} cannot be reliably wrapped into a VTKParticles'
+        exception = TypeError(message.format(data_set))
 
-        # Check for cell related attributes
-        checks.append(not hasattr(data_set, 'lines') and
-                      not hasattr(data_set, 'get_cells'))
+        if not (hasattr(data_set, "lines") or hasattr(data_set, "get_cells")):
+            raise exception
 
-        # Check that the data set contains only lines and polyline cells
-        if hasattr(data_set, 'lines'):
-            checks.append(
-                data_set.number_of_cells != data_set.lines.number_of_cells)
-        if hasattr(data_set, 'get_cells'):
-            checks.append(
-                not set(data_set.cell_types_array).issubset(set(VTKEDGETYPES)))
+        if (hasattr(data_set, "lines") and
+                hasattr(data_set, "number_of_cells") and
+                hasattr(data_set.lines, "number_of_cells") and
+                data_set.number_of_cells != data_set.lines.number_of_cells):
+            raise exception
 
-        if any(checks):
-            message = (
-                'Dataset {} cannot be reliably wrapped into a VTKParticles')
-            raise TypeError(message.format(data_set))
+        if (hasattr(data_set, "get_cells") and
+                data_set.cell_types_array and
+                set(data_set.cell_types_array) - set(VTKEDGETYPES)):
+            # there are cell types that are not VTKEDGETYPES
+            raise exception
+
         return cls(name, data_set=data_set, data=data)
 
     # Particle operations ####################################################
