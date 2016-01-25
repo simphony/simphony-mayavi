@@ -138,7 +138,8 @@ class RunAndAnimate(object):
         '''
         sources = self.mayavi_engine.current_scene.children
         return {source for source in sources
-                if source.engine == self.engine}
+                if (hasattr(source, "engine") and
+                    source.engine == self.engine)}
 
     def _get_all_sources(self):
         ''' Return sources from all the scenes and that the sources
@@ -151,5 +152,6 @@ class RunAndAnimate(object):
         sources = {source
                    for scene in self.mayavi_engine.scenes
                    for source in scene.children
-                   if source.engine == self.engine}
+                   if (hasattr(source, "engine") and
+                       source.engine == self.engine)}
         return sources
