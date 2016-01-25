@@ -51,10 +51,10 @@ class EngineManagerStandaloneUI(EngineManager):
         # Add panels
         self.panels = TabbedPanelCollection.create(
             add_engine=AddEnginePanel(engine_manager=self),
-            add_source=AddSourcePanel(engine_name=engine_name,
-                                      engine=engine,
+            add_source=AddSourcePanel(engine_name=self.engine_name,
+                                      engine=self.engine,
                                       mayavi_engine=mayavi_engine),
-            run_and_animate=RunAndAnimatePanel(engine=engine,
+            run_and_animate=RunAndAnimatePanel(engine=self.engine,
                                                mayavi_engine=mayavi_engine))
 
         if engine and engine_name:

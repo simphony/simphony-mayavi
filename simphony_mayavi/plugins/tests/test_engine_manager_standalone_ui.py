@@ -18,6 +18,15 @@ class TestEngineManagerStandaloneUI(UnittestTools, unittest.TestCase):
         self.assertIs(manager.engine, None)
         self.assertEqual(manager.engines, {})
 
+    def test_init_no_engine_then_add_engine(self):
+        manager = EngineManagerStandaloneUI()
+        engine = testing_utils.DummyEngine()
+        manager.add_engine("test", engine)
+
+        for panel in manager.panels:
+            if hasattr(panel, "engine"):
+                self.assertEqual(panel.engine, engine)
+
     def test_init_default_mayavi_engine(self):
         # given
         engine = testing_utils.DummyEngine()
