@@ -1,24 +1,22 @@
-from simphony.engine import kratos
+from traits.api import Enum
+from traitsui.api import View, Item
+
+from .abc_engine_factory import ABCEngineFactory
 
 
-def get_cdf_wrapper():
-    ''' Return a Kratos CDF Wrapper '''
-    return kratos.CFDWrapper()
+class KratosEngineFactory(ABCEngineFactory):
+
+    model = Enum("CFD", "DEM")
+
+    view = View(Item("model"), buttons=["OK", "Cancel"])
+
+    def create(self):
+        from simphony.engine import kratos
+
+        if self.model == "CFD":
+            return kratos.CFDWrapper()
+        elif self.model == "DEM":
+            return kratos.DEMWrapper()
 
 
-def get_dem_wrapper():
-    ''' Return a Kratos DEM wrapper '''
-    return kratos.DEMWrapper()
-
-
-def get_factories():
-    ''' Return a dictionary containing the factory functions
-    for creating engine wrappers.
-
-    Returns
-    -------
-    factories : dict
-        {"name of the factory": callable}
-    '''
-    return {"Kratos-CFD": get_cdf_wrapper,
-            "Kratos-DEM": get_dem_wrapper}
+ENGINE_REGISTRY = dict(kratos=KratosEngineFactory())

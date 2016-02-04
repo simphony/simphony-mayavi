@@ -8,7 +8,8 @@ from traitsui.api import (View, Group, VGroup, HGroup, ButtonEditor, Item,
 
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from simphony_mayavi.plugins.engine_manager import EngineManager
-from simphony_mayavi.plugins.engine_wrappers import loader
+from simphony_mayavi.plugins.engine_wrappers.api import (
+    DEFAULT_ENGINE_FACTORIES, ABCEngineFactory)
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class AddEnginePanel(HasTraits):
     selected_variable_name = Str
 
     # Instantiate from a factory
-    factories = Dict(Str, Callable)
+    factories = Dict(Str, Instance(ABCEngineFactory))
     factory_names = List(Str)
     factory_name = Str
 
@@ -183,8 +184,23 @@ class AddEnginePanel(HasTraits):
         If the factory_name is unselected and no engine is defined by
         loading a file, set new_engine to None'''
         if self.factory_name:
-            self.new_engine = self.factories[self.factory_name]()
+            # engine factory selected
+            factory = self.factories[self.factory_name]
+
+            # if there is anything needs specifying, pop up a UI
+            if factory.editable_traits():
+                factory.configure_traits(kind="livemodal")
+
+            # try creating the engine wrapper
+            try:
+                self.new_engine = factory.create()
+            except Exception as exception:
+                self._display_message(exception.message)
+                self.new_engine = None
+
+            # reset the load-file panel
             self._reset_load_file_panel()
+
         elif not self.selected_variable_name:
             self.new_engine = None
             self._reset_load_file_panel()
@@ -226,7 +242,7 @@ class AddEnginePanel(HasTraits):
     # ------------------------------------------------------
 
     def _factories_default(self):
-        return loader.get_factories()
+        return DEFAULT_ENGINE_FACTORIES
 
     def _factory_names_default(self):
         return [""] + self.factories.keys()
