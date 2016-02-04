@@ -16,6 +16,7 @@ from simphony_mayavi.plugins.engine_manager import EngineManager
 
 from simphony_mayavi.sources.tests.testing_utils import DummyEngine
 from simphony_mayavi.plugins.tests.testing_utils import press_button_by_label
+from simphony_mayavi.tests.testing_utils import run_and_check_dialog_was_opened
 
 
 # temp_engine should be loaded successfully from this script
@@ -122,17 +123,10 @@ class TestAddEnginePanel(UnittestTools, unittest.TestCase):
 
         # for testing modal dialog
         tester = ModalDialogTester(set_file_name)
-        tester.dialog_was_opened = False
-
-        def when_opened(tester):
-            tester.dialog_was_opened = True
-            tester.close(accept=True)
 
         # The content of the script leads to error during ``exec``
         with self.write_file(".py", ERROR_PYTHON_SCRIPT) as tmp_path:
-            tester.open_and_run(when_opened=when_opened)
-
-        self.assertTrue(tester.dialog_was_opened)
+            run_and_check_dialog_was_opened(self, tester, True)
 
     def test_error_load_from_non_py_file(self):
         panel = AddEnginePanel(engine_manager=EngineManager())
@@ -143,17 +137,10 @@ class TestAddEnginePanel(UnittestTools, unittest.TestCase):
 
         # for testing modal dialog
         tester = ModalDialogTester(set_file_name)
-        tester.dialog_was_opened = False
-
-        def when_opened(tester):
-            tester.dialog_was_opened = True
-            tester.close(accept=True)
 
         # The file does not end with *.py
         with self.write_file("", PYTHON_SCRIPT) as tmp_path:
-            tester.open_and_run(when_opened=when_opened)
-
-        self.assertTrue(tester.result)
+            run_and_check_dialog_was_opened(self, tester, True)
 
     def test_error_load_from_py_file_no_engine(self):
         panel = AddEnginePanel(engine_manager=EngineManager())
@@ -164,18 +151,11 @@ class TestAddEnginePanel(UnittestTools, unittest.TestCase):
 
         # for testing modal dialog
         tester = ModalDialogTester(set_file_name)
-        tester.dialog_was_opened = False
-
-        def when_opened(tester):
-            tester.dialog_was_opened = True
-            tester.close(accept=True)
 
         # The script contains no local variable that is an instance
         # of ABCModelingEngine
         with self.write_file(".py", NO_ENGINE_PYTHON_SCRIPT) as tmp_path:
-            tester.open_and_run(when_opened=when_opened)
-
-        self.assertTrue(tester.dialog_was_opened)
+            run_and_check_dialog_was_opened(self, tester, True)
 
     @patch("simphony_mayavi.plugins.add_engine_panel.DEFAULT_ENGINE_FACTORIES",
            MOCKED_ENGINE_FACTORIES)
@@ -187,19 +167,12 @@ class TestAddEnginePanel(UnittestTools, unittest.TestCase):
             return True
 
         tester = ModalDialogTester(choose_factory)
-        tester.dialog_was_opened = False
-
-        def when_opened(tester):
-            tester.dialog_was_opened = True
-            tester.close(accept=True)
 
         with self.assertTraitChanges(panel, "new_engine"):
-            tester.open_and_run(when_opened=when_opened)
+            run_and_check_dialog_was_opened(self, tester, True)
 
         # ensure the new engine is defined
         self.assertIsInstance(panel.new_engine, ABCModelingEngine)
-
-        self.assertTrue(tester.dialog_was_opened)
 
         # ensure the load-from-file panel is reset
         self.assertEqual(panel.file_name, "")
@@ -215,18 +188,12 @@ class TestAddEnginePanel(UnittestTools, unittest.TestCase):
             return True
 
         tester = ModalDialogTester(choose_factory)
-        tester.dialog_was_opened = False
-
-        def when_opened(tester):
-            tester.dialog_was_opened = True
-            tester.close(accept=True)
 
         # new engine would still be None
         with self.assertTraitDoesNotChange(panel, "new_engine"):
-            tester.open_and_run(when_opened=when_opened)
+            run_and_check_dialog_was_opened(self, tester, True)
 
         self.assertIsNone(panel.new_engine)
-        self.assertTrue(tester.dialog_was_opened)
 
         # ensure the load-from-file panel is reset
         self.assertEqual(panel.file_name, "")
