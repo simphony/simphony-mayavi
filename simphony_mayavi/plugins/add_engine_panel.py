@@ -71,7 +71,7 @@ class AddEnginePanel(HasTraits):
             Group(
                 Item("factory_name", show_label=False,
                      editor=EnumEditor(name="factory_names")),
-                label="Create engine from factory",
+                label="Create from registered engines",
                 show_border=True),
             Item("new_engine_name",
                  editor=TextEditor(invalid="engine_name_is_invalid")),
