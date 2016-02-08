@@ -1,10 +1,15 @@
+import sys
 from contextlib import closing
 import logging
 
 from traits.api import ListStr, Instance
 from traitsui.api import View, Group, Item, VGroup
 from apptools.persistence.file_path import FilePath
+from apptools.persistence.state_pickler import gunzip_string, set_state
+from mayavi.core.common import handle_children_state
 from mayavi.core.trait_defs import DEnum
+from tvtk.api import tvtk
+
 from simphony.io.h5_cuds import H5CUDS
 
 from .cuds_source import CUDSSource
@@ -76,3 +81,17 @@ class CUDSFileSource(CUDSSource):
         """
         name = super(CUDSFileSource, self)._get_name()
         return 'CUDS File: ' + name
+
+    def __set_pure_state__(self, state):
+        """ Attempt to restore the reference to file path """
+        self.file_path = FilePath("")
+        set_state(self, state, first=['file_path'], ignore=['*'])
+
+        # Now set the remaining state without touching the children.
+        set_state(self, state, ignore=['children', 'data', 'file_path'])
+        self.update()
+        # Setup the children.
+        handle_children_state(self.children, state.children)
+        # Setup the children's state.
+        set_state(self, state, first=['children'], ignore=['*'])
+

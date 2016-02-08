@@ -127,3 +127,11 @@ class CUDSSource(VTKDataSource):
                 msg = 'Provided object {} is not of any known cuds type'
                 raise TraitError(msg.format(type(value)))
         self._vtk_cuds = vtk_cuds
+
+    def __get_pure_state__(self):
+        """ Original CUDS is lost upon pickling but the data is pickled
+        """
+        state = super(CUDSSource, self).__get_pure_state__()
+        state.pop("_cuds", None)
+        state.pop("_vtk_cuds", None)
+        return state
