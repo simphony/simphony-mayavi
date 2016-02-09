@@ -3,7 +3,14 @@ from mayavi import mlab
 
 def get_mayavi2_engine_manager():
     ''' Return the EngineManager panel sitting in Mayavi2'''
-    panel = mlab.get_engine().window.get_service("simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2")  # noqa
+    try:
+        window = mlab.get_engine().window
+    except AttributeError:
+        message = "Failed to find the application window. Is Mayavi2 running?"
+        raise AttributeError(message)
+
+    panel = window.get_service("simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2")  # noqa
+
     if panel:
         return panel
     else:
