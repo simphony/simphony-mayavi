@@ -479,7 +479,8 @@ class TestParticlesSource(unittest.TestCase):
         engine = mlab.get_engine()
 
         # test if mayavi verion < 4.4.4
-        older_version = any(num < 4 for num in MAYAVI_VERSION.split(".")[:3])
+        older_version = any(int(num) < 4
+                            for num in MAYAVI_VERSION.split(".")[:3])
 
         try:
             # mayavi < 4.4.4 has problem loading visualisation
