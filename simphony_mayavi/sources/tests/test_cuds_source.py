@@ -7,6 +7,9 @@ import os
 import numpy
 from numpy.testing import assert_array_equal
 from mayavi.core.api import NullEngine
+from mayavi.version import version as MAYAVI_VERSION
+from mayavi import mlab
+
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony.cuds.particles import Particle, Particles, Bond
 from simphony.cuds.primitive_cell import PrimitiveCell
@@ -443,17 +446,16 @@ class TestParticlesSource(unittest.TestCase):
         # then
         self.assertEqual(source.name, 'my_particles (CUDS Particles)')
 
-    def test_save_load_visualization(self):
+    def check_save_load_visualization(self, engine):
         # set up the visualization
         container = self.container
         source = CUDSSource(cuds=container)
-        engine = NullEngine()
         engine.add_source(source)
 
         # save the visualization
         saved_viz_file = os.path.join(self.temp_dir, 'test_saved_viz.mv2')
         engine.save_visualization(saved_viz_file)
-        engine.stop()
+        engine.close_scene(engine.current_scene)
 
         # restore the visualization
         engine.load_visualization(saved_viz_file)
@@ -471,3 +473,24 @@ class TestParticlesSource(unittest.TestCase):
         # But cuds and vtk_cuds are not available
         self.assertIsNone(source_in_scene._vtk_cuds)
         self.assertIsNone(source_in_scene._cuds)
+
+    def test_save_load_visualization_with_mlab(self):
+        # test mlab.get_engine
+        engine = mlab.get_engine()
+
+        # test if mayavi verion < 4.4.4
+        older_version = any(num < 4 for num in MAYAVI_VERSION.split(".")[:3])
+
+        try:
+            # mayavi < 4.4.4 has problem loading visualisation
+            if older_version:
+                with self.assertRaises(TypeError):
+                    self.check_save_load_visualization(engine)
+            else:
+                self.check_save_load_visualization(engine)
+        finally:
+            mlab.clf()
+            mlab.close(all=True)
+
+    def test_save_load_visualization_with_null_engine(self):
+        self.check_save_load_visualization(NullEngine())
