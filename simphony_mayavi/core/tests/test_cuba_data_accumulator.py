@@ -87,8 +87,7 @@ class TestCUBADataAccumulator(unittest.TestCase):
         accumulator.append(create_data_container(restrict=[CUBA.NAME]))
         accumulator.append(
             create_data_container(restrict=[CUBA.NAME, CUBA.VELOCITY,
-                                            CUBA.LATTICE_VECTORS,
-                                            CUBA.STRAIN_TENSOR]))
+                                            CUBA.LATTICE_VECTORS]))
 
         vtk_data = tvtk.PointData()
         accumulator.load_onto_vtk(vtk_data)
