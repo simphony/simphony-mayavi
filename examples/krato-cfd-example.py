@@ -11,6 +11,8 @@ from KratosMultiphysics.FluidDynamicsApplication import *
 from KratosMultiphysics.ExternalSolversApplication import *
 from KratosMultiphysics.MeshingApplication import *
 
+from simphony.visualisation import mayavi_tools
+
 
 path = str(os.path.join(
     os.path.dirname(__file__),
@@ -46,5 +48,4 @@ for bc in kratos_model['bcs']:
     wrapper.BC[CUBA.VELOCITY][bc['name']] = bc['velocity']
     wrapper.BC[CUBA.PRESSURE][bc['name']] = bc['pressure']
 
-from simphony.visualisation import mayavi_tools
 mayavi_tools.add_engine_to_mayavi2("kratos", wrapper)

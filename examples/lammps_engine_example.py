@@ -8,6 +8,7 @@ from simphony.engine import lammps
 
 from simlammps import EngineType
 from simphony.core.cuba import CUBA
+from simphony.visualisation import mayavi_tools
 
 # read data
 particles = lammps.read_data_file(
@@ -33,5 +34,4 @@ dem.add_dataset(particles)
 # Run the engine
 dem.run()
 
-from simphony.visualisation import mayavi_tools
 mayavi_tools.add_engine_to_mayavi2("lammps", dem)
