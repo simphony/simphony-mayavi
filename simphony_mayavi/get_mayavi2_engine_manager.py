@@ -1,9 +1,15 @@
 from mayavi import mlab
 
+
 def get_mayavi2_engine_manager():
     ''' Return the EngineManager panel sitting in Mayavi2'''
-    window = mlab.get_engine().window
-    return window.get_service("simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2")  # noqa
+    panel = mlab.get_engine().window.get_service("simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2")  # noqa
+    if panel:
+        return panel
+    else:
+        message = ("Could not locate the EngineManager contributed by "
+                   "the simphony_mayavi plugin")
+        raise ValueError(message)
 
 
 def add_engine_to_mayavi2(name, engine):
