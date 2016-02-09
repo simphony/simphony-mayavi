@@ -32,3 +32,6 @@ dem.add_dataset(particles)
 
 # Run the engine
 dem.run()
+
+from simphony.visualisation import mayavi_tools
+mayavi_tools.add_engine_to_mayavi2("lammps", dem)

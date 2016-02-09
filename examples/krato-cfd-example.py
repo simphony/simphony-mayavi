@@ -45,3 +45,6 @@ for mesh in kratos_model['meshes']:
 for bc in kratos_model['bcs']:
     wrapper.BC[CUBA.VELOCITY][bc['name']] = bc['velocity']
     wrapper.BC[CUBA.PRESSURE][bc['name']] = bc['pressure']
+
+from simphony.visualisation import mayavi_tools
+mayavi_tools.add_engine_to_mayavi2("kratos", wrapper)
