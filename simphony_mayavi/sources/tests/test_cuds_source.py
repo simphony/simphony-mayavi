@@ -1,8 +1,12 @@
 import itertools
 import unittest
+import tempfile
+import shutil
+import os
 
 import numpy
 from numpy.testing import assert_array_equal
+from mayavi.core.api import NullEngine
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
 from simphony.cuds.particles import Particle, Particles, Bond
 from simphony.cuds.primitive_cell import PrimitiveCell
@@ -364,6 +368,12 @@ class TestParticlesSource(unittest.TestCase):
 
         self.bond_uids = self.container.add_bonds(bond_iter())
 
+        # for testing save/load visualization
+        self.temp_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+
     def test_source_from_vtk_particles(self):
         # given
         container = VTKParticles('test')
@@ -432,3 +442,32 @@ class TestParticlesSource(unittest.TestCase):
 
         # then
         self.assertEqual(source.name, 'my_particles (CUDS Particles)')
+
+    def test_save_load_visualization(self):
+        # set up the visualization
+        container = self.container
+        source = CUDSSource(cuds=container)
+        engine = NullEngine()
+        engine.add_source(source)
+
+        # save the visualization
+        saved_viz_file = os.path.join(self.temp_dir, 'test_saved_viz.mv2')
+        engine.save_visualization(saved_viz_file)
+        engine.stop()
+
+        # restore the visualization
+        engine.load_visualization(saved_viz_file)
+
+        # then
+        source_in_scene = engine.current_scene.children[0]
+        points = source_in_scene.data.points.to_array()
+        dataset = source_in_scene.data
+        number_of_particles = len(self.points)
+
+        # data is restored
+        self.assertEqual(len(points), number_of_particles)
+        self.assertEqual(dataset.point_data.number_of_arrays, 1)
+
+        # But cuds and vtk_cuds are not available
+        self.assertIsNone(source_in_scene._vtk_cuds)
+        self.assertIsNone(source_in_scene._cuds)

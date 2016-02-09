@@ -1,4 +1,7 @@
 import unittest
+import shutil
+import os
+import tempfile
 
 from traits.testing.api import UnittestTools
 from tvtk.api import tvtk
@@ -17,6 +20,12 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
     def setUp(self):
         self.engine = DummyEngine()
         self.datasets = self.engine.get_dataset_names()
+
+        # for testing save/load visualization
+        self.temp_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
 
     def test_datasets(self):
         source = EngineSource(engine=self.engine)
@@ -82,3 +91,36 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
         self.assertIsInstance(source.cuds, Particles)
         self.assertIsInstance(source._vtk_cuds, VTKParticles)
         self.assertIsInstance(source.outputs[0], tvtk.PolyData)
+
+    def test_save_load_visualization(self):
+        # set up the visualization
+        source = EngineSource(engine=self.engine)
+        source.dataset = "particles"   # data changed
+        engine = NullEngine()
+        engine.add_source(source)
+
+        # save the visualization
+        saved_viz_file = os.path.join(self.temp_dir, 'test_saved_viz.mv2')
+        engine.save_visualization(saved_viz_file)
+        engine.stop()
+
+        # restore the visualization
+        engine.load_visualization(saved_viz_file)
+
+        # then
+        source_in_scene = engine.current_scene.children[0]
+
+        # data is restored
+        self.assertIsNotNone(source_in_scene.data)
+        self.assertEqual(source_in_scene.dataset, "particles")
+        self.assertItemsEqual(source_in_scene.datasets, ["particles"])
+        self.assertEqual(source_in_scene.name, source.name)
+
+        # But engine, cuds and vtk_cuds are not available
+        self.assertIsNone(source_in_scene.engine)
+        self.assertIsNone(source_in_scene._vtk_cuds)
+        self.assertIsNone(source_in_scene._cuds)
+
+        # when engine is assigned, cuds should be updated
+        with self.assertTraitChanges(source_in_scene, "cuds"):
+            source_in_scene.engine = self.engine

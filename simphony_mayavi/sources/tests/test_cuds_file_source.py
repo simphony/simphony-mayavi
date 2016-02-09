@@ -97,3 +97,50 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
         self.assertIsInstance(source.cuds, H5Particles)
         self.assertIsInstance(source._vtk_cuds, VTKParticles)
         self.assertIsInstance(source.outputs[0], tvtk.PolyData)
+
+    def test_save_load_visualization(self):
+        # set up visualization
+        source = CUDSFileSource()
+        source.initialize(self.filename)
+        engine = NullEngine()
+        engine.add_source(source)
+
+        # save the visualization
+        saved_viz_file = os.path.join(self.temp_dir, 'test_saved_viz.mv2')
+        engine.save_visualization(saved_viz_file)
+        engine.stop()
+
+        # restore the visualization
+        engine.load_visualization(saved_viz_file)
+        source_in_scene = engine.current_scene.children[0]
+
+        # check
+        self.assertItemsEqual(
+            source_in_scene.datasets,
+            ['mesh1', 'particles1', 'particles3', 'lattice0'])
+        self.assertIn(source_in_scene.dataset,
+                      source_in_scene.datasets)
+
+    def test_error_restore_visualization_file_changed(self):
+        ''' Test if the data is restored anyway for unloadable file'''
+        # set up visualization
+        source = CUDSFileSource()
+        source.initialize(self.filename)
+        engine = NullEngine()
+        engine.add_source(source)
+
+        # save the visualization
+        saved_viz_file = os.path.join(self.temp_dir, 'test_saved_viz.mv2')
+        engine.save_visualization(saved_viz_file)
+        engine.stop()
+
+        # now remove the file
+        # the file handler to self.filename should be closed
+        os.remove(self.filename)
+
+        # restore the visualization
+        engine.load_visualization(saved_viz_file)
+        source_in_scene = engine.current_scene.children[0]
+
+        # check that the data is restored anyway
+        self.assertIsNotNone(source_in_scene.data)
