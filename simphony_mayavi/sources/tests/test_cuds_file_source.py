@@ -102,6 +102,7 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
         # set up visualization
         source = CUDSFileSource()
         source.initialize(self.filename)
+        source.dataset = "mesh1"
         engine = NullEngine()
         engine.add_source(source)
 
@@ -120,6 +121,10 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
             ['mesh1', 'particles1', 'particles3', 'lattice0'])
         self.assertIn(source_in_scene.dataset,
                       source_in_scene.datasets)
+
+        # should allow changing dataset as usual
+        with self.assertTraitChanges(source_in_scene, "data_changed"):
+            source_in_scene.dataset = "lattice0"
 
     def test_error_restore_visualization_file_changed(self):
         ''' Test if the data is restored anyway for unloadable file'''
@@ -144,3 +149,7 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
 
         # check that the data is restored anyway
         self.assertIsNotNone(source_in_scene.data)
+
+        # but datasets and cuds are empty
+        self.assertEqual(source_in_scene.datasets, [])
+        self.assertIsNone(source_in_scene._cuds)

@@ -96,25 +96,27 @@ class CUDSFileSource(CUDSSource):
         set_state(self.file_path, state.file_path)
 
         # Load the file and setup the datasets
-        self.initialize(self.file_path.abs_pth)
+        self.initialize(str(self.file_path))
 
         try:
             # restore the selected dataset
             self.dataset = state._dataset
         except TraitError as exception:
-            msg = ("Could not restore references for {path}\n"
+            msg = ("Could not restore references for '{dataset}' in {path}\n"
                    "Proceed with restoring the data saved anyway.\n"
                    "Got {error}: {error_msg}")
-            logger.warning(msg.format(path=self.file_path.abs_pth,
+            logger.warning(msg.format(dataset=state._dataset,
+                                      path=str(self.file_path),
                                       error=type(exception).__name__,
                                       error_msg=exception.args))
-
-        if self.data:
+            # do not overwrite _dataset and datasets while setting states
+            state.pop("_dataset", None)
+            state.pop("datasets", None)
+            # VTKDataSource will restore the data
+            super(CUDSFileSource, self).__set_pure_state__(state)
+        else:
             # all is done except for the children
             # Setup the children.
             handle_children_state(self.children, state.children)
             # Set the children's state
             set_state(self, state, first=['children'], ignore=['*'])
-        else:
-            # VTKDataSource will restore the data
-            super(CUDSFileSource, self).__set_pure_state__(state)
