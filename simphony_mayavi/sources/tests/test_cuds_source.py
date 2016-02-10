@@ -7,7 +7,7 @@ import os
 import numpy
 from numpy.testing import assert_array_equal
 from mayavi.core.api import NullEngine
-from mayavi.version import version as MAYAVI_VERSION
+from mayavi import __version__ as MAYAVI_VERSION
 from mayavi import mlab
 
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
