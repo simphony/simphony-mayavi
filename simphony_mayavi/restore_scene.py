@@ -2,7 +2,7 @@ from future_builtins import zip
 import logging
 
 from apptools.persistence.state_pickler import (load_state, set_state,
-                                                update_state, create_instance)
+                                                update_state)
 from mayavi.core.common import handle_children_state
 from mayavi import mlab
 
@@ -56,8 +56,8 @@ def restore_scene(saved_visualisation):
         # Setup the children
         handle_children_state(current_source.children, ref_source.children)
 
-        ## if current_source and ref_source do not have the same class
-        ## state_pickler.set_state cannot be applied
+        # if current_source and ref_source do not have the same class
+        # state_pickler.set_state cannot be applied
         # set_state(current_source, ref_source, first=["children"]...)
 
         # if __set_pure_state__ method is available,
