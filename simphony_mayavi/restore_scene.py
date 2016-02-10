@@ -2,7 +2,7 @@ from future_builtins import zip
 import logging
 
 from apptools.persistence.state_pickler import (load_state, set_state,
-                                                update_state)
+                                                update_state, StateSetterError)
 from mayavi.core.common import handle_children_state
 from mayavi import mlab
 
@@ -56,22 +56,31 @@ def restore_scene(saved_visualisation):
         # Setup the children
         handle_children_state(current_source.children, ref_source.children)
 
-        # if current_source and ref_source do not have the same class
-        # state_pickler.set_state cannot be applied
-        # set_state(current_source, ref_source, first=["children"]...)
-
-        # if __set_pure_state__ method is available,
-        # we are by-passing the state_pickler.set_state
-        for current_child, ref_child in zip(current_source.children,
-                                            ref_source.children):
-            if hasattr(current_child, "__set_pure_state__"):
-                current_child.__set_pure_state__(ref_child)
-            else:
-                set_state(current_child, ref_child)
+        try:
+            set_state(current_source, ref_source, first=["children"],
+                      ignore=["*"])
+        except StateSetterError:
+            # if current_source and ref_source do not have the same class
+            # state_pickler.set_state cannot be applied
+            # Try restoring each child separately
+            # if __set_pure_state__ method is available,
+            # we are by-passing the state_pickler.set_state
+            for current_child, ref_child in zip(current_source.children,
+                                                ref_source.children):
+                if hasattr(current_child, "__set_pure_state__"):
+                    current_child.__set_pure_state__(ref_child)
+                else:
+                    set_state(current_child, ref_child)
 
     # work around for the bug in restoring camera
     # https://github.com/enthought/mayavi/issues/283
     ref_scene.scene.camera.pop("distance", None)
 
     # restore scene setting
-    set_state(current_scene.scene, ref_scene.scene)
+    try:
+        set_state(current_scene.scene, ref_scene.scene)
+    except StateSetterError:
+        # current scene is an instance of a different class
+        # at least restore the camera
+        set_state(current_scene.scene.camera,
+                  ref_scene.scene.camera)
