@@ -2,6 +2,8 @@
 """
 import os
 
+from mayavi.scripts import mayavi2
+
 from simphony.core.cuba import CUBA
 from simphony.engine import kratos
 
@@ -48,4 +50,11 @@ for bc in kratos_model['bcs']:
     wrapper.BC[CUBA.VELOCITY][bc['name']] = bc['velocity']
     wrapper.BC[CUBA.PRESSURE][bc['name']] = bc['pressure']
 
-mayavi_tools.add_engine_to_mayavi2("kratos", wrapper)
+
+@mayavi2.standalone
+def view():
+    mayavi_tools.add_engine_to_mayavi2("kratos", wrapper)
+
+
+if __name__ == "__main__":
+    view()
