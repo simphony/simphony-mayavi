@@ -8,7 +8,6 @@ PLUGINAPI = [
     'VTKMesh',
     'adapt2cuds',
     'load',
-    'get_mayavi2_engine_manager',
     'add_engine_to_mayavi2'
 ]
 
