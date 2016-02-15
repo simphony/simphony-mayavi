@@ -1,4 +1,4 @@
-from future_builtins import zip
+from itertools import izip
 import logging
 
 from apptools.persistence.state_pickler import (load_state, set_state,
@@ -51,7 +51,7 @@ def restore_scene(saved_visualisation):
 
     # Restore the children for each data source
     # unmatched sources are ignored
-    for current_source, ref_source in zip(current_sources, ref_sources):
+    for current_source, ref_source in izip(current_sources, ref_sources):
 
         # Setup the children
         handle_children_state(current_source.children, ref_source.children)
