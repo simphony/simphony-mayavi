@@ -9,20 +9,21 @@ from mayavi import mlab
 logger = logging.getLogger(__name__)
 
 
-def restore_scene(saved_visualisation):
+def restore_scene(saved_visualisation, scene_index=0):
     ''' Restore the current scene and children of data sources
     according to the visualisation previously saved.
 
-    If the saved visualisation has multiple scenes, the first
-    non-empty scene is used and the rest are ignored.
-
-    Unmatched data sources are also ignored.  Say the current
+    Unmatched data sources are ignored.  Say the current
     scene has only two data sources while the saved scene has
     three, setting for the third data source is ignored.
 
     Parameters
     ----------
     saved_visualisation : file or fileobj
+
+    scene_index : int
+        index of the scene in the saved visualisation.
+        default: 0 (first scene)
     '''
 
     current_scene = mlab.gcf()
@@ -31,17 +32,14 @@ def restore_scene(saved_visualisation):
     state = load_state(saved_visualisation)
     update_state(state)
 
-    # find the first scene that is not empty
-    for ref_scene in state.scenes:
-        if len(ref_scene.children) > 0:
-            break
-    else:
-        msg = "There is no non-empty scene in the saved visualisation"
-        raise ValueError(msg)
+    # reference scene
+    ref_scene = state.scenes[scene_index]
 
-    # restore the children for each source
-    current_sources = current_scene.children
+    # data sources in the reference scene
     ref_sources = ref_scene.children
+
+    # data sources in the current scene (to be restored)
+    current_sources = current_scene.children
 
     # warn the user about mismatch data sources
     if len(current_sources) != len(ref_sources):
@@ -61,7 +59,7 @@ def restore_scene(saved_visualisation):
                       ignore=["*"])
         except StateSetterError:
             # if current_source and ref_source do not have the same class
-            # state_pickler.set_state cannot be applied
+            # state_pickler.set_state raises a StateSetterError
             # Try restoring each child separately
             # if __set_pure_state__ method is available,
             # we are by-passing the state_pickler.set_state
