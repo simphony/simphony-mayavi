@@ -108,7 +108,7 @@ class CUDSFileSource(CUDSSource):
             logger.warning(msg.format(dataset=state._dataset,
                                       path=str(self.file_path),
                                       error=type(exception).__name__,
-                                      error_msg=exception.args))
+                                      error_msg=str(exception)))
             # do not overwrite _dataset and datasets while setting states
             state.pop("_dataset", None)
             state.pop("datasets", None)
