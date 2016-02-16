@@ -6,9 +6,12 @@ virtualenv:
   system_site_packages: true
 env:
   - SIMPHONY_VERSION=master
+  - SIMPHONY_VERSION=0.3.0
+  - SIMPHONY_VERSION=0.2.2
 matrix:
   allow_failures:
     - env: SIMPHONY_VERSION=master
+    - env: SIMPHONY_VERSION=0.2.2
 addons:
   apt:
     packages:
