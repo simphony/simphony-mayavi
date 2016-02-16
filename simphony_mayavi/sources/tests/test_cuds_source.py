@@ -474,21 +474,15 @@ class TestParticlesSource(unittest.TestCase):
         self.assertIsNone(source_in_scene._vtk_cuds)
         self.assertIsNone(source_in_scene._cuds)
 
+    @unittest.skipIf(any(int(num) < 4
+                         for num in MAYAVI_VERSION.split(".")[:3]),
+                     "Mayavi < 4.4.4 has problem with load_visualization")
     def test_save_load_visualization_with_mlab(self):
         # test mlab.get_engine
         engine = mlab.get_engine()
 
-        # test if mayavi verion < 4.4.4
-        older_version = any(int(num) < 4
-                            for num in MAYAVI_VERSION.split(".")[:3])
-
         try:
-            # mayavi < 4.4.4 has problem loading visualisation
-            if older_version:
-                with self.assertRaises(TypeError):
-                    self.check_save_load_visualization(engine)
-            else:
-                self.check_save_load_visualization(engine)
+            self.check_save_load_visualization(engine)
         finally:
             mlab.clf()
             mlab.close(all=True)
