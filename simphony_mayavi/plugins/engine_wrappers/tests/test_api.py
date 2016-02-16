@@ -1,6 +1,9 @@
 import unittest
 from mock import patch
 
+from simphony_mayavi.plugins.engine_wrappers.abc_engine_factory import (
+    ABCEngineFactory)
+
 
 class TestDefaultEngineFactoryAPI(unittest.TestCase):
 
@@ -14,3 +17,5 @@ class TestDefaultEngineFactoryAPI(unittest.TestCase):
         self.assertEqual(len(DEFAULT_ENGINE_FACTORIES), 2)
         self.assertIn("kratos", DEFAULT_ENGINE_FACTORIES)
         self.assertIn("jyulb_fileio_isothermal", DEFAULT_ENGINE_FACTORIES)
+        for factory in DEFAULT_ENGINE_FACTORIES.values():
+            self.assertIsInstance(factory, ABCEngineFactory)
