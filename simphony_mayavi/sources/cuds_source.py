@@ -1,3 +1,4 @@
+import logging
 
 from traits.api import Either, Instance, TraitError, Property
 from traitsui.api import View, Group, Item
@@ -9,6 +10,8 @@ from simphony.cuds.abc_lattice import ABCLattice
 from simphony.io.h5_mesh import H5Mesh
 
 from simphony_mayavi.cuds.api import VTKParticles, VTKLattice, VTKMesh
+
+logger = logging.getLogger(__name__)
 
 
 class CUDSSource(VTKDataSource):
@@ -127,3 +130,19 @@ class CUDSSource(VTKDataSource):
                 msg = 'Provided object {} is not of any known cuds type'
                 raise TraitError(msg.format(type(value)))
         self._vtk_cuds = vtk_cuds
+
+    def __get_pure_state__(self):
+        state = super(CUDSSource, self).__get_pure_state__()
+
+        # Skip pickling CUDS dataset
+        state.pop("_cuds", None)
+        state.pop("_vtk_cuds", None)
+
+        logger.warning("The data is pickled but original CUDS dataset is not.")
+        return state
+
+    def __set_pure_state__(self, state):
+        logger.warning(("The data is restored but the original "
+                        "CUDS dataset is not. "
+                        "Please assign the data source `cuds` attribute."))
+        super(CUDSSource, self).__set_pure_state__(state)
