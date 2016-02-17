@@ -7,7 +7,9 @@ PLUGINAPI = [
     'VTKLattice',
     'VTKMesh',
     'adapt2cuds',
-    'load']
+    'load',
+    'add_engine_to_mayavi2'
+]
 
 
 class TestPluginLoading(unittest.TestCase):
