@@ -1,25 +1,19 @@
-from simphony.engine import openfoam_file_io
-from simphony.engine import openfoam_internal
+from .abc_engine_factory import ABCEngineFactory
 
 
-def get_foam_internal_wrapper():
-    ''' Return an OpenFoam Wrapper using Internal interface '''
-    return openfoam_internal.FoamInternalWrapper()
+class OpenFoamFileIOEngineFactory(ABCEngineFactory):
+
+    def create(self):
+        from simphony.engine import openfoam_file_io
+        return openfoam_file_io.FoamControlWrapper()
 
 
-def get_foam_file_io_wrapper():
-    ''' Return an OpenFoam Wrapper using File-IO interface '''
-    return openfoam_file_io.FoamControlWrapper()
+class OpenFoamInternalEngineFactory(ABCEngineFactory):
+
+    def create(self):
+        from simphony.engine import openfoam_internal
+        return openfoam_internal.FoamInternalWrapper()
 
 
-def get_factories():
-    ''' Return a dictionary containing the factory functions
-    for creating engine wrappers.
-
-    Returns
-    -------
-    factories : dict
-        {"name of the factory": callable}
-    '''
-    return {"OpenFoam File/IO": get_foam_file_io_wrapper,
-            "OpenFoam Internal": get_foam_internal_wrapper}
+ENGINE_REGISTRY = dict(openfoam_file_io=OpenFoamFileIOEngineFactory(),
+                       openfoam_internal=OpenFoamInternalEngineFactory())
