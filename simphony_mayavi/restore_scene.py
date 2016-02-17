@@ -25,9 +25,6 @@ def restore_scene(saved_visualisation, scene_index=0):
         index of the scene in the saved visualisation.
         default: 0 (first scene)
     '''
-
-    current_scene = mlab.gcf()
-
     # get the state of the visualisation
     state = load_state(saved_visualisation)
     update_state(state)
@@ -38,7 +35,10 @@ def restore_scene(saved_visualisation, scene_index=0):
     # data sources in the reference scene
     ref_sources = ref_scene.children
 
-    # data sources in the current scene (to be restored)
+    # the scene to be restored
+    current_scene = mlab.gcf()
+
+    # data sources in the current scene
     current_sources = current_scene.children
 
     # warn the user about mismatch data sources
@@ -54,21 +54,15 @@ def restore_scene(saved_visualisation, scene_index=0):
         # Setup the children
         handle_children_state(current_source.children, ref_source.children)
 
-        try:
-            set_state(current_source, ref_source, first=["children"],
-                      ignore=["*"])
-        except StateSetterError:
-            # if current_source and ref_source do not have the same class
-            # state_pickler.set_state raises a StateSetterError
-            # Try restoring each child separately
-            # if __set_pure_state__ method is available,
-            # we are by-passing the state_pickler.set_state
-            for current_child, ref_child in zip(current_source.children,
-                                                ref_source.children):
-                if hasattr(current_child, "__set_pure_state__"):
-                    current_child.__set_pure_state__(ref_child)
-                else:
-                    set_state(current_child, ref_child)
+        # Try restoring each child separately
+        # if __set_pure_state__ method is available,
+        # we are by-passing the state_pickler.set_state
+        for current_child, ref_child in zip(current_source.children,
+                                            ref_source.children):
+            if hasattr(current_child, "__set_pure_state__"):
+                current_child.__set_pure_state__(ref_child)
+            else:
+                set_state(current_child, ref_child)
 
     # work around for the bug in restoring camera
     # https://github.com/enthought/mayavi/issues/283
