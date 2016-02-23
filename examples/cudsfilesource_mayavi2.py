@@ -55,7 +55,7 @@ def view():
     g = Glyph()
     gs = g.glyph.glyph_source
     gs.glyph_source = gs.glyph_dict['sphere_source']
-    g.glyph.glyph.scale_factor = 0.02
+    g.glyph.glyph.scale_factor = 0.05
     g.glyph.scale_mode = 'data_scaling_off'
     mayavi.add_module(g)
 
@@ -65,7 +65,7 @@ def view():
     module_manager.scalar_lut_manager.show_legend = True
 
     # customise the camera
-    mlab.view(13.7, 23.3, 1.5, [5., 4., 0.])
+    mlab.view(63., 38., 3., [5., 4., 0.])
 
 
 if __name__ == '__main__':
