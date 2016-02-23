@@ -2,8 +2,23 @@ Mayavi2
 =======
 
 The Simphony-Mayavi library provides a plugin for Mayavi2 to easily
-create mayavi ``Source`` instances from SimPhoNy CUDS containers and
-files. With the provided tools one can use the SimPhoNy libraries to
+create mayavi ``Source`` instances from SimPhoNy CUDS datasets and
+files.
+
+Any CUDS datastet can be adapted as a mayavi ``Source`` using
+:class:`CUDSSource <simphony_mayavi.sources.cuds_source.CUDSSource>`.
+If CUDS datasets are to be loaded from a
+CUDS native file, it maybe easier to use
+:class:`CUDSFileSource <simphony_mayavi.sources.cuds_file_source.CUDSFileSource>`
+which does the loading for you.  Similarly, if the CUDS datasets
+are from a SimPhoNy engine wrapper,
+:class:`EngineSource <simphony_mayavi.sources.engine_source.EngineSource>`
+may be used.  All of these ``Source`` objects provide an
+:func:`update <simphony_mayavi.sources.cuds_source.CUDSSource.update>`
+function that allows the user to refresh visualisation once the
+CUDS dataset is modified.
+
+With the provided tools one can use the SimPhoNy libraries to
 work inside the Mayavi2 application, as it is demonstrated in the
 examples.
 
@@ -70,3 +85,40 @@ View CUDS in Mayavi2
 
    Use the provided example to create a CUDS Particles and visualise
    directly in Mayavi2.
+
+.. rubric:: Source from a CUDS native file
+
+.. literalinclude:: ../../examples/cudsfilesource_mayavi2.py
+
+.. figure:: _images/mayavi2_cudsfilesource.png
+   :figwidth: 80%
+
+   Use the provided example to load data from a CUDS file and visualise
+   directly in Mayavi2.
+
+.. rubric:: Source from a SimPhoNy engine wrapper
+
+.. literalinclude:: ../../examples/enginesource_mayavi2.py
+
+.. figure:: _images/mayavi2_enginesource.png
+   :figwidth: 80%
+
+   Use the provided example to load data from a SimPhoNy engine
+   and visualise directly in Mayavi2.
+
+   In the Mayavi2 embedded python interpreter, the user can access
+   the SimPhoNy engine wrapper associated with the
+   :class:`EngineSource <simphony_mayavi.sources.engine_source.EngineSource>`
+   via its ``engine`` attribute::
+
+     # Retrieve the EngineSource
+     source = engine.scenes[0].children[0]
+
+     # The SimPhoNy engine wrapper originally defined
+     source.engine
+
+     # Run the engine
+     source.engine.run()
+
+     # update the visualisation
+     source.update()
