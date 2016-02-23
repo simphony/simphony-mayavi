@@ -4,6 +4,7 @@ from simphony_mayavi.sources.tests.testing_utils import DummyEngine
 # Comply to SimPhoNy modeling engine API
 engine_wrapper = DummyEngine()
 
+
 @mayavi2.standalone
 def view():
     from mayavi.modules.glyph import Glyph
@@ -33,7 +34,7 @@ def view():
     module_manager.scalar_lut_manager.show_legend = True
 
     # set camera
-    mlab.view(-65., 60., 14., [ 1.5,  2.,  2.5])
+    mlab.view(-65., 60., 14., [1.5, 2., 2.5])
 
 
 if __name__ == '__main__':
