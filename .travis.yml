@@ -38,7 +38,8 @@ install:
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
   - pip install git+https://github.com/simphony/simphony-common.git@${SIMPHONY_VERSION}#egg=simphony
-  - python setup.py develop
+  - pip install git+https://github.com/enthought/mayavi.git@${MAYAVI_VERSION}#egg=mayavi
+- python setup.py develop
 script:
   - flake8 .
   - coverage run -m unittest discover -v
