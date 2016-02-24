@@ -5,13 +5,11 @@ python:
 virtualenv:
   system_site_packages: true
 env:
-  - SIMPHONY_VERSION=master
-  - SIMPHONY_VERSION=0.3.0
-  - SIMPHONY_VERSION=0.2.2
+  - SIMPHONY_VERSION=master MAYAVI_VERSION=master
+  - SIMPHONY_VERSION=0.3.0 MAYAVI_VERSION=4.4.3  
 matrix:
   allow_failures:
-    - env: SIMPHONY_VERSION=master
-    - env: SIMPHONY_VERSION=0.2.2
+    - env: SIMPHONY_VERSION=master MAYAVI_VERSION=master
 addons:
   apt:
     packages:
