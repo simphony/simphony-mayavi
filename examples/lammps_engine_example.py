@@ -4,10 +4,12 @@ github.com/simphony/simphony-lammps-md/examples/dem_billiards/billiards_init.dat
 """
 import os
 
-from simphony.engine import lammps
+from mayavi.scripts import mayavi2
 
+from simphony.engine import lammps
 from simlammps import EngineType
 from simphony.core.cuba import CUBA
+from simphony.visualisation import mayavi_tools
 
 # read data
 particles = lammps.read_data_file(
@@ -32,3 +34,12 @@ dem.add_dataset(particles)
 
 # Run the engine
 dem.run()
+
+
+@mayavi2.standalone
+def view():
+    mayavi_tools.add_engine_to_mayavi2("lammps", dem)
+
+
+if __name__ == "__main__":
+    view()

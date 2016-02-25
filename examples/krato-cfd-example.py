@@ -2,6 +2,8 @@
 """
 import os
 
+from mayavi.scripts import mayavi2
+
 from simphony.core.cuba import CUBA
 from simphony.engine import kratos
 
@@ -10,6 +12,8 @@ from KratosMultiphysics.IncompressibleFluidApplication import *
 from KratosMultiphysics.FluidDynamicsApplication import *
 from KratosMultiphysics.ExternalSolversApplication import *
 from KratosMultiphysics.MeshingApplication import *
+
+from simphony.visualisation import mayavi_tools
 
 
 path = str(os.path.join(
@@ -45,3 +49,12 @@ for mesh in kratos_model['meshes']:
 for bc in kratos_model['bcs']:
     wrapper.BC[CUBA.VELOCITY][bc['name']] = bc['velocity']
     wrapper.BC[CUBA.PRESSURE][bc['name']] = bc['pressure']
+
+
+@mayavi2.standalone
+def view():
+    mayavi_tools.add_engine_to_mayavi2("kratos", wrapper)
+
+
+if __name__ == "__main__":
+    view()

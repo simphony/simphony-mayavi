@@ -1,24 +1,22 @@
-from simphony.engine import lammps
+from traits.api import Enum
+from traitsui.api import View, Item
+
+from .abc_engine_factory import ABCEngineFactory
 
 
-def get_lammps_file_io_wrapper():
-    ''' Return a LammpsWrapper using File-IO interface '''
-    return lammps.LammpsWrapper(use_internal_interface=False)
+class LammpsEngineFactory(ABCEngineFactory):
+
+    interface = Enum("File-IO", "Internal")
+
+    view = View(Item("interface"), buttons=["OK", "Cancel"])
+
+    def create(self):
+        from simphony.engine import lammps
+
+        if self.interface == "File-IO":
+            return lammps.LammpsWrapper(use_internal_interface=False)
+        elif self.interface == "Internal":
+            return lammps.LammpsWrapper(use_internal_interface=True)
 
 
-def get_lammps_internal_wrapper():
-    ''' Return a LammpsWrapper using Internal interface '''
-    return lammps.LammpsWrapper(use_internal_interface=True)
-
-
-def get_factories():
-    ''' Return a dictionary containing the factory functions
-    for creating engine wrappers.
-
-    Returns
-    -------
-    factories : dict
-        {"name of the factory": callable}
-    '''
-    return {"Lammps File/IO": get_lammps_file_io_wrapper,
-            "Lammps Internal": get_lammps_internal_wrapper}
+ENGINE_REGISTRY = dict(lammps=LammpsEngineFactory())

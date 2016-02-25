@@ -135,7 +135,7 @@ class CUBADataAccumulator(object):
                 data = numpy.array(self._data[cuba], dtype=float)
                 index = vtk_data.add_array(data)
                 vtk_data.get_array(index).name = cuba.name
-            elif isinstance(default, numpy.ndarray) and len(default) == 3:
+            elif isinstance(default, numpy.ndarray) and default.size == 3:
                 nan = numpy.array([None, None, None], dtype=float)
                 data = numpy.array(
                     tuple(replacer(data) for data in self._data[cuba]),
