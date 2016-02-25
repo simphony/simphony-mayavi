@@ -5,6 +5,7 @@ from apptools.persistence.state_pickler import (load_state, set_state,
                                                 update_state, StateSetterError)
 from mayavi.core.common import handle_children_state
 from mayavi import mlab
+from mayavi import __version__ as MAYAVI_VERSION
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,10 @@ def restore_scene(saved_visualisation, scene_index=0):
         index of the scene in the saved visualisation.
         default: 0 (first scene)
     '''
+    if any(int(num) < 4 for num in MAYAVI_VERSION.split(".")[:3]):
+        msg = "restore_scene may not work properly for Mayavi version < 4.4.4"
+        logger.warning(msg)
+
     # get the state of the visualisation
     state = load_state(saved_visualisation)
     update_state(state)
