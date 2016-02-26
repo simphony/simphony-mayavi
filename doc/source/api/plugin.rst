@@ -15,6 +15,9 @@ plug-in to the simphony library.
 
 .. autoclass:: simphony_mayavi.plugins.engine_manager_standalone.EngineManagerStandalone
    :members:
+   :show-inheritance:
 
 .. autoclass:: simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI	   
-   :members:
+   :members:  add_engine, remove_engine
+   :show-inheritance:
+

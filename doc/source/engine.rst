@@ -5,13 +5,13 @@ Interacting with Simphony Engine
 Batch scripting
 ---------------
 
-Mayavi mlab library provides an easy way to visualise data in a script
+Mayavi `mlab` library provides an easy way to visualise data in a script
 in ways similar to the matplotlib's pylab module.
 As illustrated with examples in :ref:`cuds_source_examples`,
 the user can easily adapt SimPhoNy CUDS
 datasets, files, or engines into a native Mayavi `Source` object,
 and then make use of the `mlab` library to set up the visualisation.
-More details on how to use the `mlab` can be found on its documentation_.
+More details on how to use `mlab` can be found on its documentation_.
 
 .. _documentation: http://docs.enthought.com/mayavi/mayavi/mlab.html
 
@@ -59,8 +59,8 @@ provides a user-friendly and interactive approach to manage multiple engines, vi
 datasets from a particular engine, locally run an engine and animate the results.
 
 Multiple engines can be added to or removed from the manager using
-:func:`add_engine <simphony_mayavi.plugins.engine_manager.add_engine>` and
-:func:`remove_engine <simphony_mayavi.plugins.engine_manager.remove_engine>`.
+:func:`add_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.add_engine>` and
+:func:`remove_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.remove_engine>`.
 
 .. rubric:: Example (Interactive: EngineManagerStandaloneUI)
 	    
@@ -102,8 +102,8 @@ After that, **restart** Mayavi2.  Then the EngineManager panel can be added by s
 The Simphony panel is binded to the embedded Python shell within Mayavi2 as
 ``simphony_panel``.  Therefore the user can use the same methods as
 described in :ref:`enginemanagerstandaloneui`, such as
-:func:`add_engine <simphony_mayavi.plugins.engine_manager.add_engine>`
-and :func:`remove_engine <simphony_mayavi.plugins.engine_manager.remove_engine>`.
+:func:`add_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.add_engine>`
+and :func:`remove_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.remove_engine>`.
 
 Alternatively, the user can setup and load a SimPhoNy engine to Mayavi2
 by running a python script from a shell or via Mayavi2 (File->Run Python Script).
