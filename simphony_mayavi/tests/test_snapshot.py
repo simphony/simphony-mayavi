@@ -6,7 +6,6 @@ import shutil
 import numpy
 from PIL import Image
 
-
 from simphony_mayavi.snapshot import snapshot
 from simphony.cuds.lattice import make_cubic_lattice
 from simphony.cuds.mesh import Mesh, Point
@@ -66,6 +65,7 @@ class TestSnapShot(unittest.TestCase):
         image = numpy.array(Image.open(filename))
 
         self.assertEqual(image.shape[:2], (600, 800))
+
         if image.shape[2] == 3:
             check = numpy.sum(image == [0, 0, 0], axis=2) == 3
         elif image.shape[2] == 4:
