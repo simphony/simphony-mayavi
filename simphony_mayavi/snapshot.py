@@ -1,12 +1,6 @@
 import sys
 
 from mayavi import mlab
-try:
-    from vtk import VTK_MAJOR_VERSION, VTK_MINOR_VERSION
-except ImportError:
-    # For VTK version < 5.8.0
-    VTK_MAJOR_VERSION, VTK_MINOR_VERSION = None, None
-
 from contextlib import contextmanager
 
 from simphony.cuds.abc_mesh import ABCMesh
@@ -25,13 +19,8 @@ def get_figure(*args, **kwargs):
 
         # Make sure a new figure is created
         figure = mlab.figure(*args, **kwargs)
-
-        # Seg fault while creating subsequent images
-        # for VTK version 6.3 on Linux
-        # https://github.com/enthought/mayavi/issues/302
-        if (VTK_MAJOR_VERSION, VTK_MINOR_VERSION) != (6, 3):
-            # if offscreen is True, this is set anyway
-            figure.scene.off_screen_rendering = True
+        # if offscreen is True, this is set already
+        figure.scene.off_screen_rendering = True
 
         yield figure
 
