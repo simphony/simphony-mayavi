@@ -22,6 +22,10 @@ class TestSnapShot(unittest.TestCase):
     def cleanup(self):
         shutil.rmtree(self.temp_dir)
 
+    def test_error_unknown_cuds(self):
+        with self.assertRaises(TypeError):
+            snapshot((1, 2, 3), self.filename)
+
     def test_lattice_snapshot(self):
         filename = self.filename
         lattice = make_cubic_lattice(
