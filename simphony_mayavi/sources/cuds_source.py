@@ -91,7 +91,8 @@ class CUDSSource(VTKDataSource):
 
     def update(self):
         """ Recalculate the VTK data from the CUDS dataset
-        Useful when ``cuds`` is modified after assignment """
+        Useful when ``cuds`` is modified after assignment
+        """
         self._set_vtk_cuds(self.cuds)
 
     # Private interface ####################################################

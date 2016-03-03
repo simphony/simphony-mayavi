@@ -18,7 +18,7 @@ class EngineManager(HasTraits):
         Mappings of Simphony Modeling Engines in this manager
     engine_name : str
         Name of the Simphony Modeling Engine
-    engine : Instance of ABCModelingEngine
+    engine : ABCModelingEngine
         Simphony Modeling Engine
     '''
     # Engines that are added to the manager
@@ -66,7 +66,7 @@ class EngineManager(HasTraits):
         ----------
         name : str
             Name to be associated with the modeling engine
-        modeling_engine : Instance of ABCModelingEngine
+        modeling_engine : ABCModelingEngine
             Simphony Engine Wrapper
         '''
         if name in self.engines:
