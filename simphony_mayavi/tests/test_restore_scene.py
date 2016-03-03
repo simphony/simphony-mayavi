@@ -2,7 +2,6 @@ import os
 import shutil
 import tempfile
 import unittest
-from contextlib import closing
 from collections import Iterable
 
 from PIL import Image
@@ -198,22 +197,17 @@ class TestRestoreScene(unittest.TestCase):
 
     def check_images_empty(self, image_file):
         '''Check if the image in `image_file` is blank'''
+        image = numpy.array(Image.open(image_file))
 
-        with closing(Image.open(image_file)) as image_fp:
-            image = numpy.array(image_fp)
-
-            msg = "Image is not empty, min:{}, max:{}"
-            self.assertAlmostEqual(image.min(), image.max(), places=3,
-                                   msg=msg.format(image.min(), image.max()))
+        msg = "Image is not empty, min:{}, max:{}"
+        self.assertAlmostEqual(image.min(), image.max(), places=3,
+                               msg=msg.format(image.min(), image.max()))
 
     def check_images_almost_identical(self, actual_file, desired_file):
         ''' Check if two images are almost identical (within 5% error)'''
-        with closing(Image.open(actual_file)) as actual_fp, \
-             closing(Image.open(desired_file)) as desired_fp:  # noqa
+        actual = numpy.array(Image.open(actual_file))
+        desired = numpy.array(Image.open(desired_file))
+        err = float(numpy.abs(actual-desired).sum())/desired.sum()*100.
 
-            actual = numpy.array(actual_fp)
-            desired = numpy.array(desired_fp)
-            err = float(numpy.abs(actual-desired).sum())/desired.sum()*100.
-
-            message = "Actual image is not close to the desired, error: {}%"
-            self.assertTrue(err < 5., message.format(err))
+        message = "Actual image is not close to the desired, error: {}%"
+        self.assertTrue(err < 5., message.format(err))
