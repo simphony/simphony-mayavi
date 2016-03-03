@@ -54,8 +54,9 @@ class TestRestoreScene(unittest.TestCase):
 
         # set up scene, first scene is empty
         # second scene has the settings we want to restore
-        self.engine.new_scene()
-        self.engine.new_scene()
+        for _ in range(2):
+            fig = mlab.figure()
+            fig.scene.off_screen_rendering = True
 
         # add source
         self.engine.add_source(source)
@@ -84,7 +85,9 @@ class TestRestoreScene(unittest.TestCase):
     @finally_mlab_close
     def test_restore_scene(self):
         # create a new scene with new data source
-        self.engine.new_scene()
+        fig = mlab.figure()
+        fig.scene.off_screen_rendering = True
+
         sgrid_2 = datasets.generateStructuredGrid()
         source = VTKDataSource(data=sgrid_2)
         self.engine.add_source(source)
@@ -110,7 +113,8 @@ class TestRestoreScene(unittest.TestCase):
     @finally_mlab_close
     def test_pass_restore_scene_with_extra_sources(self):
         # create a new scene
-        self.engine.new_scene()
+        fig = mlab.figure()
+        fig.scene.off_screen_rendering = True
 
         # add two data sources
         for _ in range(2):
@@ -141,7 +145,8 @@ class TestRestoreScene(unittest.TestCase):
     @finally_mlab_close
     def test_pass_restore_scene_with_different_source(self):
         # create a new scene
-        self.engine.new_scene()
+        fig = mlab.figure()
+        fig.scene.off_screen_rendering = True
 
         # add two data sources
         sgrid_2 = datasets.generateUnstructuredGrid_mixed()
@@ -163,7 +168,9 @@ class TestRestoreScene(unittest.TestCase):
     @finally_mlab_close
     def test_pass_restore_empty_scene(self):
         # create a new scene
-        self.engine.new_scene()
+        fig = mlab.figure()
+        fig.scene.off_screen_rendering = True
+
         sgrid_2 = datasets.generateStructuredGrid()
         source = VTKDataSource(data=sgrid_2)
         self.engine.add_source(source)
