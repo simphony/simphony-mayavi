@@ -23,10 +23,6 @@ def add_engine_to_mayavi2(name, engine):
     ''' Add an ABCModelingEngine instance to the Mayavi2 plugin for
     SimPhoNy
 
-    Equivalent to::
-
-    mayavi_tools.get_mayavi2_engine_manager().add_engine(name, engine)
-
     Parameters
     ----------
     name : str

@@ -53,6 +53,8 @@ the Mayavi2 preferences dialog.
    and ``VELOCITY`` in the Mayavi Scene.
 
 
+.. _cuds_source_examples:
+
 View CUDS in Mayavi2
 --------------------
 

@@ -30,6 +30,6 @@ Description
      :show-inheritance:
 
 .. autoclass:: simphony_mayavi.sources.engine_source.EngineSource
-     :members:
+     :members: update
      :undoc-members:
      :show-inheritance:
