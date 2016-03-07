@@ -1,3 +1,7 @@
+""" This module provides end-user functions for interacting with
+the SimPhoNy panel in Mayavi2 application
+"""
+
 from mayavi.tools.engine_manager import get_engine as get_mayavi_engine
 from mayavi.tools.engine_manager import options as mayavi_options
 
