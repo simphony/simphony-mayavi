@@ -10,7 +10,7 @@ def get_simphony_panel():
 
     Returns
     -------
-    panel : :class:`simphony_mayavi.plugins.engine_manager.EngineManagerMayavi2`
+    panel : EngineManagerMayavi2
 
     Raises
     ------
