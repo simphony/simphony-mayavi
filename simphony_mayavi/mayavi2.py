@@ -1,9 +1,8 @@
 """ This module provides end-user functions for interacting with
 the SimPhoNy panel in Mayavi2 application
 """
-
-from mayavi.tools.engine_manager import get_engine as get_mayavi_engine
-from mayavi.tools.engine_manager import options as mayavi_options
+from mayavi.core.registry import registry
+from mayavi.plugins.envisage_engine import EnvisageEngine
 
 
 def get_simphony_panel():
@@ -11,30 +10,30 @@ def get_simphony_panel():
 
     Returns
     -------
-    panel : :class:`simphony_mayavi.plugins.engine_manager.EngineManager`
+    panel : :class:`simphony_mayavi.plugins.engine_manager.EngineManagerMayavi2`
 
     Raises
     ------
-    AttributeError
-        If the Mayavi2 application window is not found or
-        the SimPhoNy panel is not found
+    RuntimeError
+        If the Mayavi2 application is not found or
+        the SimPhoNy panel is not found in the application
     '''
-    # Ensure the Mayavi Engine is an EnvisageEngine
-    old_backend = mayavi_options.backend
-    mayavi_options.backend = "envisage"
-
-    # Look for the application window from the EnvisageEngine
-    try:
-        window = get_mayavi_engine().window
-    except AttributeError:
-        message = "Failed to find the application window. Is Mayavi2 running?"
-        raise AttributeError(message)
-    finally:
-        # Whatever happens, reset the backend
-        mayavi_options.backend = old_backend
+    # Look for EnvisageEngine
+    # We don't use `mlab.get_engine` here because the behaviour of
+    # `mlab.get_engine` depends on `mlab.options.backend`,
+    # `mlab.options.offscreen` and whether user has manually registered
+    # mayavi engines.  Here we just want to look for a registered
+    # EnvisageEngine and raise an Error if it is not found
+    for engine in registry.engines.values():
+        if isinstance(engine, EnvisageEngine):
+            break
+    else:
+        message = "No registered EnvisageEngine. Is Mayavi2 running?"
+        raise RuntimeError(message)
 
     # The Simphony Panel (plugin) should be a registered service
-    panel = window.get_service("simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2")  # noqa
+    panel = engine.window.get_service(
+        "simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2")
 
     if panel:
         return panel
@@ -43,7 +42,7 @@ def get_simphony_panel():
         # simphony_mayavi plugin in Mayavi2
         message = ("Could not locate the SimPhoNy panel contributed by "
                    "the simphony_mayavi plugin")
-        raise AttributeError(message)
+        raise RuntimeError(message)
 
 
 def add_engine_to_mayavi2(name, engine):
