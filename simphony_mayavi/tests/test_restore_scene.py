@@ -2,7 +2,6 @@ import os
 import shutil
 import tempfile
 import unittest
-from contextlib import closing
 from collections import Iterable
 
 from PIL import Image
@@ -55,8 +54,9 @@ class TestRestoreScene(unittest.TestCase):
 
         # set up scene, first scene is empty
         # second scene has the settings we want to restore
-        self.engine.new_scene()
-        self.engine.new_scene()
+        for _ in range(2):
+            fig = mlab.figure()
+            fig.scene.off_screen_rendering = True
 
         # add source
         self.engine.add_source(source)
@@ -85,7 +85,9 @@ class TestRestoreScene(unittest.TestCase):
     @finally_mlab_close
     def test_restore_scene(self):
         # create a new scene with new data source
-        self.engine.new_scene()
+        fig = mlab.figure()
+        fig.scene.off_screen_rendering = True
+
         sgrid_2 = datasets.generateStructuredGrid()
         source = VTKDataSource(data=sgrid_2)
         self.engine.add_source(source)
@@ -111,7 +113,8 @@ class TestRestoreScene(unittest.TestCase):
     @finally_mlab_close
     def test_pass_restore_scene_with_extra_sources(self):
         # create a new scene
-        self.engine.new_scene()
+        fig = mlab.figure()
+        fig.scene.off_screen_rendering = True
 
         # add two data sources
         for _ in range(2):
@@ -142,7 +145,8 @@ class TestRestoreScene(unittest.TestCase):
     @finally_mlab_close
     def test_pass_restore_scene_with_different_source(self):
         # create a new scene
-        self.engine.new_scene()
+        fig = mlab.figure()
+        fig.scene.off_screen_rendering = True
 
         # add two data sources
         sgrid_2 = datasets.generateUnstructuredGrid_mixed()
@@ -164,7 +168,9 @@ class TestRestoreScene(unittest.TestCase):
     @finally_mlab_close
     def test_pass_restore_empty_scene(self):
         # create a new scene
-        self.engine.new_scene()
+        fig = mlab.figure()
+        fig.scene.off_screen_rendering = True
+
         sgrid_2 = datasets.generateStructuredGrid()
         source = VTKDataSource(data=sgrid_2)
         self.engine.add_source(source)
@@ -198,22 +204,17 @@ class TestRestoreScene(unittest.TestCase):
 
     def check_images_empty(self, image_file):
         '''Check if the image in `image_file` is blank'''
+        image = numpy.array(Image.open(image_file))
 
-        with closing(Image.open(image_file)) as image_fp:
-            image = numpy.array(image_fp)
-
-            msg = "Image is not empty, min:{}, max:{}"
-            self.assertAlmostEqual(image.min(), image.max(), places=3,
-                                   msg=msg.format(image.min(), image.max()))
+        msg = "Image is not empty, min:{}, max:{}"
+        self.assertAlmostEqual(image.min(), image.max(), places=3,
+                               msg=msg.format(image.min(), image.max()))
 
     def check_images_almost_identical(self, actual_file, desired_file):
         ''' Check if two images are almost identical (within 5% error)'''
-        with closing(Image.open(actual_file)) as actual_fp, \
-             closing(Image.open(desired_file)) as desired_fp:  # noqa
+        actual = numpy.array(Image.open(actual_file))
+        desired = numpy.array(Image.open(desired_file))
+        err = float(numpy.abs(actual-desired).sum())/desired.sum()*100.
 
-            actual = numpy.array(actual_fp)
-            desired = numpy.array(desired_fp)
-            err = float(numpy.abs(actual-desired).sum())/desired.sum()*100.
-
-            message = "Actual image is not close to the desired, error: {}%"
-            self.assertTrue(err < 5., message.format(err))
+        message = "Actual image is not close to the desired, error: {}%"
+        self.assertTrue(err < 5., message.format(err))
