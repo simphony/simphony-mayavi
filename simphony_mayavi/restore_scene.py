@@ -11,8 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 def restore_scene(saved_visualisation, scene_index=0):
-    ''' Restore the current scene and children of data sources
-    according to the visualisation previously saved.
+    ''' Restore the current scene and modules settings
+    according to the scene saved in a visualisation
+    file.
 
     Unmatched data sources are ignored.  Say the current
     scene has only two data sources while the saved scene has

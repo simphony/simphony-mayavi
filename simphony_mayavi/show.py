@@ -26,9 +26,13 @@ def show(cuds):
 
     modules = default_module(source)
 
-    # add source
+    # ensure that a new scene is made
     mayavi_engine = mlab.get_engine()
+    mayavi_engine.new_scene()
+
+    # add source
     mayavi_engine.add_source(source)
+
     # add default modules
     for module in modules:
         mayavi_engine.add_module(module)

@@ -4,6 +4,7 @@ import numpy
 
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
 from traits.etsconfig.api import ETSConfig
+from mayavi import mlab
 
 from simphony_mayavi.show import show
 from simphony.cuds.lattice import make_cubic_lattice
@@ -11,8 +12,24 @@ from simphony.cuds.mesh import Mesh, Point
 from simphony.cuds.particles import Particles, Particle
 
 
+def check_scene_opened_then_close(func):
+    ''' Ensure that at the end of calling a function
+    any mayavi scene opened are closed '''
+    def new_func(test_case):
+        try:
+            func(test_case)
+        finally:
+            num_scenes = len(mlab.get_engine().scenes)
+            test_case.assertNotEqual(num_scenes, 0,
+                                     "No scene is opened")
+            # close everything
+            mlab.close(all=True)
+    return new_func
+
+
 class TestShow(unittest.TestCase):
 
+    @check_scene_opened_then_close
     @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
     def test_lattice_show(self):
@@ -27,6 +44,7 @@ class TestShow(unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
 
+    @check_scene_opened_then_close
     @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
     def test_mesh_show(self):
@@ -48,9 +66,10 @@ class TestShow(unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
 
+    @check_scene_opened_then_close
     @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
-    def test_particles_snapshot(self):
+    def test_particles_show(self):
         coordinates = numpy.array([
             [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
             [2, 0, 0], [3, 0, 0], [3, 1, 0], [2, 1, 0],

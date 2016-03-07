@@ -1,13 +1,33 @@
 import sys
 
 from mayavi import mlab
-from mayavi.tools.tools import _typical_distance
+from contextlib import contextmanager
 
 from simphony.cuds.abc_mesh import ABCMesh
 from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.abc_lattice import ABCLattice
 
 from simphony_mayavi.sources.api import CUDSSource
+from simphony_mayavi.modules.default_module import default_module
+
+
+@contextmanager
+def get_figure(*args, **kwargs):
+    try:
+        if sys.platform == "win32":
+            mlab.options.offscreen = True
+
+        # Make sure a new figure is created
+        figure = mlab.figure(*args, **kwargs)
+        # if offscreen is True, this is set already
+        figure.scene.off_screen_rendering = True
+
+        yield figure
+
+    finally:
+        mlab.options.offscreen = False
+        mlab.clf()
+        mlab.close()
 
 
 def snapshot(cuds, filename):
@@ -23,36 +43,24 @@ def snapshot(cuds, filename):
          The filename to use for the output file.
 
     """
+    # adapt to CUDSSource
+    if isinstance(cuds, (ABCMesh, ABCParticles, ABCLattice)):
+        source = CUDSSource(cuds=cuds)
+    else:
+        msg = 'Provided object {} is not of any known cuds type'
+        raise TypeError(msg.format(type(cuds)))
+
+    # set image size
     size = 800, 600
 
-    if sys.platform == 'win32':
-        mlab.options.offscreen = True
-    else:
-        figure = mlab.gcf()
-        figure.scene.off_screen_rendering = True
+    with get_figure(size=size):
+        # add source
+        mlab.pipeline.add_dataset(source)
 
-    try:
-        if isinstance(cuds, ABCMesh):
-            source = CUDSSource(cuds=cuds)
-            mlab.pipeline.surface(source, name=cuds.name)
-        elif isinstance(cuds, ABCParticles):
-            source = CUDSSource(cuds=cuds)
-            scale_factor = _typical_distance(source.data) * 0.5
-            mlab.pipeline.glyph(
-                source, name=cuds.name,
-                scale_factor=scale_factor, scale_mode='none')
-            surface = mlab.pipeline.surface(source)
-            surface.actor.mapper.scalar_visibility = False
-        elif isinstance(cuds, ABCLattice):
-            source = CUDSSource(cuds=cuds)
-            scale_factor = _typical_distance(source.data) * 0.5
-            mlab.pipeline.glyph(
-                source, name=cuds.name,
-                scale_factor=scale_factor, scale_mode='none')
-        else:
-            msg = 'Provided object {} is not of any known cuds type'
-            raise TypeError(msg.format(type(cuds)))
-        mlab.savefig(filename, size, magnification=1.0)
-    finally:
-        mlab.clf()
-        mlab.close()
+        modules = default_module(source)
+
+        # add default modules
+        for module in modules:
+            source.add_module(module)
+
+        mlab.savefig(filename, size=size)
