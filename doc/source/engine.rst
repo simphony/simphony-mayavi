@@ -100,7 +100,9 @@ After that, **restart** Mayavi2.  Then the EngineManager panel can be added by s
 
 	    
 The Simphony panel is binded to the embedded Python shell within Mayavi2 as
-``simphony_panel``.  Therefore the user can use the same methods as
+``simphony_panel``.  Alternatively the user can access the panel from
+:func:`simphony.visualisation.mayavi_tools.get_simphony_panel <simphony_mayavi.plugin.get_simphony_panel>`.
+With that the user can use the same methods as
 described in :ref:`enginemanagerstandaloneui`, such as
 :func:`add_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.add_engine>`
 and :func:`remove_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.remove_engine>`.
