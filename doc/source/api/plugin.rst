@@ -15,6 +15,8 @@ plug-in to the simphony library.
 
 .. autofunction:: simphony_mayavi.plugin.add_engine_to_mayavi2
 
+.. autofunction:: simphony_mayavi.plugin.get_simphony_panel
+
 .. autofunction:: simphony_mayavi.plugin.restore_scene
 		  
 .. autoclass:: simphony_mayavi.plugin.EngineManagerStandalone

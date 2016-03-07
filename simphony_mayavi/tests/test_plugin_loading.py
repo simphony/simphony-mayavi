@@ -8,7 +8,8 @@ PLUGINAPI = [
     'VTKMesh',
     'adapt2cuds',
     'load',
-    'add_engine_to_mayavi2'
+    'add_engine_to_mayavi2',
+    'get_simphony_panel'
 ]
 
 
