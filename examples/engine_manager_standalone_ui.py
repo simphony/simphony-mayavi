@@ -1,4 +1,4 @@
-from simphony_mayavi.sources.tests.testing_utils import DummyEngine
+from simphony_mayavi.tests.testing_utils import DummyEngine
 from simphony.visualisation import mayavi_tools
 
 # GUI for Interacting with the engine and mayavi

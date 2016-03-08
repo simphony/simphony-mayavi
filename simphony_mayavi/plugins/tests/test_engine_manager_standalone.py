@@ -4,9 +4,8 @@ from mayavi import mlab
 from mayavi.core.api import NullEngine
 from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
 
-from simphony_mayavi.sources.tests import testing_utils
 from simphony_mayavi.plugins.api import EngineManagerStandalone
-from simphony_mayavi.plugins.tests.testing_utils import is_current_backend
+from simphony_mayavi.tests.testing_utils import is_current_backend, DummyEngine
 
 
 @unittest.skipIf(not is_current_backend("qt4"),
@@ -14,13 +13,13 @@ from simphony_mayavi.plugins.tests.testing_utils import is_current_backend
 class TestEngineManagerStandalone(GuiTestAssistant, unittest.TestCase):
 
     def _setUp(self):
-        self.engine = testing_utils.DummyEngine()
+        self.engine = DummyEngine()
         self.mayavi_engine = NullEngine()
         self.manager = EngineManagerStandalone(self.engine,
                                                self.mayavi_engine)
 
     def test_init_default_mayavi_engine(self):
-        manager = EngineManagerStandalone(testing_utils.DummyEngine())
+        manager = EngineManagerStandalone(DummyEngine())
         self.assertEqual(manager.mayavi_engine, mlab.get_engine())
 
     def test_add_dataset_to_scene(self):
@@ -95,7 +94,7 @@ class TestEngineManagerStandalone(GuiTestAssistant, unittest.TestCase):
         self.manager.add_dataset_to_scene("particles")
 
         # when
-        self.manager.engine = testing_utils.DummyEngine()
+        self.manager.engine = DummyEngine()
 
         # then
         with self.assertRaises(RuntimeError):
