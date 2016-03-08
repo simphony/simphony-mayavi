@@ -13,7 +13,7 @@ from simphony.cuds.lattice import Lattice
 
 from simphony_mayavi.cuds.api import VTKParticles, VTKLattice, VTKMesh
 from simphony_mayavi.sources.api import EngineSource
-from simphony_mayavi.sources.tests.testing_utils import DummyEngine
+from simphony_mayavi.tests.testing_utils import DummyEngine
 
 
 class TestEngineSource(unittest.TestCase, UnittestTools):

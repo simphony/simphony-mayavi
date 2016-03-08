@@ -1,10 +1,11 @@
+import simphony_mayavi.tests.testing_utils
 from simphony.visualisation import mayavi_tools
 from simphony_mayavi.sources.tests import testing_utils
 
 
 # Dummy Modeling Engine
 # The dummy engine has datasets "particles", "lattice", "mesh"
-modeling_engine = testing_utils.DummyEngine()
+modeling_engine = simphony_mayavi.tests.testing_utils.DummyEngine()
 
 manager = mayavi_tools.EngineManagerStandalone(modeling_engine)
 

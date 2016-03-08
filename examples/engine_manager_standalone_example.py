@@ -1,6 +1,5 @@
 from simphony.visualisation import mayavi_tools
-from simphony_mayavi.sources.tests.testing_utils import DummyEngine
-
+from simphony_mayavi.tests.testing_utils import DummyEngine
 
 # Dummy Modeling Engine for demostration
 # The dummy engine has datasets "particles", "lattice", "mesh"

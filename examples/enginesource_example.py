@@ -1,6 +1,6 @@
 from mayavi import mlab
 
-from simphony_mayavi.sources.tests.testing_utils import DummyEngine
+from simphony_mayavi.tests.testing_utils import DummyEngine
 from simphony_mayavi.sources.api import EngineSource
 
 

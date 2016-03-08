@@ -1,9 +1,10 @@
+import simphony_mayavi.tests.testing_utils
 from simphony.visualisation import mayavi_tools
 from simphony_mayavi.sources.tests import testing_utils
 
 # Dummy modeling engine for testing
-engine1 = testing_utils.DummyEngine()
-engine2 = testing_utils.DummyEngine()
+engine1 = simphony_mayavi.tests.testing_utils.DummyEngine()
+engine2 = simphony_mayavi.tests.testing_utils.DummyEngine()
 
 # GUI can be initialised with an engine defined
 # "test" is used as a label for representing the engine in the GUI

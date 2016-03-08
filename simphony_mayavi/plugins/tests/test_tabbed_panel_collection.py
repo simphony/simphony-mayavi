@@ -1,18 +1,18 @@
 import unittest
 from collections import Iterable
 
+import simphony_mayavi.tests.testing_utils
 from simphony_mayavi.plugins.tabbed_panel_collection import (
     TabbedPanelCollection)
 from simphony_mayavi.sources.api import EngineSource
-from simphony_mayavi.sources.tests import testing_utils
 
 
 class TestTabbedPannelCollection(unittest.TestCase):
     def setUp(self):
-        engine1 = testing_utils.DummyEngine()
+        engine1 = simphony_mayavi.tests.testing_utils.DummyEngine()
         self.tab1 = EngineSource(engine=engine1)
 
-        engine2 = testing_utils.DummyEngine()
+        engine2 = simphony_mayavi.tests.testing_utils.DummyEngine()
         self.tab2 = EngineSource(engine=engine2)
 
         self.tabs = TabbedPanelCollection.create(tab1=self.tab1,

@@ -7,13 +7,14 @@ from pyface.ui.qt4.util.gui_test_assistant import GuiTestAssistant
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
 
 from simphony.core.cuba import CUBA
-from simphony_mayavi.sources.tests import testing_utils
 
 from simphony_mayavi.plugins.add_engine_source_to_mayavi import (
     AddEngineSourceToMayavi)
 from simphony_mayavi.plugins.run_and_animate_panel import RunAndAnimatePanel
-from simphony_mayavi.plugins.tests.testing_utils import (press_button_by_label,
-                                                         is_current_backend)
+from simphony_mayavi.tests.testing_utils import (
+    is_current_backend,
+    press_button_by_label,
+    DummyEngine)
 
 
 @unittest.skipIf(not is_current_backend("qt4"),
@@ -21,7 +22,7 @@ from simphony_mayavi.plugins.tests.testing_utils import (press_button_by_label,
 class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
 
     def _setUp(self):
-        self.engine = testing_utils.DummyEngine()
+        self.engine = DummyEngine()
         self.mayavi_engine = NullEngine()
 
         # Add a dataset to scene
@@ -52,7 +53,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
 
     def test_error_animate_fired_with_mayavi_engine_undefined(self):
         # given
-        self.panel = RunAndAnimatePanel(engine=testing_utils.DummyEngine())
+        self.panel = RunAndAnimatePanel(engine=DummyEngine())
 
         # when
         def animate():
@@ -66,7 +67,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
 
     def test_error_animate_fired_with_nothing_in_scene(self):
         # given
-        self.panel = RunAndAnimatePanel(engine=testing_utils.DummyEngine(),
+        self.panel = RunAndAnimatePanel(engine=DummyEngine(),
                                         mayavi_engine=NullEngine())
 
         # when
@@ -82,7 +83,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
     def test_error_animate_fired_with_objects_not_from_current_engine(self):
         # given
         self._setUp()
-        self.panel.engine = testing_utils.DummyEngine()
+        self.panel.engine = DummyEngine()
         self.panel.mayavi_engine.add_source(VTKDataSource())
 
         # when
@@ -106,7 +107,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
                                                  "data_changed"):
             self.panel._RunAndAnimatePanel__animate_fired()
 
-        self.panel.engine = testing_utils.DummyEngine()
+        self.panel.engine = DummyEngine()
         engine_time = self.engine.time
 
         # then
@@ -158,8 +159,8 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         # when
         self.panel.time_step = 99.
         self.panel.number_of_time_steps = 999
-        self.panel.engine = testing_utils.DummyEngine()
-        default_engine = testing_utils.DummyEngine()
+        self.panel.engine = DummyEngine()
+        default_engine = DummyEngine()
 
         # then
         self.assertAlmostEqual(self.panel.engine.CM[CUBA.TIME_STEP],
@@ -168,7 +169,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
                          default_engine.CM[CUBA.NUMBER_OF_TIME_STEPS])
 
     def test_error_if_time_step_not_found(self):
-        engine = testing_utils.DummyEngine()
+        engine = DummyEngine()
         mayavi_engine = NullEngine()
         engine.CM.pop(CUBA.TIME_STEP)
 
@@ -183,7 +184,7 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         self.assertTrue(tester.result)
 
     def test_error_if_number_of_time_steps_not_found(self):
-        engine = testing_utils.DummyEngine()
+        engine = DummyEngine()
         mayavi_engine = NullEngine()
         engine.CM.pop(CUBA.NUMBER_OF_TIME_STEPS)
 

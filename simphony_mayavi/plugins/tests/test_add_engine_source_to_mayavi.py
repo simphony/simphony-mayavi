@@ -2,16 +2,16 @@ import unittest
 
 from mayavi.core.api import NullEngine
 
+import simphony_mayavi.tests.testing_utils
 from simphony_mayavi.plugins.add_engine_source_to_mayavi import (
     add_source_and_modules_to_scene, AddEngineSourceToMayavi)
 from simphony_mayavi.sources.api import EngineSource
-from simphony_mayavi.sources.tests import testing_utils
 
 
 class TestAddEngineSourceToMayavi(unittest.TestCase):
 
     def setUp(self):
-        self.engine = testing_utils.DummyEngine()
+        self.engine = simphony_mayavi.tests.testing_utils.DummyEngine()
         self.engine_source = EngineSource(engine=self.engine)
         self.mayavi_engine = NullEngine()
 

@@ -11,9 +11,10 @@ from simphony_mayavi.plugins.add_engine_panel import AddEnginePanel
 from simphony_mayavi.plugins.engine_wrappers.api import ABCEngineFactory
 from simphony_mayavi.plugins.engine_manager import EngineManager
 
-from simphony_mayavi.sources.tests.testing_utils import DummyEngine
-from simphony_mayavi.plugins.tests.testing_utils import press_button_by_label
-from simphony_mayavi.tests.testing_utils import run_and_check_dialog_was_opened
+from simphony_mayavi.tests.testing_utils import (
+    run_and_check_dialog_was_opened,
+    press_button_by_label,
+    DummyEngine)
 
 
 class SimpleEngineFactory(ABCEngineFactory):

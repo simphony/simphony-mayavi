@@ -4,16 +4,17 @@ from mayavi.core.api import NullEngine
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
 from traits.testing.api import UnittestTools
 
-from simphony_mayavi.sources.tests import testing_utils
+import simphony_mayavi.tests.testing_utils
 from simphony_mayavi.plugins.add_source_panel import AddSourcePanel
-from simphony_mayavi.plugins.tests.testing_utils import (press_button_by_label,
-                                                         is_current_backend)
+from simphony_mayavi.tests.testing_utils import (
+    is_current_backend,
+    press_button_by_label)
 
 
 class TestAddSourcePanel(UnittestTools, unittest.TestCase):
 
     def setUp(self):
-        self.engine = testing_utils.DummyEngine()
+        self.engine = simphony_mayavi.tests.testing_utils.DummyEngine()
         self.engine_name = "testing"
         self.mayavi_engine = NullEngine()
         self.panel = AddSourcePanel(engine_name=self.engine_name,

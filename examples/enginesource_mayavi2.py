@@ -1,5 +1,5 @@
 from mayavi.scripts import mayavi2
-from simphony_mayavi.sources.tests.testing_utils import DummyEngine
+from simphony_mayavi.tests.testing_utils import DummyEngine
 
 # Comply to SimPhoNy modeling engine API
 engine_wrapper = DummyEngine()
