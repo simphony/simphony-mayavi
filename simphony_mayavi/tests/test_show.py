@@ -29,9 +29,9 @@ def check_scene_opened_then_close(func):
 
 class TestShow(unittest.TestCase):
 
-    @check_scene_opened_then_close
     @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
+    @check_scene_opened_then_close
     def test_lattice_show(self):
         lattice = make_cubic_lattice(
             'test', 0.2, (10, 10, 1), origin=(0.2, -2.4, 0.))
@@ -44,9 +44,9 @@ class TestShow(unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
 
-    @check_scene_opened_then_close
     @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
+    @check_scene_opened_then_close
     def test_mesh_show(self):
         points = numpy.array([
             [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
@@ -66,9 +66,9 @@ class TestShow(unittest.TestCase):
         tester.open_and_run(when_opened=lambda x: x.close(accept=False))
         self.assertTrue(tester.result)
 
-    @check_scene_opened_then_close
     @unittest.skipIf(ETSConfig.toolkit != "qt4",
                      "this testcase requires backend == qt4")
+    @check_scene_opened_then_close
     def test_particles_show(self):
         coordinates = numpy.array([
             [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
