@@ -11,8 +11,6 @@ from simphony_mayavi.sources.api import CUDSSource
 from simphony_mayavi.modules.default_module import default_module
 
 
-
-
 @contextmanager
 def get_figure(*args, **kwargs):
     try:

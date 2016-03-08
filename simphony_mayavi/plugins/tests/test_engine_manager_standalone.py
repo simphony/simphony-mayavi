@@ -8,7 +8,6 @@ from simphony_mayavi.plugins.api import EngineManagerStandalone
 from simphony_mayavi.tests.testing_utils import is_current_backend, DummyEngine
 
 
-
 @unittest.skipIf(not is_current_backend("qt4"),
                  "this testcase requires backend == qt4")
 class TestEngineManagerStandalone(GuiTestAssistant, unittest.TestCase):
