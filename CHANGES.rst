@@ -1,6 +1,24 @@
 SimPhoNy-Mayavi CHANGELOG
 =========================
 
+Release 0.4.0
+-------------
+
+- Support simphony-common 0.3.0 (#108)
+- Added a SimPhoNy panel (GUI) for Mayavi2 (#110, #117)
+- Added EngineManagerStandalone and EngineManagerStandaloneUI to the simphony plugin (#110)
+- Implement EngineFactory class for creating registered simphony engine (#130)
+- Support serialisation of CUDSSource, CUDSFileSource and EngineSource (#140)
+- Support running a Python script for loading a SimPhoNy engine to the GUI (#143, #154)
+- Added restore_scene in the simphony plugin for reproducing a visualisation easily (#145)
+- Refactor default visualisation setup to default_module (#110, #120)
+- Use numpy.float and numpy.int to handle dummy values (#115)
+
+- Fix VTKParticles.from_dataset when dataset has no cell_types_array (#114)
+- Fix cuba_data_accumulator so that it ignores CUBA.LATTICE_VECTORS (#137)
+- Fix dev-requirement: Pillow instead of PIL should be used for testing images (#124)
+- Fix dev-requirement: mock is required for testing (#113)
+
 Release 0.3.1
 -------------
 - Corrections in setup.py regarding version number
