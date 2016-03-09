@@ -1,7 +1,7 @@
 from contextlib import closing
 import logging
 
-from traits.api import ListStr, Instance, Bool, TraitError
+from traits.api import ListStr, Instance, Bool, TraitError, HasTraits
 from traitsui.api import View, Group, Item, VGroup
 from apptools.persistence.file_path import FilePath
 from apptools.persistence.state_pickler import set_state
@@ -45,6 +45,21 @@ class CUDSFileSource(CUDSSource):
                 Item(name='data'))))
 
     # Public interface #####################################################
+
+    def __init__(self):
+        """ Create a CUDSFileSource instance
+
+        Example
+        -------
+        source = CUDSFileSource()
+        source.initialize("path/to/cuds_file.cuds")
+        """
+        # This __init__ function should take no argument in order
+        # for it to be used by Mayavi2 application
+        # This function overloads CUDSSource.__init__
+
+        # required by Traits:
+        HasTraits.__init__(self)
 
     def initialize(self, filename):
         """ Initialise the CUDS file source.
