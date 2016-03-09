@@ -59,6 +59,53 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
         self.assertIs(source._cuds, None)
         self.assertIs(source._vtk_cuds, None)
 
+    def test_init_with_engine_and_dataset(self):
+        """ Test if engine and dataset can be defined on init.
+        Since the dataset is defined, vtk_data should be loaded
+        """
+        # when
+        source = EngineSource(engine=self.engine, dataset="lattice")
+
+        # then
+        self.assertEqual(source.engine, self.engine)
+        self.assertEqual(source.dataset, "lattice")
+        self.assertIsInstance(source._cuds, Lattice)
+        self.assertIsInstance(source._vtk_cuds, VTKLattice)
+
+    def test_init_with_engine_and_data_attributes(self):
+        """ Test if engine, point_scalars can be defined on init.
+        Note that dataset is assumed to be the first available
+        """
+        # when
+        source = EngineSource(engine=self.engine,
+                              point_scalars="TEMPERATURE")
+
+        # then
+        self.assertEqual(source.engine, self.engine)
+        self.assertIn(source.dataset, self.datasets)
+        self.assertEqual(source.point_scalars_name, "TEMPERATURE")
+
+    def test_init_with_engine_and_dataset_and_data_attributes(self):
+        """ Test if engine, dataset and data attributes can be defined on init.
+        """
+        # when
+        source = EngineSource(engine=self.engine, dataset="mesh",
+                              cell_scalars="TEMPERATURE",
+                              cell_vectors="VELOCITY")
+
+        # then
+        self.assertEqual(source.engine, self.engine)
+        self.assertEqual(source.dataset, "mesh")
+        self.assertIsInstance(source._cuds, Mesh)
+        self.assertIsInstance(source._vtk_cuds, VTKMesh)
+
+        # These are the one defined
+        self.assertEqual(source.cell_scalars_name, "TEMPERATURE")
+        self.assertEqual(source.cell_vectors_name, "VELOCITY")
+
+        # This is assumed (i.e. first available)
+        self.assertEqual(source.point_scalars_name, "TEMPERATURE")
+
     def test_source_name(self):
         # given
         source = EngineSource(engine=self.engine)
