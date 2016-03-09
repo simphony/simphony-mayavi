@@ -121,7 +121,8 @@ class CUDSSource(VTKDataSource):
         if cuds:
             self.cuds = cuds
 
-        # if cuds is not defined, VTKDataSource will complain
+        # if cuds is not defined, _point_scalars_list (etc.) is empty
+        # nothing would be selected
         self._select_attributes(point_scalars=point_scalars,
                                 point_vectors=point_vectors,
                                 cell_scalars=cell_scalars,
