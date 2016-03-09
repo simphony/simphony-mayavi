@@ -141,16 +141,16 @@ class CUDSSource(VTKDataSource):
         If point_scalars/... is undefined, the first available attribute
         is selected by mayavi.core.trait_defs.DEnum (see VTKDataSource)
         """
-        if point_scalars is not None:
+        if self._point_scalars_list and point_scalars is not None:
             self.point_scalars_name = point_scalars
 
-        if point_vectors is not None:
+        if self._point_vectors_list and point_vectors is not None:
             self.point_vectors_name = point_vectors
 
-        if cell_scalars is not None:
+        if self._cell_scalars_list and cell_scalars is not None:
             self.cell_scalars_name = cell_scalars
 
-        if cell_vectors is not None:
+        if self._cell_vectors_list and cell_vectors is not None:
             self.cell_vectors_name = cell_vectors
 
     def _get_name(self):
