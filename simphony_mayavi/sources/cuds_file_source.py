@@ -46,7 +46,7 @@ class CUDSFileSource(CUDSSource):
 
     # Public interface #####################################################
 
-    def __init__(self):
+    def __init__(self, **traits):
         """ Create a CUDSFileSource instance
 
         Example
@@ -59,7 +59,7 @@ class CUDSFileSource(CUDSSource):
         # This function overloads CUDSSource.__init__
 
         # required by Traits:
-        HasTraits.__init__(self)
+        super(CUDSFileSource, self).__init__(**traits)
 
     def initialize(self, filename):
         """ Initialise the CUDS file source.

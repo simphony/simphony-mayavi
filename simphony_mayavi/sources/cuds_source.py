@@ -90,7 +90,7 @@ class CUDSSource(VTKDataSource):
     # Public method ########################################################
 
     def __init__(self, cuds=None, point_scalars=None, point_vectors=None,
-                 cell_scalars=None, cell_vectors=None):
+                 cell_scalars=None, cell_vectors=None, **traits):
         """Initialise the CUDSSource
 
         Parameters
@@ -112,9 +112,11 @@ class CUDSSource(VTKDataSource):
         cell_scalars : str, optional
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
+
+        Other optional keyword parameters are parsed to VTKDataSource
         """
         # required by Traits
-        HasTraits.__init__(self)
+        super(CUDSSource, self).__init__(**traits)
 
         if cuds:
             self.cuds = cuds

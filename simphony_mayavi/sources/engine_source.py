@@ -73,7 +73,7 @@ class EngineSource(CUDSSource):
 
     def __init__(self, engine=None, dataset=None,
                  point_scalars=None, point_vectors=None,
-                 cell_scalars=None, cell_vectors=None):
+                 cell_scalars=None, cell_vectors=None, **traits):
         """Initialise the EngineSource
 
         Parameters
@@ -102,9 +102,11 @@ class EngineSource(CUDSSource):
         cell_scalars : str, optional
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
+
+        Other optional keyword parameters are parsed to CUDSSource
         """
         # required by Traits
-        HasTraits.__init__(self)
+        super(EngineSource, self).__init__(**traits)
 
         self.engine = engine
 
