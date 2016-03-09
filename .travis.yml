@@ -5,11 +5,11 @@ python:
 virtualenv:
   system_site_packages: true
 env:
-  - SIMPHONY_VERSION=master MAYAVI_VERSION=master
-  - SIMPHONY_VERSION=0.3.0 MAYAVI_VERSION=4.4.3  
+  - SIMPHONY_VERSION=master
+  - SIMPHONY_VERSION=0.3.0
 matrix:
   allow_failures:
-    - env: SIMPHONY_VERSION=master MAYAVI_VERSION=master
+    - env: SIMPHONY_VERSION=master
 addons:
   apt:
     packages:
@@ -38,7 +38,6 @@ install:
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
   - pip install git+https://github.com/simphony/simphony-common.git@${SIMPHONY_VERSION}#egg=simphony
-  - pip install git+https://github.com/enthought/mayavi.git@${MAYAVI_VERSION}#egg=mayavi
   - python setup.py develop
 script:
   - flake8 .
