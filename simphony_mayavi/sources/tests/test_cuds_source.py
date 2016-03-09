@@ -227,15 +227,18 @@ class TestMeshSource(unittest.TestCase):
         self.assertIs(source.data, vtk_container.data_set)
         self.assertIs(vtk_cuds, vtk_container)
 
-    def test_mesh_source_name(self):
-        # given
-        mesh = Mesh('my_mesh')
-
+    def test_mesh_source_name_and_set_data_attributes(self):
         # when
-        source = CUDSSource(cuds=mesh)
+        # all data attributes are turned off except for point_scalars
+        source = CUDSSource(cuds=self.container,
+                            point_scalars="TEMPERATURE", point_vectors="",
+                            cell_scalars="", cell_vectors="")
 
         # then
-        self.assertEqual(source.name, 'my_mesh (CUDS Mesh)')
+        self.assertEqual(source.point_scalars_name, "TEMPERATURE")
+        self.assertEqual(source.point_vectors_name, "")
+        self.assertEqual(source.cell_scalars_name, "")
+        self.assertEqual(source.cell_vectors_name, "")
 
 
 class TestLatticeSource(unittest.TestCase):
