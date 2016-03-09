@@ -1,6 +1,7 @@
 import logging
 
-from traits.api import Instance, Enum, Str, ListStr, cached_property, Property
+from traits.api import (HasTraits, Instance, Enum, Str, ListStr,
+                        cached_property, Property)
 from traitsui.api import View, Group, Item, VGroup
 from apptools.persistence.state_pickler import set_state
 
@@ -69,6 +70,61 @@ class EngineSource(CUDSSource):
         return self.engine.get_dataset_names()
 
     # Public interface #####################################################
+
+    def __init__(self, engine=None, dataset=None,
+                 point_scalars=None, point_vectors=None,
+                 cell_scalars=None, cell_vectors=None, **traits):
+        """Initialise the EngineSource
+
+        Parameters
+        ----------
+        engine : ABCModelingEngine, optional
+           The SimPhoNy Modeling Engine where dataset is loaded from.
+           Default is None.
+
+        dataset : str, optional
+            Name of the dataset to be extracted from engine.
+            Default is the first available dataset if engine is defined,
+            otherwise it is an empty string
+
+        point_scalars : str, optional
+            CUBA name of the data to be selected as point scalars.
+            Default is the first available point scalars.
+
+        point_vectors : str, optional
+            CUBA name of the data to be selected as point vectors.
+            Default is the first available point vectors.
+
+        cell_scalars : str, optional
+            CUBA name of the data to be selected as cell scalars.
+            Default is the first available cell scalars.
+
+        cell_scalars : str, optional
+            CUBA name of the data to be selected as cell scalars.
+            Default is the first available cell scalars.
+
+        Other optional keyword parameters are parsed to CUDSSource
+        """
+        # required by Traits
+        super(EngineSource, self).__init__(**traits)
+
+        self.engine = engine
+
+        # if dataset is not defined, default is already set by DEnum
+        if dataset:
+            self.dataset = dataset
+
+        if any((point_scalars, point_vectors, cell_scalars, cell_vectors)):
+            # the vtk_data may not be loaded for performance purpose
+            # however if point_scalars/... is defined that means the
+            # user wants to load the vtk data, so we load it here
+            if self._cuds is None:
+                self._update_cuds()
+
+            self._select_attributes(point_scalars=point_scalars,
+                                    point_vectors=point_vectors,
+                                    cell_scalars=cell_scalars,
+                                    cell_vectors=cell_vectors)
 
     def start(self):
         """ Load dataset from the engine and start the visualisation """

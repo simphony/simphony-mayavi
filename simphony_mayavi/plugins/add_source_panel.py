@@ -118,8 +118,8 @@ class AddSourcePanel(HasTraits):
             message_dialog.error("The engine has no dataset")
             return
 
-        source = EngineSource(engine=self.engine,
-                              engine_name=self.engine_name)
+        source = EngineSource(engine=self.engine)
+        source.engine_name = self.engine_name
         source._dataset_changed()
 
         # Default trait view of EngineSource

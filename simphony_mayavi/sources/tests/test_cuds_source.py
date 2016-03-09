@@ -42,7 +42,10 @@ class TestMeshSource(unittest.TestCase):
         self.edges = [[1, 4], [3, 8]]
         self.container = container = Mesh('test')
         point_iter = (Point(coordinates=point,
-                            data=DataContainer(TEMPERATURE=index))
+                            data=DataContainer(TEMPERATURE=index,
+                                               MASS=index,
+                                               VELOCITY=(index, 0., 0.),
+                                               FORCE=(index, 0., 0.)))
                       for index, point in enumerate(points))
         self.point_uids = container.add_points(point_iter)
 
@@ -60,7 +63,7 @@ class TestMeshSource(unittest.TestCase):
         points = source.data.points.to_array()
         self.assertEqual(len(points), number_of_points)
         self.assertEqual(len(vtk_cuds.point2index), number_of_points)
-        self.assertEqual(vtk_dataset.point_data.number_of_arrays, 1)
+        self.assertEqual(vtk_dataset.point_data.number_of_arrays, 4)
         temperature = vtk_dataset.point_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.point2index.iteritems():
             point = container.get_point(key)
@@ -190,7 +193,7 @@ class TestMeshSource(unittest.TestCase):
             len(self.faces) + len(self.edges) + len(self.cells)
         self.assertEqual(len(elements), number_of_elements)
         self.assertEqual(len(vtk_cuds.element2index), number_of_elements)
-        self.assertEqual(source.data.point_data.number_of_arrays, 1)
+        self.assertEqual(source.data.point_data.number_of_arrays, 4)
         self.assertEqual(source.data.cell_data.number_of_arrays, 1)
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
@@ -227,15 +230,30 @@ class TestMeshSource(unittest.TestCase):
         self.assertIs(source.data, vtk_container.data_set)
         self.assertIs(vtk_cuds, vtk_container)
 
-    def test_mesh_source_name(self):
-        # given
-        mesh = Mesh('my_mesh')
-
+    def test_mesh_source_and_set_point_scalars(self):
         # when
-        source = CUDSSource(cuds=mesh)
+        # all data attributes are turned off except for point_scalars
+        source = CUDSSource(cuds=self.container,
+                            point_scalars="TEMPERATURE", point_vectors="",
+                            cell_scalars="", cell_vectors="")
 
         # then
-        self.assertEqual(source.name, 'my_mesh (CUDS Mesh)')
+        self.assertEqual(source.point_scalars_name, "TEMPERATURE")
+        self.assertEqual(source.point_vectors_name, "")
+        self.assertEqual(source.cell_scalars_name, "")
+        self.assertEqual(source.cell_vectors_name, "")
+
+    def test_mesh_source_and_set_point_vectors_default_point_scalars(self):
+        # when
+        # only define point_vectors
+        source = CUDSSource(cuds=self.container, point_vectors="VELOCITY")
+
+        # then
+        # this is defined
+        self.assertEqual(source.point_vectors_name, "VELOCITY")
+
+        # this is assumed (first available)
+        self.assertIn(source.point_scalars_name, ("TEMPERATURE", "MASS"))
 
 
 class TestLatticeSource(unittest.TestCase):

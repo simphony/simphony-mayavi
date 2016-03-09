@@ -1,6 +1,6 @@
 import logging
 
-from traits.api import Either, Instance, TraitError, Property
+from traits.api import Either, Instance, TraitError, Property, HasTraits
 from traitsui.api import View, Group, Item
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
@@ -89,6 +89,45 @@ class CUDSSource(VTKDataSource):
 
     # Public method ########################################################
 
+    def __init__(self, cuds=None, point_scalars=None, point_vectors=None,
+                 cell_scalars=None, cell_vectors=None, **traits):
+        """Initialise the CUDSSource
+
+        Parameters
+        ----------
+        cuds : ABCParticles, ABCLattice, ABCMesh or H5Mesh, optional
+
+        point_scalars : str, optional
+            CUBA name of the data to be selected as point scalars.
+            Default is the first available point scalars.
+
+        point_vectors : str, optional
+            CUBA name of the data to be selected as point vectors.
+            Default is the first available point vectors.
+
+        cell_scalars : str, optional
+            CUBA name of the data to be selected as cell scalars.
+            Default is the first available cell scalars.
+
+        cell_scalars : str, optional
+            CUBA name of the data to be selected as cell scalars.
+            Default is the first available cell scalars.
+
+        Other optional keyword parameters are parsed to VTKDataSource
+        """
+        # required by Traits
+        super(CUDSSource, self).__init__(**traits)
+
+        if cuds:
+            self.cuds = cuds
+
+        # if cuds is not defined, _point_scalars_list (etc.) is empty
+        # nothing would be selected
+        self._select_attributes(point_scalars=point_scalars,
+                                point_vectors=point_vectors,
+                                cell_scalars=cell_scalars,
+                                cell_vectors=cell_vectors)
+
     def update(self):
         """ Recalculate the VTK data from the CUDS dataset
         Useful when ``cuds`` is modified after assignment
@@ -96,6 +135,26 @@ class CUDSSource(VTKDataSource):
         self._update_vtk_cuds_from_cuds(self.cuds)
 
     # Private interface ####################################################
+
+    def _select_attributes(self, point_scalars=None, point_vectors=None,
+                           cell_scalars=None, cell_vectors=None):
+        """ Select point_scalars/point_vectors/cell_scalars/cell_vectors
+        for the CUDSSource
+
+        If point_scalars/... is undefined, the first available attribute
+        is selected by mayavi.core.trait_defs.DEnum (see VTKDataSource)
+        """
+        if self._point_scalars_list and point_scalars is not None:
+            self.point_scalars_name = point_scalars
+
+        if self._point_vectors_list and point_vectors is not None:
+            self.point_vectors_name = point_vectors
+
+        if self._cell_scalars_list and cell_scalars is not None:
+            self.cell_scalars_name = cell_scalars
+
+        if self._cell_vectors_list and cell_vectors is not None:
+            self.cell_vectors_name = cell_vectors
 
     def _get_name(self):
         """ Returns the name to display on the tree view.  Note that
