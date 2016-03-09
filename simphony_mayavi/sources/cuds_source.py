@@ -80,7 +80,7 @@ class CUDSSource(VTKDataSource):
 
     def _set_cuds(self, value):
         self._cuds = value
-        self._set_vtk_cuds(value)
+        self._update_vtk_cuds_from_cuds(value)
 
     # Traits change handlers ###############################################
 
@@ -132,7 +132,7 @@ class CUDSSource(VTKDataSource):
         """ Recalculate the VTK data from the CUDS dataset
         Useful when ``cuds`` is modified after assignment
         """
-        self._set_vtk_cuds(self.cuds)
+        self._update_vtk_cuds_from_cuds(self.cuds)
 
     # Private interface ####################################################
 
@@ -175,20 +175,20 @@ class CUDSSource(VTKDataSource):
             kind = u'Unknown'
         return '{} ({})'.format(name, kind)
 
-    def _set_vtk_cuds(self, value):
-        """ update _vtk_cuds.  Note that this is not a property setter """
-        if isinstance(value, (VTKMesh, VTKParticles, VTKLattice)):
-            vtk_cuds = value
+    def _update_vtk_cuds_from_cuds(self, cuds):
+        """ update _vtk_cuds. """
+        if isinstance(cuds, (VTKMesh, VTKParticles, VTKLattice)):
+            vtk_cuds = cuds
         else:
-            if isinstance(value, (ABCMesh, H5Mesh)):
-                vtk_cuds = VTKMesh.from_mesh(value)
-            elif isinstance(value, ABCParticles):
-                vtk_cuds = VTKParticles.from_particles(value)
-            elif isinstance(value, ABCLattice):
-                vtk_cuds = VTKLattice.from_lattice(value)
+            if isinstance(cuds, (ABCMesh, H5Mesh)):
+                vtk_cuds = VTKMesh.from_mesh(cuds)
+            elif isinstance(cuds, ABCParticles):
+                vtk_cuds = VTKParticles.from_particles(cuds)
+            elif isinstance(cuds, ABCLattice):
+                vtk_cuds = VTKLattice.from_lattice(cuds)
             else:
                 msg = 'Provided object {} is not of any known cuds type'
-                raise TraitError(msg.format(type(value)))
+                raise TraitError(msg.format(type(cuds)))
         self._vtk_cuds = vtk_cuds
 
     def __get_pure_state__(self):
