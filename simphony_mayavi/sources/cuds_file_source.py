@@ -51,8 +51,8 @@ class CUDSFileSource(CUDSSource):
 
         Example
         -------
-        source = CUDSFileSource()
-        source.initialize("path/to/cuds_file.cuds")
+        >>> source = CUDSFileSource()
+        >>> source.initialize("path/to/cuds_file.cuds")
         """
         # This __init__ function should take no argument in order
         # for it to be used by Mayavi2 application
