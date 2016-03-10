@@ -124,6 +124,8 @@ Directory structure
   - sources -- Wrap CUDS objects to provide Mayavi Sources.
   - cuds -- Wrap VTK Dataset objects to provide the CUDS container api.
   - core -- Utility classes and tools to manipulate vtk and cuds objects.
-- examples -- Holds examples of loading and visualising SimPhoNy objects with simphony-mayavi.
+  - plugins -- GUI for Mayavi2
+  - modules -- default modules for visualising SimPhoNy objects
+  - examples -- Holds examples of loading and visualising SimPhoNy objects with simphony-mayavi.
 - doc -- Documentation related files:
   - The rst source files for the documentation
