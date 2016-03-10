@@ -1,4 +1,4 @@
-from traits.api import HasTraits, List, Any
+from traits.api import HasTraits, List, Any, Instance
 from traitsui.api import View, Item, VGroup, ListEditor
 
 
@@ -11,7 +11,7 @@ class TabbedPanelCollection(HasTraits):
     panels = List
 
     # The Traits object currently selected
-    selected_panel = Any
+    selected_panel = Instance(HasTraits)
 
     @classmethod
     def create(cls, **kwargs):
