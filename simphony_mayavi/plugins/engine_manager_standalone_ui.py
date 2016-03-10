@@ -32,10 +32,10 @@ class EngineManagerStandaloneUI(EngineManager):
         engine_name : str
             Name of the Simphony Modeling Engine wrapper
 
-        engine : Instance
+        engine : ABCModelingEngine
             Simphony Modeling Engine wrapper
 
-        mayavi_engine : Instance
+        mayavi_engine : mayavi.core.engine
             Default to be mayavi.mlab.get_engine()
 
         '''
