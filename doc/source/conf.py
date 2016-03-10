@@ -29,6 +29,7 @@ def mock_modules():
             'tvtk',
             'tvtk.api',
             'tvtk.array_handler',
+            'tvtk.tvtk_classes.sphere_source',
             'mayavi',
             'mayavi.sources',
             'mayavi.sources.vtk_data_source',
@@ -41,6 +42,7 @@ def mock_modules():
             'mayavi.mlab',
             'mayavi.modules',
             'mayavi.modules.api',
+            'envisage',
             'envisage.api',
             'simphony_mayavi.core.constants'))
 
