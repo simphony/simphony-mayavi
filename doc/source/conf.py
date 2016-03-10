@@ -40,6 +40,7 @@ def mock_modules():
             'mayavi.core.api',
             'mayavi.core.trait_defs',
             'mayavi.core.common',
+            'mayavi.core.registry',
             'mayavi.mlab',
             'mayavi.modules',
             'mayavi.modules.api',
