@@ -3,7 +3,7 @@ from traitsui.api import View, Item, VGroup, ListEditor
 
 
 class TabbedPanelCollection(HasTraits):
-    """Collect a list of Traits object and display each
+    """Collect a list of HasTraits instances and display each
     of them as a tab in a tabbed notebook using ListEditor
     """
 
@@ -16,21 +16,26 @@ class TabbedPanelCollection(HasTraits):
     @classmethod
     def create(cls, **kwargs):
         """Create a TabbedPanelCollection containing the given
-        Traits objects.
+        HasTraits instances.
 
-        Optional keyword arguments
-        ---------------------------
-        {key: traits_object}
+        Arguments
+        ---------
+        **kwargs :
+            The values are the HasTraits instances to be collected.
+            The keys in the keyword arguments are used to define
+            attributes of the TabbedPanelCollection
+            so that the HasTraits instances can be retrieved easily.
 
-        The keys in the keyword arguments are used to define
-        attributes of the TabbedPanelCollection
-        so that the Traits object can be retrieved easily.
+            As with any keyword arguments, the order of the keys
+            is lost.
 
-        As with any keyword arguments, the order of the keys
-        is lost.
+        Raises
+        ------
+        AttributeError
+            If the given key is a pre-defined attribute/method
 
         Examples
-        ---------
+        --------
         >>> all_panels = TabbedPanelCollection(panel_a=PanelA(),
                                                panel_b=PanelB())
         >>> all_panels.panel_a
