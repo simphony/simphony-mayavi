@@ -17,6 +17,7 @@ API Reference
    :maxdepth: 1
 
    api/plugin
+   api/plugins
    api/sources
    api/cuds
    api/core
