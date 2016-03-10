@@ -37,6 +37,7 @@ def mock_modules():
             'mayavi.core',
             'mayavi.core.api',
             'mayavi.core.trait_defs',
+            'mayavi.core.common',
             'simphony_mayavi.core.constants'))
 
         from traits.api import HasTraits, TraitType
