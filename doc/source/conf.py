@@ -29,6 +29,7 @@ def mock_modules():
             'tvtk',
             'tvtk.api',
             'tvtk.array_handler',
+            'tvtk.tvtk_classes',
             'tvtk.tvtk_classes.sphere_source',
             'mayavi',
             'mayavi.sources',
