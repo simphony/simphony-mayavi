@@ -48,6 +48,7 @@ def mock_modules():
             'mayavi.mlab',
             'mayavi.modules',
             'mayavi.modules.api',
+            'mayavi.plugins',
             'mayavi.plugins.envisage_engine',
             'envisage',
             'envisage.api',
