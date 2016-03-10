@@ -16,8 +16,12 @@ API Reference
 .. toctree::
    :maxdepth: 1
 
+   api/core	      
+   api/cuds
+   api/modules
    api/plugin
    api/plugins
    api/sources
-   api/cuds
-   api/core
+
+
+
