@@ -23,7 +23,7 @@ def restore_scene(saved_visualisation, scene_index=0):
     ----------
     saved_visualisation : file or fileobj
 
-    scene_index : int
+    scene_index : int, optional
         index of the scene in the saved visualisation.
         default: 0 (first scene)
     '''
