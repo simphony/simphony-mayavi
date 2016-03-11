@@ -296,10 +296,10 @@ class CubaData(MutableSequence):
 
         Parameters
         ----------
-        size : int
+        size : int, optional
             The virtual size of the container.
 
-        type_ : AttributeSetType
+        type_ : AttributeSetType, optional
             The type of the vtkAttributeSet to create.
 
         """
