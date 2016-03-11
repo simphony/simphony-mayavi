@@ -15,6 +15,54 @@ logger = logging.getLogger(__name__)
 
 
 class CUDSSource(VTKDataSource):
+    """ A mayavi source of a SimPhoNy CUDS container.
+
+    Attributes
+    ----------
+    cuds : instance of ABCParticle/ABCMesh/ABCLattice/H5Mesh
+         The CUDS container to be wrapped as VTK data source
+
+    point_scalars_name : str
+         Name of the point scalar array visualised
+
+    point_vectors_name : str
+         Name of the point vector array visualised
+
+    cell_scalars_name : str
+         Name of the cell scalar array visualised
+
+    cell_vectors_name : str
+         Name of the cell vector array visualised
+
+
+    The ``cuds`` attribute holds a reference to the CUDS instance it is
+    assigned to, as oppose to making a copy.  Therefore in any given time
+    after setting ``cuds``, the CUDS container could be modified internally
+    and divert from the VTK data source.  The ``update`` function can be
+    called to update the visualisation.
+
+    Examples
+    --------
+    >>> cuds = Particles("test")  # the container is empty
+
+    >>> # Say each particle has scalars "TEMPERATURE" and "MASS"
+    >>> # and vector data: "VELOCITY"
+    >>> cuds.add_particles([...])
+
+    >>> # Initialise the source and specify scalar data to visualise
+    >>> # but turn off the visualisation for point vectors
+    >>> source = CUDSSource(cuds=cuds, point_scalars="MASS",
+                            point_vectors="")
+
+    >>> # Show it in Mayavi!
+    >>> from mayavi import mlab
+    >>> mlab.pipeline.glyph(source)
+
+    >>> # If the original cuds dataset is modified,
+    >>> # you need to update the source
+    >>> cuds.add_particles([...])
+    >>> source.update()    # the scene is updated
+    """
 
     #: The version of this class. Used for persistence.
     __version__ = 0
@@ -67,13 +115,7 @@ class CUDSSource(VTKDataSource):
 
     def __init__(self, cuds=None, point_scalars=None, point_vectors=None,
                  cell_scalars=None, cell_vectors=None, **traits):
-        """ A mayavi source of a SimPhoNy CUDS container.
-
-        The ``cuds`` attribute holds a reference to the CUDS instance it is
-        assigned to, as oppose to making a copy.  Therefore in any given time
-        after setting ``cuds``, the CUDS container could be modified internally
-        and divert from the VTK data source.  The ``update`` function can be
-        called to update the visualisation.
+        """ Constructor
 
         Parameters
         ----------
@@ -103,27 +145,6 @@ class CUDSSource(VTKDataSource):
 
         Other optional keyword parameters are parsed to VTKDataSource.
 
-        Examples
-        --------
-        >>> cuds = Particles("test")  # the container is empty
-
-        >>> # Say each particle has scalars "TEMPERATURE" and "MASS"
-        >>> # and vector data: "VELOCITY"
-        >>> cuds.add_particles([...])
-
-        >>> # Initialise the source and specify scalar data to visualise
-        >>> # but turn off the visualisation for point vectors
-        >>> source = CUDSSource(cuds=cuds, point_scalars="MASS",
-                                point_vectors="")
-
-        >>> # Show it in Mayavi!
-        >>> from mayavi import mlab
-        >>> mlab.pipeline.glyph(source)
-
-        >>> # If the original cuds dataset is modified,
-        >>> # you need to update the source
-        >>> cuds.add_particles([...])
-        >>> source.update()    # the scene is updated
         """
         # required by Traits
         super(CUDSSource, self).__init__(**traits)

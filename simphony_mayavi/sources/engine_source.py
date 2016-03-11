@@ -13,7 +13,36 @@ logger = logging.getLogger(__name__)
 
 
 class EngineSource(CUDSSource):
+    """A mayavi source for reading data from a SimPhoNy Engine
 
+    Attributes
+    ----------
+    engine : ABCModelingEngine
+        The SimPhoNy Modeling Engine where dataset is loaded from.
+
+    engine_name : str
+        Name of the engine, if provided, it is use for representation
+        purpose in the Mayavi pipeline GUI
+
+    dataset : str
+        Name of the dataset currently selected from the engine
+
+    datasets : list of str
+        The list of datasets in the engine
+
+    Examples
+    --------
+    >>> source = EngineSource(engine=some_engine)
+    >>> source.datasets
+    ["particles", "lattice"]
+    >>> source.dataset = "particles"
+
+    >>> # Alternatively
+    >>> source = EngineSource(engine=some_engine, dataset="particles")
+
+    >>> from mayavi import mlab
+    >>> mlab.pipline.glypy(source)
+    """
     # The version of this class.  Used for persistence
     __version__ = 0
 
@@ -51,7 +80,7 @@ class EngineSource(CUDSSource):
     def __init__(self, engine=None, dataset=None,
                  point_scalars=None, point_vectors=None,
                  cell_scalars=None, cell_vectors=None, **traits):
-        """A mayavi source for reading data from a SimPhoNy Engine
+        """Constructor
 
         Parameters
         ----------
@@ -87,20 +116,6 @@ class EngineSource(CUDSSource):
         assign the attribute to an empty string (i.e. point_scalars="")
 
         Other optional keyword parameters are parsed to CUDSSource
-
-        Examples
-        --------
-        >>> source = EngineSource(engine=some_engine)
-        >>> source.datasets
-        ["particles", "lattice"]
-        >>> source.dataset = "particles"
-
-        >>> # Alternatively
-        >>> source = EngineSource(engine=some_engine, dataset="particles")
-
-        >>> from mayavi import mlab
-        >>> mlab.pipline.glypy(source)
-
         """
         # required by Traits
         super(EngineSource, self).__init__(**traits)
