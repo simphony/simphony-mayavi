@@ -6,31 +6,21 @@ logger = logging.getLogger(__name__)
 
 
 class RunAndAnimate(object):
-    ''' Standalone non-GUI based controller for running a Simphony
-    Modeling Engine and animating the CUDS dataset in Mayavi.
 
-    Precondition: The required CUDS datasets are already visible
-    in the Mayavi scene(s)
-
-    Parameters
-    ----------
-    engine : Instance
-        base class: ABCModelingEngine
-        Simphony Modeling Engine
-
-    mayavi_engine : Instance
-        mayavi.core.engine.Engine; for retrieving scenes and visible
-        datasets
-    '''
     def __init__(self, engine, mayavi_engine):
-        '''
+        ''' Standalone non-GUI based controller for running a Simphony
+        Modeling Engine and animating the CUDS dataset in Mayavi.
+
+        Precondition: The required CUDS datasets are already visible
+        in the Mayavi scene(s)
+
         Parameters
         ----------
-        engine : Instance
-           base class : ABCModelingEngine
+        engine : ABCModelingEngine
+            Simphony Modeling Engine
 
-        mayavi_engine : Instance
-           mayavi.core.engine.Engine
+        mayavi_engine : mayavi.api.Engine
+            for retrieving scenes and visible datasets
         '''
         self.engine = engine
         self.mayavi_engine = mayavi_engine
@@ -48,14 +38,14 @@ class RunAndAnimate(object):
         number_of_runs : int
             the number of times the engine.run() is called
 
-        delay : int, optional
+        delay : int
             delay between each run.
-            If None, use previous setting or Mayavi's default: 500
+            If None, use previous setting or the Mayavi's default (500)
 
-        ui : bool, optional
+        ui : bool
             whether an UI is shown, default is False
 
-        update_all_scenes : bool, optional
+        update_all_scenes : bool
             whether all scenes are updated, default is False: i.e. only
             the current scene is updated
 
@@ -63,7 +53,6 @@ class RunAndAnimate(object):
         ------
         RuntimeError
             if nothing in scene(s) belongs to ``engine``
-
         '''
         if self.mayavi_engine is None:
             message = "Mayavi engine is not defined in the manager"

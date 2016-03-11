@@ -127,6 +127,10 @@ class VTKParticles(ABCParticles):
     def from_particles(cls, particles):
         """ Create a new VTKParticles copy from a CUDS particles instance.
 
+        Parameters
+        ----------
+        particles : ABCParticles
+            CUDS Particles dataset
         """
         points = []
         lines = []

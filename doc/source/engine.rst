@@ -30,7 +30,7 @@ Interactive scripting
 Non-GUI approach
 ................
 
-The :class:`~simphony_mayavi.plugins.engine_manager_standalone.EngineManagerStandalone`
+The :class:`~simphony_mayavi.plugin.EngineManagerStandalone`
 is available for the user to select and visualise datasets from a Simphony Modeling
 Engine via the Python shell.  It also allows the user to run the engine (locally) and
 animate the visualisation after each run.
@@ -54,13 +54,13 @@ of them as the engine runs.
 GUI approach
 ............
 
-:class:`EngineManagerStandaloneUI <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI>`
+:class:`EngineManagerStandaloneUI <simphony_mayavi.plugin.EngineManagerStandaloneUI>`
 provides a user-friendly and interactive approach to manage multiple engines, visualise
 datasets from a particular engine, locally run an engine and animate the results.
 
 Multiple engines can be added to or removed from the manager using
-:func:`add_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.add_engine>` and
-:func:`remove_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.remove_engine>`.
+:func:`add_engine <simphony_mayavi.plugin.EngineManagerStandaloneUI.add_engine>` and
+:func:`remove_engine <simphony_mayavi.plugin.EngineManagerStandaloneUI.remove_engine>`.
 
 .. rubric:: Example (Interactive: EngineManagerStandaloneUI)
 	    
@@ -83,7 +83,7 @@ Simphony GUI within Mayavi2
 ---------------------------
 
 A GUI essentially identical to the 
-:class:`EngineManagerStandaloneUI <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI>`
+:class:`EngineManagerStandaloneUI <simphony_mayavi.plugin.EngineManagerStandaloneUI>`
 is provided for the Mayavi2 application.
 In order to use it, one needs to first activate the plugin in
 ``Preferences``, following the instructions in :ref:`mayavi-plugin-setup-label`.
@@ -104,8 +104,8 @@ The Simphony panel is binded to the embedded Python shell within Mayavi2 as
 :func:`simphony.visualisation.mayavi_tools.get_simphony_panel <simphony_mayavi.plugin.get_simphony_panel>`.
 With that the user can use the same methods as
 described in :ref:`enginemanagerstandaloneui`, such as
-:func:`add_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.add_engine>`
-and :func:`remove_engine <simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI.remove_engine>`.
+:func:`add_engine <simphony_mayavi.plugin.EngineManagerStandaloneUI.add_engine>`
+and :func:`remove_engine <simphony_mayavi.plugin.EngineManagerStandaloneUI.remove_engine>`.
 
 Alternatively, the user can setup and load a SimPhoNy engine to Mayavi2
 by running a python script from a shell or via Mayavi2 (File->Run Python Script).
