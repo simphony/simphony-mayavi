@@ -22,19 +22,6 @@ class CUDSSource(VTKDataSource):
     cuds : instance of ABCParticle/ABCMesh/ABCLattice/H5Mesh
          The CUDS container to be wrapped as VTK data source
 
-    point_scalars_name : str
-         Name of the point scalar array visualised
-
-    point_vectors_name : str
-         Name of the point vector array visualised
-
-    cell_scalars_name : str
-         Name of the cell scalar array visualised
-
-    cell_vectors_name : str
-         Name of the cell vector array visualised
-
-
     The ``cuds`` attribute holds a reference to the CUDS instance it is
     assigned to, as oppose to making a copy.  Therefore in any given time
     after setting ``cuds``, the CUDS container could be modified internally
@@ -44,24 +31,16 @@ class CUDSSource(VTKDataSource):
     Examples
     --------
     >>> cuds = Particles("test")  # the container is empty
+    >>> source = CUDSSource(cuds=cuds)
 
-    >>> # Say each particle has scalars "TEMPERATURE" and "MASS"
-    >>> # and vector data: "VELOCITY"
-    >>> cuds.add_particles([...])
-
-    >>> # Initialise the source and specify scalar data to visualise
-    >>> # but turn off the visualisation for point vectors
-    >>> source = CUDSSource(cuds=cuds, point_scalars="MASS",
-                            point_vectors="")
-
-    >>> # Show it in Mayavi!
     >>> from mayavi import mlab
-    >>> mlab.pipeline.glyph(source)
+    >>> mlab.pipeline.glyph(source)   # scene is empty
 
-    >>> # If the original cuds dataset is modified,
-    >>> # you need to update the source
+    >>> # Add content to cuds after the source is initialised
     >>> cuds.add_particles([...])
-    >>> source.update()    # the scene is updated
+
+    >>> # update the scene!
+    >>> source.update()
     """
 
     #: The version of this class. Used for persistence.
@@ -145,6 +124,22 @@ class CUDSSource(VTKDataSource):
 
         Other optional keyword parameters are parsed to VTKDataSource.
 
+        Examples
+        --------
+        >>> cuds = Particles("test")
+
+        >>> # Say each particle has scalars "TEMPERATURE" and "MASS"
+        >>> # and vector data: "VELOCITY"
+        >>> cuds.add_particles([...])
+
+        >>> # Initialise the source and specify scalar data to visualise
+        >>> # but turn off the visualisation for point vectors
+        >>> source = CUDSSource(cuds=cuds, point_scalars="MASS",
+                                point_vectors="")
+
+        >>> # Show it in Mayavi!
+        >>> from mayavi import mlab
+        >>> mlab.pipeline.glyph(source)
         """
         # required by Traits
         super(CUDSSource, self).__init__(**traits)
