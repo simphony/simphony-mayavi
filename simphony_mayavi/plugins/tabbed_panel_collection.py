@@ -1,4 +1,4 @@
-from traits.api import HasTraits, List, Any, Instance
+from traits.api import HasTraits, List, Instance
 from traitsui.api import View, Item, VGroup, ListEditor
 
 
