@@ -13,29 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class EngineSource(CUDSSource):
-    """ A mayavi source for reading data from a SimPhoNy Engine
 
-    Attributes
-    ----------
-    engine : ABCModelingEngine
-       Simphony modeling engine wrapper
-
-    dataset : str
-       Selected dataset name in the engine
-
-    Examples
-    --------
-    >>> source = EngineSource(engine=some_engine)
-    >>> source.datasets
-    ["particles", "lattice"]
-    >>> source.dataset = "particles"
-
-    >>> # Alternatively
-    >>> source = EngineSource(engine=some_engine, dataset="particles")
-
-    >>> from mayavi import mlab
-    >>> mlab.pipline.glypy(source)
-    """
     # The version of this class.  Used for persistence
     __version__ = 0
 
