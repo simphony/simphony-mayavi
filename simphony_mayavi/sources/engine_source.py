@@ -105,10 +105,9 @@ class EngineSource(CUDSSource):
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
 
-        cell_scalars : str
-            CUBA name of the data to be selected as cell scalars.
-            Default is the first available cell scalars.
-
+        cell_vectors : str
+            CUBA name of the data to be selected as cell vectors.
+            Default is the first available cell vectors.
 
         Notes
         -----
