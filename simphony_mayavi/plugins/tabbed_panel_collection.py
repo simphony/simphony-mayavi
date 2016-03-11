@@ -28,7 +28,7 @@ class TabbedPanelCollection(HasTraits):
 
         Parameters
         ----------
-        **kwargs
+        \**kwargs
             The values are the HasTraits instances to be collected.
             The keys in the keyword arguments are used to define
             attributes of the TabbedPanelCollection so that the
