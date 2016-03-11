@@ -1,24 +1,32 @@
-Plugins module
+\Plugins module
 ==============
 
 This module contains classes the Simphony plugins for the Mayavi2 application.
 
 .. rubric:: Classes
 
-.. currentmodule:: simphony_mayavi.plugin
+.. currentmodule:: simphony_mayavi.plugins
 
 .. autosummary::
    :nosignatures:
 
    ~simphony_mayavi.plugins.add_source_panel.AddSourcePanel
    ~simphony_mayavi.plugins.add_engine_panel.AddEnginePanel
+   ~simphony_mayavi.plugins.add_engine_source_to_mayavi.AddEngineSourceToMayavi
    ~simphony_mayavi.plugins.engine_manager.EngineManager
    ~simphony_mayavi.plugins.engine_manager_mayavi2.EngineManagerMayavi2
    ~simphony_mayavi.plugins.engine_manager_standalone.EngineManagerStandalone
    ~simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI
    ~simphony_mayavi.plugins.run_and_animate.RunAndAnimate
-   ~simphony_mayavi.plugins.run_and_animate_panel.RunAndAnimatePanel   
+   ~simphony_mayavi.plugins.run_and_animate_panel.RunAndAnimatePanel
    ~simphony_mayavi.plugins.tabbed_panel_collection.TabbedPanelCollection
+
+.. rubric:: Functions
+
+.. autosummary::
+   :nosignatures:
+
+   ~simphony_mayavi.plugins.add_engine_source_to_mayavi.add_source_and_modules_to_scene
 
 
 Descriptions
@@ -29,6 +37,10 @@ Descriptions
    :show-inheritance:
 
 .. autoclass:: simphony_mayavi.plugins.add_engine_panel.AddEnginePanel
+   :members:
+   :show-inheritance:
+
+.. autoclass:: simphony_mayavi.plugins.add_engine_source_to_mayavi.AddEngineSourceToMayavi
    :members:
    :show-inheritance:
 
@@ -43,7 +55,7 @@ Descriptions
 .. autoclass:: simphony_mayavi.plugins.engine_manager_standalone.EngineManagerStandalone
    :members:
    :show-inheritance:
-	       
+
 .. autoclass:: simphony_mayavi.plugins.engine_manager_standalone_ui.EngineManagerStandaloneUI
    :members:
    :show-inheritance:
@@ -52,7 +64,7 @@ Descriptions
    :members:
    :show-inheritance:
 
-.. autoclass:: simphony_mayavi.plugins.run_and_animate_panel.RunAndAnimatePanel   
+.. autoclass:: simphony_mayavi.plugins.run_and_animate_panel.RunAndAnimatePanel
    :members:
    :show-inheritance:
 
@@ -60,7 +72,9 @@ Descriptions
    :members:
    :show-inheritance:
 
-      
+.. autofunction:: simphony_mayavi.plugins.add_engine_source_to_mayavi.add_source_and_modules_to_scene
+
+
 Engine_wrapper module
 ---------------------
 

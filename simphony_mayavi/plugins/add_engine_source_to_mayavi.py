@@ -28,16 +28,21 @@ def add_source_and_modules_to_scene(mayavi_engine, source):
 
 
 class AddEngineSourceToMayavi(object):
+    """ This class provides the functions needed for loading
+    a dataset from an engine and visualising it in Mayavi
+    with the default visualisation pipeline.  It makes use
+    of EngineSource and is used by the GUI in Mayavi2
+    """
 
     def __init__(self, engine, mayavi_engine):
         '''
-        Paramater
-        ---------
+        Paramaters
+        ----------
         engine : ABCModelingEngine
-           where dataset is extracted
+            from which dataset is loaded
 
         mayavi_engine : mayavi.core.engine.Engine
-           for visualizing data
+            the mayavi engine that manages the scenes
         '''
         self.engine = engine
         self.mayavi_engine = mayavi_engine
