@@ -17,9 +17,9 @@ class EngineManagerStandalone(object):
         '''
         Parameters
         ----------
-        engine : Instance of ABCModelingEngine
+        engine : ABCModelingEngine
 
-        mayavi_engine : mayavi.core.engine.Engine (option)
+        mayavi_engine : mayavi.api.Engine
             default to be mayavi.mlab.get_engine()
         '''
         self.engine = engine

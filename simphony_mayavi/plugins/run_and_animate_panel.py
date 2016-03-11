@@ -14,12 +14,15 @@ class RunAndAnimatePanel(HasTraits):
 
     Attributes
     ----------
-    engine : Instance of ABCModelingEngine
+    engine : ABCModelingEngine
         Simphony Engine
-    mayavi_engine : mayavi.core.engine.Engine instance
-        for retrieving current scenes
+
+    mayavi_engine : mayavi.api.Engine
+        The mayavi engine that manages the scenes
+
     time_step : float
         CUBA.TIME_STEP of the Simphony Engine
+
     number_of_time_steps : float
         CUBA.NUMBER_OF_TIME_STEPS of the Simphony Engine
     '''

@@ -8,13 +8,13 @@ def load(filename, name=None, kind=None, rename_arrays=None):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         The file name of the file to load.
 
-    name : string
+    name : str
         The name of the returned CUDS container. Default is 'CUDS container'.
 
-    kind :
+    kind : str
         The kind {'mesh', 'lattice', 'particles'} of the container to return.
         Default is None, where the function will use some heuristics to
         infer the most appropriate type of CUDS container to return

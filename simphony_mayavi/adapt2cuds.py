@@ -1,18 +1,18 @@
 from simphony_mayavi.cuds.api import VTKMesh, VTKLattice, VTKParticles
 
 
-def adapt2cuds(data_set, name='CUDS container', kind=None, rename_arrays=None):
+def adapt2cuds(data_set, name='CUDS dataset', kind=None, rename_arrays=None):
     """ Adapt a TVTK dataset to a CUDS container.
 
     Parameters
     ----------
     data_set : tvtk.Dataset
-        The dataset to import and wrap into CUDS container.
+        The dataset to import and wrap into CUDS dataset.
 
-    name : string
-        The name of the CUDS container. Default is 'CUDS container'.
+    name : str
+        The name of the CUDS dataset. Default is 'CUDS dataset'.
 
-    kind :
+    kind : str
         The kind {'mesh', 'lattice', 'particles'} of the container
         to return. Default is None, where the function will use some
         heuristics to infer the most appropriate type of CUDS
@@ -21,7 +21,7 @@ def adapt2cuds(data_set, name='CUDS container', kind=None, rename_arrays=None):
     rename_array : dict
         Dictionary mapping the array names used in the dataset object
         to their related CUBA keywords that will be used in the returned
-        CUDS container.
+        CUDS dataset.  Default is None.
 
         .. note::
 
