@@ -9,16 +9,16 @@ def adapt2cuds(data_set, name='CUDS dataset', kind=None, rename_arrays=None):
     data_set : tvtk.Dataset
         The dataset to import and wrap into CUDS dataset.
 
-    name : str, optional
+    name : str
         The name of the CUDS dataset. Default is 'CUDS dataset'.
 
-    kind : str, optional
+    kind : str
         The kind {'mesh', 'lattice', 'particles'} of the container
         to return. Default is None, where the function will use some
         heuristics to infer the most appropriate type of CUDS
         container to return
 
-    rename_array : dict, optional
+    rename_array : dict
         Dictionary mapping the array names used in the dataset object
         to their related CUBA keywords that will be used in the returned
         CUDS dataset.  Default is None.

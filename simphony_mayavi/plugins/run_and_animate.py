@@ -38,14 +38,14 @@ class RunAndAnimate(object):
         number_of_runs : int
             the number of times the engine.run() is called
 
-        delay : int, optional
+        delay : int
             delay between each run.
             If None, use previous setting or Mayavi's default: 500
 
-        ui : bool, optional
+        ui : bool
             whether an UI is shown, default is False
 
-        update_all_scenes : bool, optional
+        update_all_scenes : bool
             whether all scenes are updated, default is False: i.e. only
             the current scene is updated
 

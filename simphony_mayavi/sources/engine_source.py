@@ -55,28 +55,28 @@ class EngineSource(CUDSSource):
 
         Parameters
         ----------
-        engine : ABCModelingEngine, optional
+        engine : ABCModelingEngine
            The SimPhoNy Modeling Engine where dataset is loaded from.
            Default is None.
 
-        dataset : str, optional
+        dataset : str
             Name of the dataset to be extracted from engine.
             Default is the first available dataset if engine is defined,
             otherwise it is an empty string
 
-        point_scalars : str, optional
+        point_scalars : str
             CUBA name of the data to be selected as point scalars.
             Default is the first available point scalars.
 
-        point_vectors : str, optional
+        point_vectors : str
             CUBA name of the data to be selected as point vectors.
             Default is the first available point vectors.
 
-        cell_scalars : str, optional
+        cell_scalars : str
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
 
-        cell_scalars : str, optional
+        cell_scalars : str
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
 

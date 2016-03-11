@@ -77,22 +77,22 @@ class CUDSSource(VTKDataSource):
 
         Parameters
         ----------
-        cuds : ABCParticles, ABCLattice, ABCMesh or H5Mesh, optional
+        cuds : ABCParticles, ABCLattice, ABCMesh or H5Mesh
             The CUDS dataset to be wrapped as VTK data source
 
-        point_scalars : str, optional
+        point_scalars : str
             CUBA name of the data to be selected as point scalars.
             Default is the first available point scalars.
 
-        point_vectors : str, optional
+        point_vectors : str
             CUBA name of the data to be selected as point vectors.
             Default is the first available point vectors.
 
-        cell_scalars : str, optional
+        cell_scalars : str
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
 
-        cell_vectors : str, optional
+        cell_vectors : str
             CUBA name of the data to be selected as cell vectors.
             Default is the first available cell vectors.
 

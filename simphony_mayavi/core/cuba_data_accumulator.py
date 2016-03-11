@@ -58,7 +58,7 @@ class CUBADataAccumulator(object):
 
         Parameters
         ----------
-        keys : list, optional
+        keys : list
 
             The list of keys that the accumulator should care
             about. Providing this value at initialisation sets up the
@@ -84,7 +84,7 @@ class CUBADataAccumulator(object):
 
         Parameters
         ----------
-        data : DataContainer, optional
+        data : DataContainer
             The data information to append.
 
         Notes

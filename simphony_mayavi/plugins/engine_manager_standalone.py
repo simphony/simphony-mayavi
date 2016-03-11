@@ -19,7 +19,7 @@ class EngineManagerStandalone(object):
         ----------
         engine : ABCModelingEngine
 
-        mayavi_engine : mayavi.core.engine.Engine, optional
+        mayavi_engine : mayavi.core.engine.Engine
             default to be mayavi.mlab.get_engine()
         '''
         self.engine = engine

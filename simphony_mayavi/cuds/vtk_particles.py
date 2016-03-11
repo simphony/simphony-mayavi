@@ -24,14 +24,14 @@ class VTKParticles(ABCParticles):
         name : string
             The name of the container.
 
-        data : DataContainer, optional
+        data : DataContainer
             The data attribute to attach to the container. Default is None.
 
-        data_set : tvtk.DataSet, optional
+        data_set : tvtk.DataSet
             The dataset to wrap in the CUDS api. Default is None which
             will create a tvtk.PolyData
 
-        mappings : dict, optional
+        mappings : dict
             A dictionary of mappings for the particle2index, index2particle,
             bond2index and bond2element. Should be provided if the particles
             and bonds described in ``data_set`` are already assigned uids.
@@ -190,7 +190,7 @@ class VTKParticles(ABCParticles):
             The dataset to wrap in the CUDS api. Default is None which
             will create a tvtk.PolyData
 
-        data : DataContainer, optional
+        data : DataContainer
             The data attribute to attach to the container. Default is None.
 
         Raises

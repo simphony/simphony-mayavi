@@ -53,19 +53,19 @@ class AddEngineSourceToMayavi(object):
             Name of the CUDS dataset to be loaded from the modeling
             engine
 
-        point_scalars_name : str, optional
+        point_scalars_name : str
             CUBA name of the data to be selected as point scalars.
             default is the first available point scalars data
 
-        point_vectors_name : str, optional
+        point_vectors_name : str
             CUBA name of the data to be selected as point vectors
             default is the first available point vectors data
 
-        cell_scalars_name : str, optional
+        cell_scalars_name : str
             CUBA name of the data to be selected as cell scalars
             default is the first available cell scalars data
 
-        cell_vectors_name : str, optional
+        cell_vectors_name : str
             CUBA name of the data to be selected as cell vectors
             default is the first available cell vectors data
 
