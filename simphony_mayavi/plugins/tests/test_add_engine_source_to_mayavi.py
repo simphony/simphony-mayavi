@@ -79,8 +79,13 @@ class TestAddEngineSourceToMayavi(unittest.TestCase):
         handler = AddEngineSourceToMayavi(self.engine, self.mayavi_engine)
 
         # when
-        handler.add_dataset_to_scene("particles", "", "VELOCITY")
-        handler.add_dataset_to_scene("mesh", "", "", "TEMPERATURE", "VELOCITY")
+        handler.add_dataset_to_scene("particles",
+                                     point_scalars="",
+                                     point_vectors="VELOCITY")
+        handler.add_dataset_to_scene("mesh",
+                                     point_scalars="", point_vectors="",
+                                     cell_scalars="TEMPERATURE",
+                                     cell_vectors="VELOCITY")
 
         # then
         sources = self.mayavi_engine.current_scene.children
