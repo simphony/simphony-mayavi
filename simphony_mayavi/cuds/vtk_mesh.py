@@ -27,14 +27,14 @@ class VTKMesh(ABCMesh):
         name : string
             The name of the container
 
-        data : DataContainer
+        data : DataContainer, optional
             The data attribute to attach to the container. Default is None.
 
-        data_set : tvtk.DataSet
+        data_set : tvtk.DataSet, optional
             The dataset to wrap in the CUDS api. Default is None which
             will create a tvtk.UnstructuredGrid.
 
-        mappings : dict
+        mappings : dict, optional
             A dictionary of mappings for the point2index, index2point,
             element2index and index2element. Should be provided if the points
             and elements described in ``data_set`` are already assigned uids.
@@ -178,7 +178,7 @@ class VTKMesh(ABCMesh):
             The dataset to wrap in the CUDS api. Default is None which
             will create a tvtk.UnstructuredGrid.
 
-        data : DataContainer
+        data : DataContainer, optional
             The data attribute to attach to the container. Default is None.
 
         Raises

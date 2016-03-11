@@ -39,7 +39,7 @@ class VTKLattice(ABCLattice):
             the first point is the origin and the last point is furthest away
             from the origin
 
-        data : DataContainer
+        data : DataContainer, optional
             The data attribute to attach to the container. Default is None.
         """
         if primitive_cell.bravais_lattice not in BravaisLattice:
@@ -176,7 +176,7 @@ class VTKLattice(ABCLattice):
         origin : tuple
             lattice origin (x, y, z)
 
-        data : DataContainer
+        data : DataContainer, optional
             The data attribute to attach to the container. Default is None.
 
         Returns
@@ -306,7 +306,7 @@ class VTKLattice(ABCLattice):
             The dataset to wrap in the CUDS api.  If it is a PolyData,
             the points are assumed to be arranged in C-contiguous order
 
-        data : DataContainer
+        data : DataContainer, optional
             The data attribute to attach to the container. Default is None.
 
         Returns
