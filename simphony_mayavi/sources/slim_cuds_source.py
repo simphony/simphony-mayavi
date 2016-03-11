@@ -230,4 +230,3 @@ def _cuba_dimensionality(cuba):
         return 3
     else:
         raise ValueError("Unknown dimensionality for CUBA {}".format(cuba))
-
