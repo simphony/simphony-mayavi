@@ -126,7 +126,8 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         engine_source1 = self.mayavi_engine.current_scene.children[0]
 
         self.mayavi_engine.new_scene()
-        self.add_source_handler.add_dataset_to_scene("lattice", "TEMPERATURE")
+        self.add_source_handler.add_dataset_to_scene(
+            "lattice", point_scalars="TEMPERATURE")
         engine_source2 = self.mayavi_engine.current_scene.children[0]
 
         # when

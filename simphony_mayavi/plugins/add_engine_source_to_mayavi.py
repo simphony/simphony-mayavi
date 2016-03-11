@@ -46,9 +46,7 @@ class AddEngineSourceToMayavi(object):
         self.engine = engine
         self.mayavi_engine = mayavi_engine
 
-    def add_dataset_to_scene(self, name,
-                             point_scalars_name=None, point_vectors_name=None,
-                             cell_scalars_name=None, cell_vectors_name=None):
+    def add_dataset_to_scene(self, name, **kwargs):
         ''' Add a dataset from the engine to Mayavi
 
         Parameters
@@ -57,35 +55,9 @@ class AddEngineSourceToMayavi(object):
             Name of the CUDS dataset to be loaded from the modeling
             engine
 
-        point_scalars_name : str
-            CUBA name of the data to be selected as point scalars.
-            default is the first available point scalars data
-
-        point_vectors_name : str
-            CUBA name of the data to be selected as point vectors
-            default is the first available point vectors data
-
-        cell_scalars_name : str
-            CUBA name of the data to be selected as cell scalars
-            default is the first available cell scalars data
-
-        cell_vectors_name : str
-            CUBA name of the data to be selected as cell vectors
-            default is the first available cell vectors data
-
-        Notes
-        -----
-        To turn off visualisation of a point/cell data, assign
-        the data name to an empty string (e.g. point_scalars_name="")
+        \**kwargs :
+            Keyword arguments accepted by CUDSSource
         '''
-        source = EngineSource(engine=self.engine)
-        source.dataset = name
-        if point_scalars_name is not None:
-            source.point_scalars_name = point_scalars_name
-        if point_vectors_name is not None:
-            source.point_vectors_name = point_vectors_name
-        if cell_scalars_name is not None:
-            source.cell_scalars_name = cell_scalars_name
-        if cell_vectors_name is not None:
-            source.cell_vectors_name = cell_vectors_name
+        source = EngineSource(engine=self.engine, dataset=name,
+                              **kwargs)
         add_source_and_modules_to_scene(self.mayavi_engine, source)
