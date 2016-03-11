@@ -40,7 +40,7 @@ class RunAndAnimate(object):
 
         delay : int
             delay between each run.
-            If None, use previous setting or Mayavi's default: 500
+            If None, use previous setting or the Mayavi's default (500)
 
         ui : bool
             whether an UI is shown, default is False
