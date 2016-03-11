@@ -69,8 +69,10 @@ class AddEngineSourceToMayavi(object):
             CUBA name of the data to be selected as cell vectors
             default is the first available cell vectors data
 
+        Notes
+        -----
         To turn off visualisation of a point/cell data, assign
-        [point/cell]_[scalars/vectors]_name to an empty string (i.e. "")
+        the data name to an empty string (e.g. point_scalars_name="")
         '''
         source = EngineSource(engine=self.engine)
         source.dataset = name
