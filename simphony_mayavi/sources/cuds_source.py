@@ -92,7 +92,7 @@ class CUDSSource(VTKDataSource):
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
 
-        cell_scalars : str, optional
+        cell_vectors : str, optional
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
 
