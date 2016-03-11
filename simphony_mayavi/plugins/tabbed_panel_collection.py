@@ -5,6 +5,14 @@ from traitsui.api import View, Item, VGroup, ListEditor
 class TabbedPanelCollection(HasTraits):
     """Collect a list of HasTraits instances and display each
     of them as a tab in a tabbed notebook using ListEditor
+
+    Attributes
+    ----------
+    panels : list
+        Instances of HasTraits to be displayed in tabs
+
+    selected_panel : HasTraits
+        Currectly selected (visible) instance
     """
 
     # List of Traits object to be displayed in the notebook
@@ -18,16 +26,14 @@ class TabbedPanelCollection(HasTraits):
         """Create a TabbedPanelCollection containing the given
         HasTraits instances.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
         **kwargs
             The values are the HasTraits instances to be collected.
             The keys in the keyword arguments are used to define
-            attributes of the TabbedPanelCollection
-            so that the HasTraits instances can be retrieved easily.
-
-            As with any keyword arguments, the order of the keys
-            is lost.
+            attributes of the TabbedPanelCollection so that the
+            HasTraits instances can be retrieved easily. As with
+            any keyword arguments, the order of the keys is lost.
 
         Raises
         ------

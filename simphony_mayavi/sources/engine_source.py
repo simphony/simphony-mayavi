@@ -73,7 +73,7 @@ class EngineSource(CUDSSource):
     def __init__(self, engine=None, dataset=None,
                  point_scalars=None, point_vectors=None,
                  cell_scalars=None, cell_vectors=None, **traits):
-        """Initialise the EngineSource
+        """A mayavi source for reading data from a SimPhoNy Engine
 
         Parameters
         ----------
@@ -102,7 +102,27 @@ class EngineSource(CUDSSource):
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
 
+
+        Notes
+        -----
+        To turn off visualisation for a point/cell scalar/vector data,
+        assign the attribute to an empty string (i.e. point_scalars="")
+
         Other optional keyword parameters are parsed to CUDSSource
+
+        Examples
+        --------
+        >>> source = EngineSource(engine=some_engine)
+        >>> source.datasets
+        ["particles", "lattice"]
+        >>> source.dataset = "particles"
+
+        >>> # Alternatively
+        >>> source = EngineSource(engine=some_engine, dataset="particles")
+
+        >>> from mayavi import mlab
+        >>> mlab.pipline.glypy(source)
+
         """
         # required by Traits
         super(EngineSource, self).__init__(**traits)
