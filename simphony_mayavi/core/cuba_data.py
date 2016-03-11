@@ -57,13 +57,16 @@ class CubaData(MutableSequence):
         ----------
         attribute_data: tvtk.DataSetAttributes
             The vtk attribute container.
-        stored_cuba : set
+
+        stored_cuba : set, optional
             The CUBA keys that are going to be stored default
             is the result of running :meth:`supported_cuba`
-        size : int
+
+        size : int, optional
             The initial size of the container. Default is None. Setting
             a value will activate the virtual size behaviour of the container.
-        mask : tvtk.FieldData
+
+        mask : tvtk.FieldData, optional
             A data arrays containing the mask of some of the CUBA data in
             ``attribute_data``.
 

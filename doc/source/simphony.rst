@@ -38,8 +38,10 @@ allows the common `mayavi operations`_.
 Create VTK backed CUDS
 ----------------------
 
-Three objects (i.e class:`~. VTKMesh`, class:`~.VTKLattice`,
-`~.VTKParticles`) that wrap a VTK dataset and provide the CUDS top
+Three objects (i.e :class:`VTKMesh <simphony_mayavi.cuds.vtk_mesh.VTKMesh>`,
+:class:`VTKLattice <simphony_mayavi.cuds.vtk_lattice.VTKLattice>`,
+:class:`VTKParticles <simphony_mayavi.cuds.vtk_particles.VTKParticles>`)
+that wrap a VTK dataset and provide the CUDS top
 level container API are also available. The vtk backed objects are
 expected to provide memory and some speed advantages when Mayavi aided
 visualisation and processing is a major part of the working session.
@@ -64,7 +66,7 @@ The provided examples are equivalent to the ones in section
 Adapting VTK datasets
 ---------------------
 
-The :func:`~simphony_mayavi.adapt2cuds.adapt2cuds` function is
+The :func:`~simphony_mayavi.plugin.adapt2cuds` function is
 available to wrap common VTK datsets into top level CUDS
 containers. The function will attempt to automatically adapt the
 (t)vtk Dataset into a CUDS container. When automatic conversion
@@ -82,7 +84,7 @@ vtk datasets that come from vtk reader objects).
 Loading into CUDS
 -----------------
 
-The :func:`~simphony_mayavi.load.load` function is available to
+The :func:`~simphony_mayavi.plugin.load` function is available to
 load mayavi readable files (e.g. VTK xml format) into top level
 CUDS containers. Using ``load`` the user can import inside their
 simulation scripts files that have been created by other

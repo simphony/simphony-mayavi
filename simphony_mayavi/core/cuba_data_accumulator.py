@@ -58,7 +58,7 @@ class CUBADataAccumulator(object):
 
         Parameters
         ----------
-        keys : list
+        keys : list, optional
 
             The list of keys that the accumulator should care
             about. Providing this value at initialisation sets up the
@@ -84,9 +84,11 @@ class CUBADataAccumulator(object):
 
         Parameters
         ----------
-        data : DataContainer
+        data : DataContainer, optional
             The data information to append.
 
+        Notes
+        -----
         If the accumulator operates in ``fixed`` mode:
 
         - Any keys in :code:`self.keys()` that have values in ``data``
