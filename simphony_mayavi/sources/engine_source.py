@@ -17,9 +17,8 @@ class EngineSource(CUDSSource):
 
     Attributes
     ----------
-    engine : Instance
+    engine : ABCModelingEngine
        Simphony modeling engine wrapper
-       (Base class: ABCModelingEngine)
 
     dataset : str
        Selected dataset name in the engine

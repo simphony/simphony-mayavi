@@ -6,31 +6,21 @@ logger = logging.getLogger(__name__)
 
 
 class RunAndAnimate(object):
-    ''' Standalone non-GUI based controller for running a Simphony
-    Modeling Engine and animating the CUDS dataset in Mayavi.
 
-    Precondition: The required CUDS datasets are already visible
-    in the Mayavi scene(s)
-
-    Parameters
-    ----------
-    engine : Instance
-        base class: ABCModelingEngine
-        Simphony Modeling Engine
-
-    mayavi_engine : Instance
-        mayavi.core.engine.Engine; for retrieving scenes and visible
-        datasets
-    '''
     def __init__(self, engine, mayavi_engine):
-        '''
+        ''' Standalone non-GUI based controller for running a Simphony
+        Modeling Engine and animating the CUDS dataset in Mayavi.
+
+        Precondition: The required CUDS datasets are already visible
+        in the Mayavi scene(s)
+
         Parameters
         ----------
-        engine : Instance
-           base class : ABCModelingEngine
+        engine : ABCModelingEngine
+            Simphony Modeling Engine
 
-        mayavi_engine : Instance
-           mayavi.core.engine.Engine
+        mayavi_engine : mayavi.core.engine.Engine
+            for retrieving scenes and visible datasets
         '''
         self.engine = engine
         self.mayavi_engine = mayavi_engine
@@ -63,7 +53,6 @@ class RunAndAnimate(object):
         ------
         RuntimeError
             if nothing in scene(s) belongs to ``engine``
-
         '''
         if self.mayavi_engine is None:
             message = "Mayavi engine is not defined in the manager"

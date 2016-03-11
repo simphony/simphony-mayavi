@@ -49,11 +49,13 @@ class AddSourcePanel(HasTraits):
 
     Parameters
     ----------
-    engine : Instance of ABCModelingEngine
+    engine : ABCModelingEngine
         Simphony Modeling Engine wrapper
+
     engine_name : str
         Name of the modeling engine
-    mayavi_engine : Instance of mayavi.core.engine.Engine
+
+    mayavi_engine : mayavi.core.engine.Engine
         for visualisation
     '''
     engine = Instance(ABCModelingEngine)
