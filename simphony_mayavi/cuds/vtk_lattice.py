@@ -211,12 +211,16 @@ class VTKLattice(ABCLattice):
                    data=data, data_set=data_set)
 
     @classmethod
-    def from_lattice(cls, lattice):
+    def from_lattice(cls, lattice, node_keys=None):
         """ Create a new Lattice from the provided one.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         lattice : simphony.cuds.lattice.Lattice
+
+        node_keys : list
+            A list of point CUBA keys that we want to copy, and only those.
+            If None, all available and compatible keys will be copied.
 
         Returns
         -------
@@ -235,7 +239,7 @@ class VTKLattice(ABCLattice):
         lattice_type = primitive_cell.bravais_lattice
         size = lattice.size
         name = lattice.name
-        node_data = CUBADataAccumulator()
+        node_data = CUBADataAccumulator(node_keys)
         data = lattice.data
 
         if lattice_type in (
