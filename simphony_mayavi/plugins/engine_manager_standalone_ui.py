@@ -35,7 +35,7 @@ class EngineManagerStandaloneUI(EngineManager):
         engine : ABCModelingEngine
             Simphony Modeling Engine wrapper
 
-        mayavi_engine : mayavi.core.engine
+        mayavi_engine : mayavi.api.engine
             Default to be mayavi.mlab.get_engine()
 
         '''
