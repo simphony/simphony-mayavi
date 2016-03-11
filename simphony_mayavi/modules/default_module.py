@@ -49,7 +49,8 @@ def default_module(source):
 
     Returns
     -------
-    modules : list of mayavi.modules to be added to the pipeline
+    modules : list
+        mayavi modules to be added to the pipeline
     '''
     modules = []
 

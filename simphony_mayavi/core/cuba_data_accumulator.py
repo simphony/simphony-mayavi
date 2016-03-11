@@ -92,6 +92,8 @@ class CUBADataAccumulator(object):
         data : DataContainer
             The data information to append.
 
+        Notes
+        -----
         If the accumulator operates in ``fixed`` mode:
 
         - Any keys in :code:`self.keys()` that have values in ``data``

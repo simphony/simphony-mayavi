@@ -11,8 +11,8 @@ from simphony_mayavi.plugins.tabbed_panel_collection import (
 
 
 class EngineManagerStandaloneUI(EngineManager):
-    ''' Standalone GUI for visualising datasets from a Simphony Modeling
-    Engine, running the engine and animating the results
+    ''' Standalone GUI for visualising datasets from a modeling engine,
+    running the engine and animating the results
 
     '''
 
@@ -32,10 +32,10 @@ class EngineManagerStandaloneUI(EngineManager):
         engine_name : str
             Name of the Simphony Modeling Engine wrapper
 
-        engine : Instance
+        engine : ABCModelingEngine
             Simphony Modeling Engine wrapper
 
-        mayavi_engine : Instance
+        mayavi_engine : mayavi.api.engine
             Default to be mayavi.mlab.get_engine()
 
         '''

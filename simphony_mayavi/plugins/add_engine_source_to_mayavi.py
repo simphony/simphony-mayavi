@@ -4,14 +4,17 @@ from simphony_mayavi.sources.api import EngineSource
 
 def add_source_and_modules_to_scene(mayavi_engine, source):
     ''' Add a data source to the current Mayavi scene
-    and add the modules appropriate for the data
+    in a given Mayavi engine and add the modules appropriate
+    for the data
 
     Parameters
     ----------
-    mayavi_engine : mayavi.core.engine.Engine instance
+    mayavi_engine : mayavi.api.Engine
 
     source : VTKDataSource
-        '''
+       Examples are CUDSSource, CUDSFileSource, EngineSource,
+       which are subclasses of VTKDataSource
+    '''
     if mayavi_engine is None:
         raise RuntimeError("mayavi_engine cannot be None")
 
@@ -25,16 +28,20 @@ def add_source_and_modules_to_scene(mayavi_engine, source):
 
 
 class AddEngineSourceToMayavi(object):
+    """ This class provides the functions needed for loading
+    a dataset from an engine and visualising it in Mayavi
+    with the default visualisation pipeline.
+    """
 
     def __init__(self, engine, mayavi_engine):
         '''
-        Paramater
-        ---------
-        engine : Instance of ABCModelingEngine
-           where dataset is extracted
+        Paramaters
+        ----------
+        engine : ABCModelingEngine
+            from which dataset is loaded
 
-        mayavi_engine : mayavi.core.engine.Engine
-           for visualizing data
+        mayavi_engine : mayavi.api.Engine
+            the mayavi engine that manages the scenes
         '''
         self.engine = engine
         self.mayavi_engine = mayavi_engine
@@ -47,28 +54,29 @@ class AddEngineSourceToMayavi(object):
         Parameters
         ----------
         name : str
-            name of the CUDS dataset to be added
-            Check self.engine.get_dataset_names() to see available
-            dataset names.
+            Name of the CUDS dataset to be loaded from the modeling
+            engine
 
-        point_scalars_name : str, optional
+        point_scalars_name : str
             CUBA name of the data to be selected as point scalars.
             default is the first available point scalars data
 
-        point_vectors_name : str, optional
+        point_vectors_name : str
             CUBA name of the data to be selected as point vectors
             default is the first available point vectors data
 
-        cell_scalars_name : str, optional
+        cell_scalars_name : str
             CUBA name of the data to be selected as cell scalars
             default is the first available cell scalars data
 
-        cell_vectors_name : str, optional
+        cell_vectors_name : str
             CUBA name of the data to be selected as cell vectors
             default is the first available cell vectors data
 
+        Notes
+        -----
         To turn off visualisation of a point/cell data, assign
-        [point/cell]_[scalars/vectors]_name to an empty string (i.e. "")
+        the data name to an empty string (e.g. point_scalars_name="")
         '''
         source = EngineSource(engine=self.engine)
         source.dataset = name

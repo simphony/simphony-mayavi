@@ -79,8 +79,8 @@ class EngineManager(HasTraits):
         If modeling engine to be removed is currently selected,
         select the one of the remaining engines
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         name : str
             Name associated with the engine to be removed
         '''

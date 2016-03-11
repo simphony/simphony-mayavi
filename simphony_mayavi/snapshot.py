@@ -31,7 +31,7 @@ def get_figure(*args, **kwargs):
 
 
 def snapshot(cuds, filename):
-    """ Shave a snapshot of the cuds object using the default visualisation.
+    """ Save a snapshot of the cuds object using the default visualisation.
 
      Parameters
      ----------

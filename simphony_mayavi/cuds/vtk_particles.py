@@ -129,9 +129,8 @@ class VTKParticles(ABCParticles):
 
         Parameters
         ----------
-
-        particles: Particles
-            The particles object we want to copy from.
+        particles : ABCParticles
+            CUDS Particles dataset
 
         particle_keys : list
             A list of point CUBA keys that we want to copy, and only those.

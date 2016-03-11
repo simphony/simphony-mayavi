@@ -13,16 +13,22 @@ logger = logging.getLogger(__name__)
 
 
 class EngineSource(CUDSSource):
-    """ A mayavi source for reading data from a SimPhoNy Engine
+    """A mayavi source for reading data from a SimPhoNy Engine
 
     Attributes
     ----------
-    engine : Instance
-       Simphony modeling engine wrapper
-       (Base class: ABCModelingEngine)
+    engine : ABCModelingEngine
+        The SimPhoNy Modeling Engine where dataset is loaded from.
+
+    engine_name : str
+        Name of the engine, if provided, it is use for representation
+        purpose in the Mayavi pipeline GUI
 
     dataset : str
-       Selected dataset name in the engine
+        Name of the dataset currently selected from the engine
+
+    datasets : list of str
+        The list of datasets in the engine
 
     Examples
     --------
@@ -74,34 +80,39 @@ class EngineSource(CUDSSource):
     def __init__(self, engine=None, dataset=None,
                  point_scalars=None, point_vectors=None,
                  cell_scalars=None, cell_vectors=None, **traits):
-        """Initialise the EngineSource
+        """Constructor
 
         Parameters
         ----------
-        engine : ABCModelingEngine, optional
+        engine : ABCModelingEngine
            The SimPhoNy Modeling Engine where dataset is loaded from.
            Default is None.
 
-        dataset : str, optional
+        dataset : str
             Name of the dataset to be extracted from engine.
             Default is the first available dataset if engine is defined,
             otherwise it is an empty string
 
-        point_scalars : str, optional
+        point_scalars : str
             CUBA name of the data to be selected as point scalars.
             Default is the first available point scalars.
 
-        point_vectors : str, optional
+        point_vectors : str
             CUBA name of the data to be selected as point vectors.
             Default is the first available point vectors.
 
-        cell_scalars : str, optional
+        cell_scalars : str
             CUBA name of the data to be selected as cell scalars.
             Default is the first available cell scalars.
 
-        cell_scalars : str, optional
-            CUBA name of the data to be selected as cell scalars.
-            Default is the first available cell scalars.
+        cell_vectors : str
+            CUBA name of the data to be selected as cell vectors.
+            Default is the first available cell vectors.
+
+        Notes
+        -----
+        To turn off visualisation for a point/cell scalar/vector data,
+        assign the attribute to an empty string (i.e. point_scalars="")
 
         Other optional keyword parameters are parsed to CUDSSource
         """

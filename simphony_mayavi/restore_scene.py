@@ -25,7 +25,7 @@ def restore_scene(saved_visualisation, scene_index=0):
 
     scene_index : int
         index of the scene in the saved visualisation.
-        default: 0 (first scene)
+        default is 0 (first scene)
     '''
     if any(int(num) < 4 for num in MAYAVI_VERSION.split(".")[:3]):
         msg = "restore_scene may not work properly for Mayavi version < 4.4.4"
