@@ -102,6 +102,7 @@ from simphony_mayavi._version import full_version, version  # noqa
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
