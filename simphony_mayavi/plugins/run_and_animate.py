@@ -19,7 +19,7 @@ class RunAndAnimate(object):
         engine : ABCModelingEngine
             Simphony Modeling Engine
 
-        mayavi_engine : mayavi.core.engine.Engine
+        mayavi_engine : mayavi.api.Engine
             for retrieving scenes and visible datasets
         '''
         self.engine = engine

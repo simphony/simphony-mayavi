@@ -55,7 +55,7 @@ class AddSourcePanel(HasTraits):
     engine_name : str
         Name of the modeling engine
 
-    mayavi_engine : mayavi.core.engine.Engine
+    mayavi_engine : mayavi.api.Engine
         the mayavi engine that manages the scenes
     '''
     engine = Instance(ABCModelingEngine)

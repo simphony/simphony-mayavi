@@ -9,7 +9,7 @@ def add_source_and_modules_to_scene(mayavi_engine, source):
 
     Parameters
     ----------
-    mayavi_engine : mayavi.core.engine.Engine
+    mayavi_engine : mayavi.api.Engine
 
     source : VTKDataSource
        Examples are CUDSSource, CUDSFileSource, EngineSource,
@@ -41,7 +41,7 @@ class AddEngineSourceToMayavi(object):
         engine : ABCModelingEngine
             from which dataset is loaded
 
-        mayavi_engine : mayavi.core.engine.Engine
+        mayavi_engine : mayavi.api.Engine
             the mayavi engine that manages the scenes
         '''
         self.engine = engine
