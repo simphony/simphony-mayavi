@@ -6,27 +6,24 @@ import os
 
 import numpy
 from numpy.testing import assert_array_equal
-from mayavi.core.api import NullEngine
-from mayavi import __version__ as MAYAVI_VERSION
-from mayavi import mlab
 
-from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
+from simphony.cuds.mesh import Cell, Edge, Face
 from simphony.cuds.particles import Particle, Particles, Bond
-from simphony.cuds.primitive_cell import PrimitiveCell
 from simphony.cuds.lattice import (
-    Lattice, make_hexagonal_lattice, make_cubic_lattice,
+    make_hexagonal_lattice, make_cubic_lattice,
     make_orthorhombic_lattice)
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 
-from simphony_mayavi.cuds.api import VTKMesh, VTKLattice, VTKParticles
 from simphony_mayavi.core.api import (
     cell_array_slicer,
     CELL2VTKCELL, FACE2VTKCELL, EDGE2VTKCELL)
 from simphony_mayavi.sources.slim_cuds_source import SlimCUDSSource, \
     _available_keys
-from simphony_mayavi.sources.tests.test_cuds_source import TestParticlesSource, \
-    TestLatticeSource, TestMeshSource
+from simphony_mayavi.sources.tests.test_cuds_source import (
+    TestParticlesSource,
+    TestLatticeSource,
+    TestMeshSource)
 
 
 class TestMeshSlimSource(TestMeshSource):
@@ -367,6 +364,7 @@ class TestParticlesSlimSource(TestParticlesSource):
     def test_save_load_visualization_with_null_engine(self):
         pass
 
+
 class TestLatticeSlimSource(TestLatticeSource):
     tested_class = SlimCUDSSource
 
@@ -473,4 +471,3 @@ class TestLatticeSlimSource(TestLatticeSource):
             node.data[CUBA.VELOCITY] = node.index
             new_nodes.append(node)
         lattice.update_nodes(new_nodes)
-

@@ -234,9 +234,12 @@ class TestMeshSource(unittest.TestCase):
     def test_mesh_source_and_set_point_scalars(self):
         # when
         # all data attributes are turned off except for point_scalars
-        source = self.tested_class(cuds=self.container,
-                            point_scalars="TEMPERATURE", point_vectors="",
-                            cell_scalars="", cell_vectors="")
+        source = self.tested_class(
+            cuds=self.container,
+            point_scalars="TEMPERATURE",
+            point_vectors="",
+            cell_scalars="",
+            cell_vectors="")
 
         # then
         self.assertEqual(source.point_scalars_name, "TEMPERATURE")
