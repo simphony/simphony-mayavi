@@ -28,19 +28,6 @@ class CUDSSource(VTKDataSource):
     and divert from the VTK data source.  The ``update`` function can be
     called to update the visualisation.
 
-    Examples
-    --------
-    >>> cuds = Particles("test")  # the container is empty
-    >>> source = CUDSSource(cuds=cuds)
-
-    >>> from mayavi import mlab
-    >>> mlab.pipeline.glyph(source)   # scene is empty
-
-    >>> # Add content to cuds after the source is initialised
-    >>> cuds.add_particles([...])
-
-    >>> # update the scene!
-    >>> source.update()
     """
 
     #: The version of this class. Used for persistence.
@@ -156,8 +143,16 @@ class CUDSSource(VTKDataSource):
                                 cell_vectors=cell_vectors)
 
     def update(self):
-        """ Recalculate the VTK data from the CUDS dataset
-        Useful when ``cuds`` is modified after assignment
+        """ Recalculate the VTK data from the CUDS dataset.
+        Useful when ``cuds`` is modified after assignment.
+
+        Examples
+        --------
+        >>> # Add content to cuds after visualisation is set up
+        >>> source.cuds.add_particles([...])
+
+        >>> # update the scene!
+        >>> source.update()
         """
         self._update_vtk_cuds_from_cuds(self.cuds)
 
