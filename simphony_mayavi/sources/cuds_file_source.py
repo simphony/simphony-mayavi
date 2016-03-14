@@ -31,7 +31,7 @@ class CUDSFileSource(CUDSSource):
     #: The names of the contained datasets.
     datasets = ListStr
 
-    # whether the source is initialized
+    #: whether the source is initialized
     initialized = Bool(False)
 
     view = View(
