@@ -1,5 +1,7 @@
 import itertools
 import numpy
+from common import is_old_pipeline
+from mayavi.sources.vtk_xml_file_reader import get_all_attributes
 from traits.api import TraitError
 
 from simphony.core.cuba import CUBA
@@ -85,21 +87,72 @@ class SlimCUDSSource(CUDSSource):
         self._vtk_cuds = vtk_cuds
 
     def _update_data(self):
-        # We need to silence the behavior of the VTKDataSource, otherwise it
-        # will overwrite the point_scalar_list etc. with data from the vtk
-        # datasource, which in this case contains only the data we care
-        # about.
-        pass
+        """Reimplement _update_data from VTKDataSource,
+        to workaround its automatic rewriting of names in the data.
+        The e.g. _point_scalars_list is filled with the VTK dataset info
+        by this method, but by design of this class, the VTK dataset content
+        is limited. We need to take full control of those lists while leaving
+        the rest of the method functionality alone.
+        """
 
+        if self.data is None:
+            return
+        pnt_attr, cell_attr = get_all_attributes(self.data)
 
-def _to_cuba(iterable):
-    """Small generator that processes an iterable of strings
-    into an iterable of CUBA keys"""
-    for elem in iterable:
-        try:
-            yield CUBA[elem]
-        except ValueError:
-            pass
+        pd = self.data.point_data
+        scalars = pd.scalars
+        if self.data.is_a('vtkImageData') and scalars is not None:
+            # For some reason getting the range of the scalars flushes
+            # the data through to prevent some really strange errors
+            # when using an ImagePlaneWidget.
+            if is_old_pipeline():
+                self._assign_attribute.output.scalar_type = scalars.data_type
+                self.data.scalar_type = scalars.data_type
+
+        self._setup_data_traits(pnt_attr, 'point')
+        self._setup_data_traits(cell_attr, 'cell')
+
+        if self._first:
+            self._first = False
+
+        # Propagate the data changed event.
+        self.data_changed = True
+
+    def __get_pure_state__(self):
+        """Overrides the same functionality from the base class, but
+        since it is based on the vtk content, which is restricted, we can't
+        provide this functionality on this class"""
+        raise NotImplementedError("Cannot get state of SlimCUDSSource. "
+                                  "Operation not implemented.")
+
+    def __set_pure_state__(self, state):
+        """Overrides the same functionality from the base class, but
+        since it is based on the vtk content, which is restricted, we can't
+        provide this functionality on this class"""
+        raise NotImplementedError("Cannot set state of SlimCUDSSource. "
+                                  "Operation not implemented.")
+
+    def _setup_data_traits(self, attributes, d_type):
+        """Given the object, the dict of the attributes from the
+        `get_all_attributes` function and the data type
+        (point/cell) data this will setup the object and the data.
+        """
+        attrs = ['scalars', 'vectors', 'tensors']
+        aa = self._assign_attribute
+        data = getattr(self.data, '%s_data' % d_type)
+        for attr in attrs:
+            values = attributes[attr]
+            if len(values) == 0:
+                choice = ''
+            else:
+                choice = getattr(self, '%s_%s_name' % (d_type, attr))
+
+            getattr(data, 'set_active_%s' % attr)(choice)
+            aa.assign(choice, attr.upper(), d_type.upper() + '_DATA')
+            aa.update()
+            kw = {'%s_%s_name' % (d_type, attr): choice,
+                  'trait_change_notify': False}
+            self.set(**kw)
 
 
 def _available_keys(cuds):
@@ -230,3 +283,5 @@ def _cuba_dimensionality(cuba):
         return 3
     else:
         raise ValueError("Unknown dimensionality for CUBA {}".format(cuba))
+
+
