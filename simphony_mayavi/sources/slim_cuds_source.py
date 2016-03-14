@@ -1,6 +1,6 @@
 import itertools
-import numpy
-from common import is_old_pipeline
+
+from tvtk.common import is_old_pipeline
 from mayavi.sources.vtk_xml_file_reader import get_all_attributes
 from traits.api import TraitError
 
