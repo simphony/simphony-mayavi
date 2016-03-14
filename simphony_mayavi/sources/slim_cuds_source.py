@@ -5,9 +5,9 @@ from mayavi.sources.vtk_xml_file_reader import get_all_attributes
 from traits.api import TraitError
 
 from simphony.core.cuba import CUBA
+from simphony.core.keywords import KEYWORDS
 from simphony.cuds import ABCMesh, ABCParticles, ABCLattice
 from simphony.io.h5_mesh import H5Mesh
-from simphony.testing.utils import dummy_cuba_value
 from simphony_mayavi.cuds.vtk_lattice import VTKLattice
 from simphony_mayavi.cuds.vtk_mesh import VTKMesh
 from simphony_mayavi.cuds.vtk_particles import VTKParticles
@@ -51,6 +51,8 @@ class SlimCUDSSource(CUDSSource):
 
         for lst, keys in zip(all_lists, _available_keys(cuds)):
             lst[:] = sorted([key.name for key in keys])
+            # Adds an empty string as selection for not show attribute
+            lst.insert(0, '')
 
         super(SlimCUDSSource, self)._set_cuds(cuds)
 
@@ -222,13 +224,13 @@ def _available_keys(cuds):
     return point_scalars, point_vectors, cell_scalars, cell_vectors
 
 
-def _extract_cuba_keys_per_data_types(data):
+def _extract_cuba_keys_per_data_types(data_container):
     """Given a DataContainer, gets the scalar and vector CUBA types
     it contains, as two independent sets
 
     Parameters
     ----------
-    data : DataContainer
+    data_container : DataContainer
         A data container.
 
     Returns
@@ -239,15 +241,15 @@ def _extract_cuba_keys_per_data_types(data):
     scalars = set()
     vectors = set()
 
-    for cuba_key in data.keys():
+    for cuba_key in data_container.keys():
         try:
-            dim = _cuba_dimensionality(cuba_key)
+            shape = _cuba_shape(cuba_key)
         except ValueError:
             continue
 
-        if dim == 0:
+        if shape == [1]:
             scalars.add(cuba_key)
-        elif dim == 3:
+        elif shape == [3]:
             vectors.add(cuba_key)
         else:
             # We don't represent this dimensionality, skip it
@@ -256,32 +258,21 @@ def _extract_cuba_keys_per_data_types(data):
     return scalars, vectors
 
 
-def _cuba_dimensionality(cuba):
-    """Given a cuba type, returns its associated dimensionality.
-    Raises ValueError if the dimensionality for that cuba type is unknown.
-    A scalar has zero dimensionality.
+def _cuba_shape(cuba):
+    """Given a cuba type, returns its associated shape as specified in
+    the KEYWORDS.
 
     Parameters
     ----------
-
     cuba: CUBA
         The CUBA type enumeration
 
-
     Returns
     -------
-    dim : int
-        The dimensionality of the CUBA type
-
+    shape : list(int)
+        The shape of the CUBA type, as specified in the KEYWORDS
+        in simphony.core.keywords.
     """
 
-    default = dummy_cuba_value(cuba)
-    if (numpy.issubdtype(type(default), numpy.float) or
-            numpy.issubdtype(type(default), numpy.int)):
-        return 0
-    elif isinstance(default, numpy.ndarray) and default.size == 3:
-        return 3
-    else:
-        raise ValueError("Unknown dimensionality for CUBA {}".format(cuba))
-
-
+    keyword = KEYWORDS[CUBA(cuba).name]
+    return keyword.shape
