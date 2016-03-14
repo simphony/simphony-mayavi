@@ -22,23 +22,18 @@ class SlimCUDSSource(CUDSSource):
     """
 
     def _point_scalars_name_changed(self, value):
-        super(CUDSSource, self)._point_scalars_name_changed(value)
         self.update()
 
     def _point_vectors_name_changed(self, value):
-        super(CUDSSource, self)._point_vectors_name_changed(value)
         self.update()
 
     def _cell_scalars_name_changed(self, value):
-        super(CUDSSource, self)._cell_scalars_name_changed(value)
         self.update()
 
     def _cell_vectors_name_changed(self, value):
-        super(CUDSSource, self)._cell_vectors_name_changed(value)
         self.update()
 
     def _set_cuds(self, cuds):
-
         # Before refreshing the VTK CUDS object, we need to set the content
         # of the available data in the cuds. Normally this is done by the
         # VTKDataSource _from_ the VTK data, but our VTK data will not contain
@@ -54,6 +49,11 @@ class SlimCUDSSource(CUDSSource):
             # Adds an empty string as selection for not show attribute
             lst.insert(0, '')
 
+        # We need to fill the tensors with an empty entry, even if we
+        # technically don't use them.
+        self._point_tensors_list = ['']
+        self._cell_tensors_list = ['']
+
         super(SlimCUDSSource, self)._set_cuds(cuds)
 
     def _update_vtk_cuds_from_cuds(self, cuds):
@@ -63,11 +63,13 @@ class SlimCUDSSource(CUDSSource):
         # Extract the requested data we want.
         points_keys = [CUBA[x]
                        for x in [self.point_scalars_name,
-                                 self.point_vectors_name]]
+                                 self.point_vectors_name]
+                       if len(x) > 0]
 
         cell_keys = [CUBA[x]
                      for x in [self.cell_scalars_name,
-                               self.cell_vectors_name]]
+                               self.cell_vectors_name]
+                     if len(x) > 0]
 
         if isinstance(cuds, (VTKMesh, VTKParticles, VTKLattice)):
             vtk_cuds = cuds
@@ -242,10 +244,7 @@ def _extract_cuba_keys_per_data_types(data_container):
     vectors = set()
 
     for cuba_key in data_container.keys():
-        try:
-            shape = _cuba_shape(cuba_key)
-        except ValueError:
-            continue
+        shape = KEYWORDS[cuba_key.name].shape
 
         if shape == [1]:
             scalars.add(cuba_key)
@@ -256,23 +255,3 @@ def _extract_cuba_keys_per_data_types(data_container):
             pass
 
     return scalars, vectors
-
-
-def _cuba_shape(cuba):
-    """Given a cuba type, returns its associated shape as specified in
-    the KEYWORDS.
-
-    Parameters
-    ----------
-    cuba: CUBA
-        The CUBA type enumeration
-
-    Returns
-    -------
-    shape : list(int)
-        The shape of the CUBA type, as specified in the KEYWORDS
-        in simphony.core.keywords.
-    """
-
-    keyword = KEYWORDS[CUBA(cuba).name]
-    return keyword.shape
