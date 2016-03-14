@@ -15,47 +15,21 @@ logger = logging.getLogger(__name__)
 class EngineSource(CUDSSource):
     """A mayavi source for reading data from a SimPhoNy Engine
 
-    Attributes
-    ----------
-    engine : ABCModelingEngine
-        The SimPhoNy Modeling Engine where dataset is loaded from.
-
-    engine_name : str
-        Name of the engine, if provided, it is use for representation
-        purpose in the Mayavi pipeline GUI
-
-    dataset : str
-        Name of the dataset currently selected from the engine
-
-    datasets : list of str
-        The list of datasets in the engine
-
-    Examples
-    --------
-    >>> source = EngineSource(engine=some_engine)
-    >>> source.datasets
-    ["particles", "lattice"]
-    >>> source.dataset = "particles"
-
-    >>> # Alternatively
-    >>> source = EngineSource(engine=some_engine, dataset="particles")
-
-    >>> from mayavi import mlab
-    >>> mlab.pipline.glypy(source)
     """
-    # The version of this class.  Used for persistence
+    #: The version of this class.  Used for persistence.
     __version__ = 0
 
-    # the SimPhoNy Modeling Engine from which datasets are loaded
+    #: the SimPhoNy Modeling Engine from which datasets are loaded.
     engine = Instance(ABCModelingEngine)
 
-    # Label for the engine (for representation purposes)
+    #: Label for the engine, if provided, it is use for representation
+    #: purpose in the Mayavi pipeline GUI).
     engine_name = Str
 
-    # The name of the CUDS container that is currently loaded
+    #: The name of the CUDS container that is currently loaded.
     dataset = Enum(values="datasets")
 
-    # datasets depends on the engine and should be read-only
+    #: datasets in the engine.  This should be read-only.
     datasets = Property(ListStr, depends_on="engine")
 
     view = View(
@@ -115,6 +89,20 @@ class EngineSource(CUDSSource):
         assign the attribute to an empty string (i.e. point_scalars="")
 
         Other optional keyword parameters are parsed to CUDSSource
+
+        Examples
+        --------
+        >>> source = EngineSource(engine=some_engine)
+        >>> source.datasets
+        ["particles", "lattice"]
+        >>> source.dataset = "particles"
+
+        >>> # Alternatively
+        >>> source = EngineSource(engine=some_engine, dataset="particles")
+
+        >>> from mayavi import mlab
+        >>> mlab.pipline.glypy(source)
+
         """
         # required by Traits
         super(EngineSource, self).__init__(**traits)
