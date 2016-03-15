@@ -2,6 +2,7 @@ import itertools
 
 from mayavi.core.pipeline_info import get_tvtk_dataset_name
 from mayavi.sources.vtk_data_source import has_attributes
+from mayavi.sources.vtk_xml_file_reader import get_all_attributes
 from tvtk.common import is_old_pipeline
 from tvtk.api import tvtk
 from tvtk import messenger
@@ -157,6 +158,8 @@ class SlimCUDSSource(CUDSSource):
     def _update_data_2(self):
         if self.data is None:
             return
+        pnt_attr, cell_attr = get_all_attributes(self.data)
+
         pd = self.data.point_data
         scalars = pd.scalars
         if self.data.is_a('vtkImageData') and scalars is not None:
@@ -167,6 +170,33 @@ class SlimCUDSSource(CUDSSource):
                 self._assign_attribute.output.scalar_type = scalars.data_type
                 self.data.scalar_type = scalars.data_type
 
+        def _setup_data_traits(obj, attributes, d_type):
+            """Given the object, the dict of the attributes from the
+            `get_all_attributes` function and the data type
+            (point/cell) data this will setup the object and the data.
+            """
+            attrs = ['scalars', 'vectors', 'tensors']
+            aa = obj._assign_attribute
+            data = getattr(obj.data, '%s_data' % d_type)
+            for attr in attrs:
+                values = attributes[attr]
+                values.append('')
+                if len(values) > 1:
+                    default = getattr(obj, '%s_%s_name'%(d_type, attr))
+                    if obj._first and len(default) == 0:
+                        default = values[0]
+                    getattr(data, 'set_active_%s' % attr)(default)
+                    aa.assign(default, attr.upper(),
+                              d_type.upper() + '_DATA')
+                    aa.update()
+                    kw = {'%s_%s_name'%(d_type, attr): default,
+                          'trait_change_notify': False}
+                    obj.set(**kw)
+
+        _setup_data_traits(self, pnt_attr, 'point')
+        _setup_data_traits(self, cell_attr, 'cell')
+        if self._first:
+            self._first = False
         # Propagate the data changed event.
         self.data_changed = True
 
