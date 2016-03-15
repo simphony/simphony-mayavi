@@ -1,8 +1,6 @@
 import itertools
 import unittest
 import tempfile
-import shutil
-import os
 
 import numpy
 from numpy.testing import assert_array_equal

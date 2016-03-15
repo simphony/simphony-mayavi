@@ -182,14 +182,14 @@ class SlimCUDSSource(CUDSSource):
                 values = attributes[attr]
                 values.append('')
                 if len(values) > 1:
-                    default = getattr(obj, '%s_%s_name'%(d_type, attr))
+                    default = getattr(obj, '%s_%s_name' % (d_type, attr))
                     if obj._first and len(default) == 0:
                         default = values[0]
                     getattr(data, 'set_active_%s' % attr)(default)
                     aa.assign(default, attr.upper(),
                               d_type.upper() + '_DATA')
                     aa.update()
-                    kw = {'%s_%s_name'%(d_type, attr): default,
+                    kw = {'%s_%s_name' % (d_type, attr): default,
                           'trait_change_notify': False}
                     obj.set(**kw)
 
