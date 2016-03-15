@@ -135,7 +135,7 @@ class SlimCUDSSource(CUDSSource):
         if has_attributes(self.data):
             aa = self._assign_attribute
             self.configure_input_data(aa, new)
-            self._update_data_2()
+            self._update_vtk_dataset()
             aa.update()
             self.outputs = [aa.output]
         else:
@@ -160,9 +160,16 @@ class SlimCUDSSource(CUDSSource):
         # Change our name so that our label on the tree is updated.
         self.name = self._get_name()
 
-    def _update_data_2(self):
+    def _update_vtk_dataset(self):
+        """This routine updates the VTK DataSet and the associated
+        pipeline info. In the base class, this same task is performed
+        by _update_data, but we can't use that implementation because
+        it also overwrites the content of the _list, and therefore the
+        combobox selection."""
+
         if self.data is None:
             return
+
         pnt_attr, cell_attr = get_all_attributes(self.data)
 
         pd = self.data.point_data
