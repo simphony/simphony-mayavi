@@ -54,7 +54,7 @@ class SlimCUDSSource(CUDSSource):
         super(SlimCUDSSource, self)._set_cuds(cuds)
 
     def _fill_datatype_enums(self, cuds):
-        """Fills the "comboboxes" x_y_list enumerations
+        """Fills the "comboboxes" _x_y_list enumerations
         from the cuds.
         """
         all_lists = (
@@ -63,11 +63,16 @@ class SlimCUDSSource(CUDSSource):
             self._cell_scalars_list,
             self._cell_vectors_list)
 
-        if cuds is not None:
-            for lst, keys in zip(all_lists, _available_keys(cuds)):
-                entries = sorted([key.name for key in keys])
-                entries.insert(0, '')
-                lst[:] = entries
+        available_keys = (
+            _available_keys(cuds)
+            if cuds is not None
+            else (set(), set(), set(), set())
+        )
+
+        for lst, keys in zip(all_lists, available_keys):
+            entries = sorted([key.name for key in keys])
+            entries.insert(0, '')
+            lst[:] = entries
 
         # We need to fill the tensors with an empty entry, even if we
         # technically don't use them.

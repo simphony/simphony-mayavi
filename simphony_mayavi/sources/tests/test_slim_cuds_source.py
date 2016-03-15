@@ -3,6 +3,7 @@ import unittest
 import tempfile
 
 import numpy
+from mayavi.sources.vtk_xml_file_reader import get_all_attributes
 from numpy.testing import assert_array_equal
 
 from simphony.cuds.mesh import Cell, Edge, Face
@@ -361,6 +362,77 @@ class TestParticlesSlimSource(TestParticlesSource):
     @unittest.skip("Cannot perform save/load with SlimCUDSSource")
     def test_save_load_visualization_with_null_engine(self):
         pass
+
+    def test_start_setup(self):
+        # Try with an empty source (no cuds) and call start on it.
+        source = SlimCUDSSource()
+
+        source.start()
+
+        self.assertEqual(source.point_scalars_name, "")
+        self.assertEqual(source.point_vectors_name, "")
+        self.assertEqual(source.cell_scalars_name, "")
+        self.assertEqual(source.cell_vectors_name, "")
+
+        self.assertEqual(len(source._point_scalars_list), 1)
+        self.assertEqual(len(source._point_vectors_list), 1)
+        self.assertEqual(len(source._cell_scalars_list), 1)
+        self.assertEqual(len(source._cell_vectors_list), 1)
+
+        source = SlimCUDSSource(cuds=self.container)
+
+        self.assertEqual(source.point_scalars_name, "")
+        self.assertEqual(source.point_vectors_name, "")
+        self.assertEqual(source.cell_scalars_name, "")
+        self.assertEqual(source.cell_vectors_name, "")
+
+        self.assertEqual(len(source._point_scalars_list), 4)
+        self.assertEqual(len(source._point_vectors_list), 1)
+        self.assertEqual(len(source._cell_scalars_list), 2)
+        self.assertEqual(len(source._cell_vectors_list), 1)
+
+        source = SlimCUDSSource(cuds=self.container,
+                                point_scalars="TEMPERATURE")
+
+        self.assertEqual(source.point_scalars_name, "TEMPERATURE")
+        self.assertEqual(source.point_vectors_name, "")
+        self.assertEqual(source.cell_scalars_name, "")
+        self.assertEqual(source.cell_vectors_name, "")
+
+        self.assertEqual(len(source._point_scalars_list), 4)
+        self.assertEqual(len(source._point_vectors_list), 1)
+        self.assertEqual(len(source._cell_scalars_list), 2)
+        self.assertEqual(len(source._cell_vectors_list), 1)
+
+    def test_changing_names(self):
+        source = SlimCUDSSource(cuds=self.container,
+                                point_scalars="TEMPERATURE")
+
+        point_attrs, cell_attrs = get_all_attributes(source.data)
+        self.assertEqual(len(point_attrs["scalars"]), 1)
+        self.assertEqual(point_attrs["scalars"][0], "TEMPERATURE")
+
+        source.point_scalars_name = ""
+        point_attrs, cell_attrs = get_all_attributes(source.data)
+        self.assertEqual(len(point_attrs["scalars"]), 0)
+
+    def test_unexistent_choice(self):
+        # This should work and trigger no error
+        source = SlimCUDSSource(point_scalars="TEMPERATURE")
+        self.assertEqual(source.point_scalars_name, '')
+
+    def test_changing_cuds(self):
+        source = SlimCUDSSource()
+
+        source.cuds = self.container
+        source.point_scalars_name = "TEMPERATURE"
+        point_attrs, cell_attrs = get_all_attributes(source.data)
+        self.assertEqual(len(point_attrs["scalars"]), 1)
+        self.assertEqual(point_attrs["scalars"][0], "TEMPERATURE")
+
+        source.point_scalars_name = ""
+        point_attrs, cell_attrs = get_all_attributes(source.data)
+        self.assertEqual(len(point_attrs["scalars"]), 0)
 
 
 class TestLatticeSlimSource(TestLatticeSource):
