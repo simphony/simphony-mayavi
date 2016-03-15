@@ -1,7 +1,10 @@
 import itertools
 
+from mayavi.core.pipeline_info import get_tvtk_dataset_name
+from mayavi.sources.vtk_data_source import has_attributes
 from tvtk.common import is_old_pipeline
-from mayavi.sources.vtk_xml_file_reader import get_all_attributes
+from tvtk.api import tvtk
+from tvtk import messenger
 from traits.api import TraitError
 
 from simphony.core.cuba import CUBA
@@ -21,40 +24,60 @@ class SlimCUDSSource(CUDSSource):
     instead of preemptively load all available data.
     """
 
+    def start(self):
+        if self.running:
+            return
+
+        super(CUDSSource, self).start()
+
+        self._fill_datatype_enums(self.cuds)
+
     def _point_scalars_name_changed(self, value):
         self.update()
+        super(SlimCUDSSource, self)._point_scalars_name_changed(value)
 
     def _point_vectors_name_changed(self, value):
         self.update()
+        super(SlimCUDSSource, self)._point_vectors_name_changed(value)
 
     def _cell_scalars_name_changed(self, value):
         self.update()
+        super(SlimCUDSSource, self)._cell_scalars_name_changed(value)
 
     def _cell_vectors_name_changed(self, value):
         self.update()
+        super(SlimCUDSSource, self)._cell_vectors_name_changed(value)
 
     def _set_cuds(self, cuds):
-        # Before refreshing the VTK CUDS object, we need to set the content
-        # of the available data in the cuds. Normally this is done by the
-        # VTKDataSource _from_ the VTK data, but our VTK data will not contain
-        # all the keys. We are therefore required to update them here.
+        self._fill_datatype_enums(cuds)
+        super(SlimCUDSSource, self)._set_cuds(cuds)
+
+    def _fill_datatype_enums(self, cuds):
+        """Fills the "comboboxes" x_y_list enumerations
+        from the cuds.
+        """
         all_lists = (
             self._point_scalars_list,
             self._point_vectors_list,
             self._cell_scalars_list,
             self._cell_vectors_list)
 
-        for lst, keys in zip(all_lists, _available_keys(cuds)):
-            lst[:] = sorted([key.name for key in keys])
-            # Adds an empty string as selection for not show attribute
-            lst.insert(0, '')
+        if cuds is not None:
+            for lst, keys in zip(all_lists, _available_keys(cuds)):
+                entries = sorted([key.name for key in keys])
+                entries.insert(0, '')
+                lst[:] = entries
 
         # We need to fill the tensors with an empty entry, even if we
         # technically don't use them.
         self._point_tensors_list = ['']
         self._cell_tensors_list = ['']
-
-        super(SlimCUDSSource, self)._set_cuds(cuds)
+        if self._first:
+            self._first = False
+            self.trait_setq(point_scalars_name="",
+                            point_vectors_name="",
+                            cell_scalars_name="",
+                            cell_vectors_name="")
 
     def _update_vtk_cuds_from_cuds(self, cuds):
         """Update _vtk_cuds, but limit the extraction to only the requested
@@ -98,11 +121,42 @@ class SlimCUDSSource(CUDSSource):
         is limited. We need to take full control of those lists while leaving
         the rest of the method functionality alone.
         """
+        # This one _must_ be empty because the base class start() calls it
+        # and we want it to do nothing.
+        pass
 
+    def _data_changed(self, old, new):
+        if has_attributes(self.data):
+            aa = self._assign_attribute
+            self.configure_input_data(aa, new)
+            self._update_data_2()
+            aa.update()
+            self.outputs = [aa.output]
+        else:
+            self.outputs = [self.data]
+        self.data_changed = True
+
+        self.output_info.datasets = \
+            [get_tvtk_dataset_name(self.outputs[0])]
+
+        # Add an observer to the VTK dataset after removing the one
+        # for the old dataset.  We use the messenger to avoid an
+        # uncollectable reference cycle.  See the
+        # tvtk.messenger module documentation for details.
+        if old is not None:
+            old.remove_observer(self._observer_id)
+        self._observer_id = new.add_observer('ModifiedEvent',
+                                             messenger.send)
+        new_vtk = tvtk.to_vtk(new)
+        messenger.connect(new_vtk, 'ModifiedEvent',
+                          self._fire_data_changed)
+
+        # Change our name so that our label on the tree is updated.
+        self.name = self._get_name()
+
+    def _update_data_2(self):
         if self.data is None:
             return
-        pnt_attr, cell_attr = get_all_attributes(self.data)
-
         pd = self.data.point_data
         scalars = pd.scalars
         if self.data.is_a('vtkImageData') and scalars is not None:
@@ -112,12 +166,6 @@ class SlimCUDSSource(CUDSSource):
             if is_old_pipeline():
                 self._assign_attribute.output.scalar_type = scalars.data_type
                 self.data.scalar_type = scalars.data_type
-
-        self._setup_data_traits(pnt_attr, 'point')
-        self._setup_data_traits(cell_attr, 'cell')
-
-        if self._first:
-            self._first = False
 
         # Propagate the data changed event.
         self.data_changed = True
@@ -135,28 +183,6 @@ class SlimCUDSSource(CUDSSource):
         provide this functionality on this class"""
         raise NotImplementedError("Cannot set state of SlimCUDSSource. "
                                   "Operation not implemented.")
-
-    def _setup_data_traits(self, attributes, d_type):
-        """Given the object, the dict of the attributes from the
-        `get_all_attributes` function and the data type
-        (point/cell) data this will setup the object and the data.
-        """
-        attrs = ['scalars', 'vectors', 'tensors']
-        aa = self._assign_attribute
-        data = getattr(self.data, '%s_data' % d_type)
-        for attr in attrs:
-            values = attributes[attr]
-            if len(values) == 0:
-                choice = ''
-            else:
-                choice = getattr(self, '%s_%s_name' % (d_type, attr))
-
-            getattr(data, 'set_active_%s' % attr)(choice)
-            aa.assign(choice, attr.upper(), d_type.upper() + '_DATA')
-            aa.update()
-            kw = {'%s_%s_name' % (d_type, attr): choice,
-                  'trait_change_notify': False}
-            self.set(**kw)
 
 
 def _available_keys(cuds):
