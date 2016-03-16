@@ -223,6 +223,9 @@ class SlimCUDSSource(Source):
         # so that our label on the tree is updated.
         self.name = self._get_name()
 
+    def _get__vtk_dataset(self):
+        return self._vtk_cuds.data_set
+
     # Change handlers
     # -------------------------------------------------------------------------
 
@@ -239,12 +242,6 @@ class SlimCUDSSource(Source):
     def _cell_vectors_name_changed(self, value):
         self._update_vtk_cuds_from_cuds()
     ###
-
-    def __vtk_cuds_changed(self, vtk_cuds):
-        """Fired when we change the vtk_cuds.
-        Changes the associated vtk dataset to the one in the new
-        vtk_cuds."""
-        self._vtk_dataset = vtk_cuds.data_set
 
     def __vtk_dataset_changed(self, old, new):
         """When the vtk dataset changes, adjust the pipeline
