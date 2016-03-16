@@ -42,6 +42,11 @@ class TestMeshSlimSource(TestMeshSource):
         points = source.data.points.to_array()
         self.assertEqual(len(points), number_of_points)
         self.assertEqual(len(vtk_cuds.point2index), number_of_points)
+        self.assertEqual(vtk_dataset.point_data.number_of_arrays, 2)
+
+        source.point_scalars_name = ''
+        source.point_vectors_name = ''
+        vtk_dataset = source.data
         self.assertEqual(vtk_dataset.point_data.number_of_arrays, 0)
 
         source.point_scalars_name = 'TEMPERATURE'
@@ -72,7 +77,7 @@ class TestMeshSlimSource(TestMeshSource):
             for cell in cell_array_slicer(vtk_dataset.get_cells().to_array())]
         self.assertEqual(len(cells), number_of_cells)
         self.assertEqual(len(vtk_cuds.element2index), number_of_cells)
-        self.assertEqual(source.data.cell_data.number_of_arrays, 0)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
 
         source.cell_scalars_name = 'TEMPERATURE'
         vtk_dataset = source.data
@@ -108,12 +113,15 @@ class TestMeshSlimSource(TestMeshSource):
         number_of_edges = len(self.edges)
         self.assertEqual(len(edges), number_of_edges)
         self.assertEqual(len(vtk_cuds.element2index), number_of_edges)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
+
+        source.cell_scalars_name = ''
         self.assertEqual(source.data.cell_data.number_of_arrays, 0)
 
         source.cell_scalars_name = 'TEMPERATURE'
         vtk_dataset = source.data
 
-        self.assertEqual(vtk_dataset.cell_data.number_of_arrays, 1)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
         temperature = vtk_dataset.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
             edge = container.get_edge(key)
@@ -144,7 +152,12 @@ class TestMeshSlimSource(TestMeshSource):
         number_of_faces = len(self.faces)
         self.assertEqual(len(faces), number_of_faces)
         self.assertEqual(len(vtk_cuds.element2index), number_of_faces)
-        self.assertEqual(source.data.cell_data.number_of_arrays, 0)
+        self.assertEqual(source.data.cell_data.number_of_arrays, 1)
+
+        source.cell_scalars_name = ''
+        vtk_dataset = source.data
+        self.assertEqual(vtk_dataset.cell_data.number_of_arrays, 0)
+
         source.cell_scalars_name = 'TEMPERATURE'
         vtk_dataset = source.data
         self.assertEqual(vtk_dataset.cell_data.number_of_arrays, 1)
@@ -191,7 +204,9 @@ class TestMeshSlimSource(TestMeshSource):
         self.assertEqual(len(vtk_cuds.element2index), number_of_elements)
 
         source.point_scalars_name = 'TEMPERATURE'
+        source.point_vectors_name = ''
         source.cell_scalars_name = 'TEMPERATURE'
+        source.cell_vectors_name = ''
         vtk_dataset = source.data
 
         self.assertEqual(source.data.point_data.number_of_arrays, 1)
@@ -273,8 +288,8 @@ class TestParticlesSlimSource(TestParticlesSource):
             self.assertIn(entry, source._point_scalars_list)
 
         dataset = source.data
-        self.assertEqual(dataset.point_data.number_of_arrays, 0)
-        self.assertEqual(source.point_scalars_name, '')
+        self.assertEqual(dataset.point_data.number_of_arrays, 1)
+        self.assertEqual(source.point_scalars_name, 'MASS')
 
         source.point_scalars_name = "TEMPERATURE"
         dataset = source.data
@@ -302,18 +317,16 @@ class TestParticlesSlimSource(TestParticlesSource):
         self.assertEqual(dataset.point_data.number_of_arrays, 0)
 
     def test_available_keys(self):
-        (point_scalars,
-         point_vectors,
-         cell_scalars,
-         cell_vectors) = _available_keys(self.container)
+        available_keys = _available_keys(self.container)
 
-        self.assertEqual(point_scalars, {CUBA.TEMPERATURE,
-                                         CUBA.RADIUS,
-                                         CUBA.MASS})
+        self.assertEqual(available_keys["point_scalars"],
+                         {CUBA.TEMPERATURE,
+                          CUBA.RADIUS,
+                          CUBA.MASS})
 
-        self.assertEqual(point_vectors, set())
-        self.assertEqual(cell_scalars, {CUBA.TEMPERATURE})
-        self.assertEqual(cell_vectors, set())
+        self.assertEqual(available_keys["point_vectors"], set())
+        self.assertEqual(available_keys["cell_scalars"], {CUBA.TEMPERATURE})
+        self.assertEqual(available_keys["cell_vectors"], set())
 
     def test_bonds(self):
         source = SlimCUDSSource(cuds=self.container)
@@ -327,8 +340,13 @@ class TestParticlesSlimSource(TestParticlesSource):
         dataset = source.data
         # The actual array set in the cell data should be empty if selection
         # is blank
+        self.assertEqual(dataset.cell_data.number_of_arrays, 1)
+        self.assertEqual(source.cell_scalars_name, 'TEMPERATURE')
+
+        # Clearing should empty the data again
+        source.cell_scalars_name = ""
+        dataset = source.data
         self.assertEqual(dataset.cell_data.number_of_arrays, 0)
-        self.assertEqual(source.cell_scalars_name, '')
 
         # Selecting temperature triggers the transfer from cuds to vtk cuds
         # of only the selected array
@@ -349,11 +367,6 @@ class TestParticlesSlimSource(TestParticlesSource):
                 vtk_cuds.particle2index[uid] for uid in bond.particles]
             self.assertEqual(bonds[index], particles)
             self.assertEqual(temperature[index], bond.data[CUBA.TEMPERATURE])
-
-        # Clearing should empty the data again
-        source.cell_scalars_name = ""
-        dataset = source.data
-        self.assertEqual(dataset.cell_data.number_of_arrays, 0)
 
     @unittest.skip("Cannot perform save/load with SlimCUDSSource")
     def test_save_load_visualization_with_mlab(self):
@@ -381,9 +394,9 @@ class TestParticlesSlimSource(TestParticlesSource):
 
         source = SlimCUDSSource(cuds=self.container)
 
-        self.assertEqual(source.point_scalars_name, "")
+        self.assertEqual(source.point_scalars_name, "MASS")
         self.assertEqual(source.point_vectors_name, "")
-        self.assertEqual(source.cell_scalars_name, "")
+        self.assertEqual(source.cell_scalars_name, "TEMPERATURE")
         self.assertEqual(source.cell_vectors_name, "")
 
         self.assertEqual(len(source._point_scalars_list), 4)
@@ -396,7 +409,7 @@ class TestParticlesSlimSource(TestParticlesSource):
 
         self.assertEqual(source.point_scalars_name, "TEMPERATURE")
         self.assertEqual(source.point_vectors_name, "")
-        self.assertEqual(source.cell_scalars_name, "")
+        self.assertEqual(source.cell_scalars_name, "TEMPERATURE")
         self.assertEqual(source.cell_vectors_name, "")
 
         self.assertEqual(len(source._point_scalars_list), 4)
@@ -442,60 +455,60 @@ class TestLatticeSlimSource(TestLatticeSource):
         cuds = make_cubic_lattice('test', 0.4, (14, 24, 34), (4, 5, 6))
         self._add_velocity(cuds)
         source = SlimCUDSSource(cuds=cuds)
-        data = source.data
-        self.assertEqual(data.number_of_points, 14 * 24 * 34)
-        assert_array_equal(data.origin, (4.0, 5.0, 6.0))
+        self.assertEqual(source.data.number_of_points, 14 * 24 * 34)
+        assert_array_equal(source.data.origin, (4.0, 5.0, 6.0))
 
-        self.assertEqual(data.point_data.number_of_arrays, 0)
+        self.assertEqual(source.data.point_data.number_of_arrays, 1)
         self.assertEqual(len(source._point_vectors_list), 2)
-        self.assertEqual(source._point_vectors_list, ['', 'VELOCITY'])
-        self.assertEqual(source.point_vectors_name, '')
+        self.assertEqual(source._point_vectors_list, ['VELOCITY', ''])
+        self.assertEqual(source.point_vectors_name, 'VELOCITY')
+
+        source.point_vectors_name = ""
+        self.assertEqual(source.data.point_data.number_of_arrays, 0)
 
         source.point_vectors_name = 'VELOCITY'
-        data = source.data
-        self.assertEqual(data.point_data.number_of_arrays, 1)
-        vectors = data.point_data.vectors.to_array()
+        self.assertEqual(source.data.point_data.number_of_arrays, 1)
+        vectors = source.data.point_data.vectors.to_array()
 
         for node in cuds.iter_nodes():
-            point_id = data.compute_point_id(node.index)
+            point_id = source.data.compute_point_id(node.index)
             assert_array_equal(
                 cuds.get_coordinate(node.index),
-                data.get_point(point_id))
+                source.data.get_point(point_id))
             assert_array_equal(vectors[point_id], node.index)
 
         source.point_vectors_name = ''
-        data = source.data
-        self.assertEqual(data.point_data.number_of_arrays, 0)
+        self.assertEqual(source.data.point_data.number_of_arrays, 0)
 
     def test_source_from_an_orthorombic_p_lattice(self):
         cuds = make_orthorhombic_lattice(
             'test',  (0.5, 0.54, 0.58), (15, 25, 35), (7, 9, 8))
         self._add_velocity(cuds)
         source = SlimCUDSSource(cuds=cuds)
-        data = source.data
-        self.assertEqual(data.number_of_points, 15 * 25 * 35)
-        assert_array_equal(data.origin, (7.0, 9.0, 8.0))
+        self.assertEqual(source.data.number_of_points, 15 * 25 * 35)
+        assert_array_equal(source.data.origin, (7.0, 9.0, 8.0))
 
-        self.assertEqual(data.point_data.number_of_arrays, 0)
+        self.assertEqual(source.data.point_data.number_of_arrays, 1)
         self.assertEqual(len(source._point_vectors_list), 2)
-        self.assertEqual(source._point_vectors_list, ['', 'VELOCITY'])
-        self.assertEqual(source.point_vectors_name, '')
+        self.assertEqual(source._point_vectors_list, ['VELOCITY', ''])
+        self.assertEqual(source.point_vectors_name, 'VELOCITY')
+
+        source.point_vectors_name = ''
+        self.assertEqual(source.data.point_data.number_of_arrays, 0)
 
         source.point_vectors_name = 'VELOCITY'
-        data = source.data
-        self.assertEqual(data.point_data.number_of_arrays, 1)
+        self.assertEqual(source.data.point_data.number_of_arrays, 1)
 
-        vectors = data.point_data.vectors.to_array()
+        vectors = source.data.point_data.vectors.to_array()
         for node in cuds.iter_nodes():
-            point_id = data.compute_point_id(node.index)
+            point_id = source.data.compute_point_id(node.index)
             assert_array_equal(
                 cuds.get_coordinate(node.index),
-                data.get_point(point_id))
+                source.data.get_point(point_id))
             assert_array_equal(vectors[point_id], node.index)
 
         source.point_vectors_name = ''
-        data = source.data
-        self.assertEqual(data.point_data.number_of_arrays, 0)
+        self.assertEqual(source.data.point_data.number_of_arrays, 0)
 
     def test_source_from_a_xy_plane_hexagonal_lattice(self):
         xspace = 0.1
@@ -503,19 +516,19 @@ class TestLatticeSlimSource(TestLatticeSource):
         cuds = make_hexagonal_lattice('test', xspace, 0.2, (5, 4, 1))
         self._add_velocity(cuds)
         source = SlimCUDSSource(cuds=cuds)
-        data = source.data
-        self.assertEqual(data.number_of_points, 5 * 4 * 1)
-
-        self.assertEqual(data.point_data.number_of_arrays, 0)
+        self.assertEqual(source.data.number_of_points, 5 * 4 * 1)
+        self.assertEqual(source.data.point_data.number_of_arrays, 1)
         self.assertEqual(len(source._point_vectors_list), 2)
-        self.assertEqual(source._point_vectors_list, ['', 'VELOCITY'])
-        self.assertEqual(source.point_vectors_name, '')
+        self.assertEqual(source._point_vectors_list, ['VELOCITY', ''])
+        self.assertEqual(source.point_vectors_name, 'VELOCITY')
+
+        source.point_vectors_name = ''
+        self.assertEqual(source.data.point_data.number_of_arrays, 0)
 
         source.point_vectors_name = 'VELOCITY'
-        data = source.data
-        self.assertEqual(data.point_data.number_of_arrays, 1)
+        self.assertEqual(source.data.point_data.number_of_arrays, 1)
 
-        for index, point in enumerate(data.points):
+        for index, point in enumerate(source.data.points):
             # The lattice has 4 rows (y axis) and 5 columns (x axis).
             # Thus the correct size to unravel is (4, 5) instead of
             # (5, 4).
@@ -526,13 +539,13 @@ class TestLatticeSlimSource(TestLatticeSource):
                     yspace * row,
                     0.0))
 
-        vectors = data.point_data.vectors.to_array()
+        vectors = source.data.point_data.vectors.to_array()
         for node in cuds.iter_nodes():
             position = (
                 node.index[0] * xspace + 0.5 * xspace * node.index[1],
                 node.index[1] * yspace,
                 0.0)
-            point_id = data.find_point(position)
+            point_id = source.data.find_point(position)
             assert_array_equal(vectors[point_id], node.index)
 
     def _add_velocity(self, lattice):
