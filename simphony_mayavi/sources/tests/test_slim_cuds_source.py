@@ -377,21 +377,6 @@ class TestParticlesSlimSource(TestParticlesSource):
         pass
 
     def test_start_setup(self):
-        # Try with an empty source (no cuds) and call start on it.
-        source = SlimCUDSSource()
-
-        source.start()
-
-        self.assertEqual(source.point_scalars_name, "")
-        self.assertEqual(source.point_vectors_name, "")
-        self.assertEqual(source.cell_scalars_name, "")
-        self.assertEqual(source.cell_vectors_name, "")
-
-        self.assertEqual(len(source._point_scalars_list), 1)
-        self.assertEqual(len(source._point_vectors_list), 1)
-        self.assertEqual(len(source._cell_scalars_list), 1)
-        self.assertEqual(len(source._cell_vectors_list), 1)
-
         source = SlimCUDSSource(cuds=self.container)
 
         self.assertEqual(source.point_scalars_name, "MASS")
