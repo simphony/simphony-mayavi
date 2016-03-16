@@ -341,7 +341,7 @@ class SlimCUDSSource(Source):
                 vtk_cuds = VTKMesh.from_mesh(cuds, points_keys, cell_keys)
             elif isinstance(cuds, ABCParticles):
                 vtk_cuds = VTKParticles.from_particles(cuds, points_keys,
-                    cell_keys)
+                                                       cell_keys)
             elif isinstance(cuds, ABCLattice):
                 vtk_cuds = VTKLattice.from_lattice(cuds, points_keys)
             else:
@@ -539,5 +539,3 @@ def _extract_cuba_keys_per_data_types(data_container):
             pass
 
     return scalars, vectors
-
-
