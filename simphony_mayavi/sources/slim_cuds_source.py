@@ -99,7 +99,9 @@ class SlimCUDSSource(Source):
         Instance(VTKLattice))
 
     # The VTK dataset to manage. It is taken from the vtk_cuds.
-    _vtk_dataset = Property(Instance(tvtk.DataSet), depends_on="_vtk_cuds")
+    # Name is unfortunately generic, but is for compatibility with
+    # CUDSSource. It is unsure if it needs to be public at all.
+    data = Property(Instance(tvtk.DataSet), depends_on="_vtk_cuds")
 
     # This filter allows us to change the attributes of the data
     # object and will ensure that the pipeline is properly taken care
@@ -223,7 +225,7 @@ class SlimCUDSSource(Source):
         # so that our label on the tree is updated.
         self.name = self._get_name()
 
-    def _get__vtk_dataset(self):
+    def _get_data(self):
         return self._vtk_cuds.data_set
 
     # Change handlers
@@ -243,18 +245,18 @@ class SlimCUDSSource(Source):
         self._update_vtk_cuds_from_cuds()
     ###
 
-    def __vtk_dataset_changed(self, old, new):
+    def _data_changed(self, old, new):
         """When the vtk dataset changes, adjust the pipeline
         accordingly so that we sync against the new dataset"""
 
-        if has_attributes(self._vtk_dataset):
+        if has_attributes(self.data):
             aa = self._assign_attribute
             self.configure_input_data(aa, new)
             self._update_vtk_dataset_content()
             aa.update()
             self.outputs = [aa.output]
         else:
-            self.outputs = [self._vtk_dataset]
+            self.outputs = [self.data]
 
         # Notify the pipeline to refresh against the new data.
         self.data_changed = True
@@ -379,7 +381,7 @@ class SlimCUDSSource(Source):
     # Synchronization routines for the vtk dataset changes and the
     # overall low-level vtk pipeline. Used by __vtk_dataset_changed
     def _update_vtk_dataset_content(self):
-        vtk_dataset = self._vtk_dataset
+        vtk_dataset = self.data
 
         if vtk_dataset is None:
             return
@@ -402,7 +404,7 @@ class SlimCUDSSource(Source):
         """Support routine to setup the appropriate pipeline objects.
         """
         # e.g. self._vtk_dataset.point_data
-        data_type_data = getattr(self._vtk_dataset, '%s_data' % data_type)
+        data_type_data = getattr(self.data, '%s_data' % data_type)
 
         assign_attribute = self._assign_attribute
         for attr in ['scalars', 'vectors']:
