@@ -186,6 +186,7 @@ class SlimCUDSSource(Source):
             self.cell_vectors_name = cell_vectors
 
     # Public
+    # -------------------------------------------------------------------------
 
     def start(self):
         """This is invoked when this object is added to the mayavi
@@ -207,19 +208,25 @@ class SlimCUDSSource(Source):
         self._update_vtk_cuds_from_cuds()
 
     # Properties
+    # -------------------------------------------------------------------------
 
     def _get_cuds(self):
         return self._cuds
 
     def _set_cuds(self, cuds):
+        """Sets the new cuds, and updates the pipeline appropriately"""
         self._cuds = cuds
         self._fill_datatype_enums()
         self._update_vtk_cuds_from_cuds()
 
-        # Change our name so that our label on the tree is updated.
+        # Change our name according to the nature of the new cuds,
+        # so that our label on the tree is updated.
         self.name = self._get_name()
 
     # Change handlers
+    # -------------------------------------------------------------------------
+
+    # Triggered when the user selects a new entry from the comboboxes
     def _point_scalars_name_changed(self, value):
         self._update_vtk_cuds_from_cuds()
 
@@ -231,6 +238,7 @@ class SlimCUDSSource(Source):
 
     def _cell_vectors_name_changed(self, value):
         self._update_vtk_cuds_from_cuds()
+    ###
 
     def __vtk_cuds_changed(self, vtk_cuds):
         """Fired when we change the vtk_cuds.
@@ -271,34 +279,41 @@ class SlimCUDSSource(Source):
                           self._fire_data_changed)
 
     # Private
+    # -------------------------------------------------------------------------
 
     def _fill_datatype_enums(self):
         """Fills the "comboboxes" enumeration options from the current cuds.
+        Works appropriately if the cuds is None.
         """
         cuds = self.cuds
-        all_lists = (
-            self._point_scalars_list,
-            self._point_vectors_list,
-            self._cell_scalars_list,
-            self._cell_vectors_list)
+        available_keys = _available_keys(cuds) if cuds is not None else {}
 
-        available_keys = (
-            _available_keys(cuds)
-            if cuds is not None
-            else (set(), set(), set(), set())
-        )
+        # We go through the individual combobox lists, computing their names
+        # and using reflection, populating each _list with the keys available,
+        # adding a space for "no selection" and finally setting the appropriate
+        # default in the _name trait
+        for data_type in ["point", "cell"]:
+            for attr in ["scalars", "vectors"]:
+                data_type_attr = "{}_{}".format(data_type, attr)
+                keys = available_keys.get(data_type_attr, set())
+                entries = sorted([key.name for key in keys])
 
-        for lst, keys in zip(all_lists, available_keys):
-            entries = sorted([key.name for key in keys])
-            entries.insert(0, '')
-            lst[:] = entries
+                # Add an empty entry so that we always have something to
+                # select, and selecting this one will disable the visualization
+                # of that dataset.
+                entries.append('')
 
-        if self._first:
-            self._first = False
-            self.trait_setq(point_scalars_name="",
-                            point_vectors_name="",
-                            cell_scalars_name="",
-                            cell_vectors_name="")
+                # Set the list content for the enumeration
+                lst = getattr(self, "_{}_list".format(data_type_attr))
+                lst[:] = entries
+
+                # and set the name as the default. We choose the first one
+                # available. However, we want to set it silently, because
+                # otherwise it would trigger the update of the vtk cuds,
+                # and we are not ready to do so in most circumstances.
+                self.trait_setq(
+                    **{"{}_name".format(data_type_attr): entries[0]}
+                )
 
     def _update_vtk_cuds_from_cuds(self):
         """This private method converts the CUDS into a VTKCUDS.
@@ -328,18 +343,16 @@ class SlimCUDSSource(Source):
             if isinstance(cuds, (ABCMesh, H5Mesh)):
                 vtk_cuds = VTKMesh.from_mesh(cuds, points_keys, cell_keys)
             elif isinstance(cuds, ABCParticles):
-                vtk_cuds = VTKParticles.from_particles(
-                    cuds,
-                    points_keys,
+                vtk_cuds = VTKParticles.from_particles(cuds, points_keys,
                     cell_keys)
             elif isinstance(cuds, ABCLattice):
-                vtk_cuds = VTKLattice.from_lattice(
-                    cuds,
-                    points_keys)
+                vtk_cuds = VTKLattice.from_lattice(cuds, points_keys)
             else:
                 msg = 'Provided object {} is not of any known cuds type'
                 raise TraitError(msg.format(type(cuds)))
 
+        # Finally set the vtk cuds. This will update vtk_dataset as a
+        # subsequent handler.
         self._vtk_cuds = vtk_cuds
 
     def _get_name(self):
@@ -410,9 +423,7 @@ class SlimCUDSSource(Source):
                 assign_attribute.assign(value, attr.upper(),
                                         data_type.upper() + '_DATA')
                 assign_attribute.update()
-    # End.
     ##########
-
 
     def __get_pure_state__(self):
         """Overrides the same functionality from the base class, but
@@ -445,8 +456,9 @@ def _available_keys(cuds):
 
     Returns
     -------
-    _ : tuple(set, set, set, set)
-        A tuple of four sets for each of the classes above.
+    _ : dict(key: set)
+        A dict of sets for each of the classes above, with the corresponding
+        keys as above.
     """
 
     point_scalars = set()
@@ -493,7 +505,12 @@ def _available_keys(cuds):
         msg = 'Provided object {} is not of any known cuds type'
         raise TraitError(msg.format(type(cuds)))
 
-    return point_scalars, point_vectors, cell_scalars, cell_vectors
+    return {
+        "point_scalars": point_scalars,
+        "point_vectors": point_vectors,
+        "cell_scalars": cell_scalars,
+        "cell_vectors": cell_vectors
+    }
 
 
 def _extract_cuba_keys_per_data_types(data_container):
