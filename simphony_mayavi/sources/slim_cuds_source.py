@@ -379,7 +379,7 @@ class SlimCUDSSource(Source):
 
     ###########
     # Synchronization routines for the vtk dataset changes and the
-    # overall low-level vtk pipeline. Used by __vtk_dataset_changed
+    # overall low-level vtk pipeline. Used by _data_changed
     def _update_vtk_dataset_content(self):
         vtk_dataset = self.data
 
@@ -403,7 +403,7 @@ class SlimCUDSSource(Source):
     def _update_vtk_pipeline_for_data(self, data_type, attributes):
         """Support routine to setup the appropriate pipeline objects.
         """
-        # e.g. self._vtk_dataset.point_data
+        # e.g. self.data.point_data
         data_type_data = getattr(self.data, '%s_data' % data_type)
 
         assign_attribute = self._assign_attribute
@@ -440,7 +440,7 @@ class SlimCUDSSource(Source):
 
 
 def _available_keys(cuds):
-    """Given a cuds, it returns a tuple of sets, containing the available
+    """Given a cuds, it returns a dict of sets, containing the available
     CUBA keys divided in classes:
 
         - point_scalars
