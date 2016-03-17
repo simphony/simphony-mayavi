@@ -7,7 +7,6 @@ import os
 import numpy
 from numpy.testing import assert_array_equal
 from mayavi.core.api import NullEngine
-from mayavi import __version__ as MAYAVI_VERSION
 from mayavi import mlab
 
 from simphony.cuds.mesh import Mesh, Point, Cell, Edge, Face
@@ -24,6 +23,7 @@ from simphony_mayavi.core.api import (
     cell_array_slicer,
     CELL2VTKCELL, FACE2VTKCELL, EDGE2VTKCELL)
 from simphony_mayavi.sources.api import CUDSSource
+from simphony_mayavi.tests.testing_utils import is_mayavi_older
 
 
 class TestMeshSource(unittest.TestCase):
@@ -492,8 +492,7 @@ class TestParticlesSource(unittest.TestCase):
         self.assertIsNone(source_in_scene._vtk_cuds)
         self.assertIsNone(source_in_scene._cuds)
 
-    @unittest.skipIf(any(int(num) < 4
-                         for num in MAYAVI_VERSION.split(".")[:3]),
+    @unittest.skipIf(is_mayavi_older("4.4.4"),
                      "Mayavi < 4.4.4 has problem with load_visualization")
     def test_save_load_visualization_with_mlab(self):
         # test mlab.get_engine

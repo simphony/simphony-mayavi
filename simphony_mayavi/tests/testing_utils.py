@@ -1,5 +1,8 @@
+import distutils
+
 import numpy
 from traits.etsconfig.etsconfig import ETSConfig
+from mayavi import __version__ as MAYAVI_VERSION
 
 from simphony.core.cuba import CUBA
 from simphony.core.cuds_item import CUDSItem
@@ -9,6 +12,27 @@ from simphony.cuds import Particles, Particle, Mesh, Point, Face, ABCLattice, \
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from simphony.cuds.lattice import make_tetragonal_lattice
 from simphony_mayavi.core.doc_utils import mergedocs
+
+
+def is_mayavi_older(version):
+    """ Check if the installed mayavi version is older than `version`
+    (up to micro version)
+
+    Parameters
+    ----------
+    version : str
+        e.g. "4.4.4"
+
+    Returns
+    -------
+    is_older : bool
+    """
+    # the version of mayavi currently installed
+    this_version = distutils.version.LooseVersion(MAYAVI_VERSION)
+
+    target_version = distutils.version.LooseVersion(version)
+
+    return this_version < target_version
 
 
 def run_and_check_dialog_was_opened(test_case, tester, accept=False):
