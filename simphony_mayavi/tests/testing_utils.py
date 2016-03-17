@@ -14,6 +14,7 @@ from simphony_mayavi.core.doc_utils import mergedocs
 
 def is_mayavi_older(version):
     """ Check if the installed mayavi version is older than `version`
+    (up to micro version)
 
     Parameters
     ----------
@@ -24,12 +25,14 @@ def is_mayavi_older(version):
     -------
     is_older : bool
     """
-    # current mayavi version
+    # convert the current version (upto micro version) to a list of int
     this_version = map(int, MAYAVI_VERSION.split(".")[:3])
 
-    # if older than target_version, skip
+    # convert the target version (upto micro version) to a list of int
     target_version = map(int, version.split(".")[:3])
 
+    # if any of the number of `this_version` is greater (or equal)
+    # this_version >= target_version
     for ver_num_1, ver_num_2 in zip(this_version, target_version):
         if ver_num_1 >= ver_num_2:
             return False
