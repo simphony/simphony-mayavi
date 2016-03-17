@@ -1,3 +1,5 @@
+import distutils
+
 import numpy
 from traits.etsconfig.etsconfig import ETSConfig
 from mayavi import __version__ as MAYAVI_VERSION
@@ -25,19 +27,12 @@ def is_mayavi_older(version):
     -------
     is_older : bool
     """
-    # convert the current version (upto micro version) to a list of int
-    this_version = map(int, MAYAVI_VERSION.split(".")[:3])
+    # the version of mayavi currently installed
+    this_version = distutils.version.LooseVersion(MAYAVI_VERSION)
 
-    # convert the target version (upto micro version) to a list of int
-    target_version = map(int, version.split(".")[:3])
+    target_version = distutils.version.LooseVersion(version)
 
-    # if any of the number of `this_version` is greater (or equal)
-    # this_version >= target_version
-    for ver_num_1, ver_num_2 in zip(this_version, target_version):
-        if ver_num_1 >= ver_num_2:
-            return False
-    else:
-        return True
+    return this_version < target_version
 
 
 def run_and_check_dialog_was_opened(test_case, tester, accept=False):
