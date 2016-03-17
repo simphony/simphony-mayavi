@@ -3,6 +3,7 @@ import unittest
 from mock import patch
 
 from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
+from traits.etsconfig.api import ETSConfig
 from traits.api import Bool
 from traits.testing.api import UnittestTools
 
@@ -44,6 +45,8 @@ MOCKED_ENGINE_FACTORIES = {"good_factory": SimpleEngineFactory(),
 
 class TestAddEnginePanel(UnittestTools, unittest.TestCase):
 
+    @unittest.skipIf(ETSConfig.toolkit != "qt4",
+                     "this testcase requires backend == qt4")
     @patch("simphony_mayavi.plugins.add_engine_panel.DEFAULT_ENGINE_FACTORIES",
            MOCKED_ENGINE_FACTORIES)
     def test_create_from_factory_need_more_definitions(self):
@@ -61,6 +64,8 @@ class TestAddEnginePanel(UnittestTools, unittest.TestCase):
         # ensure the new engine is defined
         self.assertIsInstance(panel.new_engine, ABCModelingEngine)
 
+    @unittest.skipIf(ETSConfig.toolkit != "qt4",
+                     "this testcase requires backend == qt4")
     @patch("simphony_mayavi.plugins.add_engine_panel.DEFAULT_ENGINE_FACTORIES",
            MOCKED_ENGINE_FACTORIES)
     def test_dialog_create_from_factory_with_bad_factory(self):
