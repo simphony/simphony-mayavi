@@ -23,6 +23,7 @@ from simphony_mayavi.sources.tests.test_cuds_source import (
     TestParticlesSource,
     TestLatticeSource,
     TestMeshSource)
+from simphony_mayavi.tests.testing_utils import DummyEngine
 
 
 class TestMeshSlimSource(TestMeshSource):
@@ -431,6 +432,19 @@ class TestParticlesSlimSource(TestParticlesSource):
         source.point_scalars_name = ""
         point_attrs, cell_attrs = get_all_attributes(source.data)
         self.assertEqual(len(point_attrs["scalars"]), 0)
+
+    def test_combo_selection_preserved(self):
+        dummy_engine = DummyEngine()
+        source = SlimCUDSSource(cuds=dummy_engine.get_dataset("particles"),
+                                point_scalars="MASS", point_vectors="")
+
+        self.assertEqual(source.point_scalars_name, "MASS")
+        self.assertEqual(source.point_vectors_name, "")
+
+        source.start()
+
+        self.assertEqual(source.point_scalars_name, "MASS")
+        self.assertEqual(source.point_vectors_name, "")
 
 
 class TestLatticeSlimSource(TestLatticeSource):

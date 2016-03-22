@@ -10,7 +10,8 @@ from mayavi.core.pipeline_info import (PipelineInfo,
 from tvtk.common import is_old_pipeline
 from tvtk.api import tvtk
 from tvtk import messenger
-from traits.api import TraitError, Instance, Either, Property, List, Str, Int
+from traits.api import TraitError, Instance, Either, Property, List, Str, \
+    Int, Dict
 from traitsui.api import View, Group, Item
 
 from simphony.core.cuba import CUBA
@@ -20,6 +21,13 @@ from simphony.io.h5_mesh import H5Mesh
 from simphony_mayavi.cuds.vtk_lattice import VTKLattice
 from simphony_mayavi.cuds.vtk_mesh import VTKMesh
 from simphony_mayavi.cuds.vtk_particles import VTKParticles
+
+
+def data_type_attrs():
+    """Returns a convenient iterable for data_type
+    entries ("point", "cell") and attributes ("scalars", "vectors").
+    """
+    return itertools.product(["point", "cell"], ["scalars", "vectors"])
 
 
 class SlimCUDSSource(Source):
@@ -49,6 +57,7 @@ class SlimCUDSSource(Source):
     #: as strings and the selected one out of the list. The corresponding
     #: selection is contained into the private _point_scalar_list etc.
     #: traits.
+    #: NOTE: these names must not change, as they are computed dynamically.
     point_scalars_name = DEnum(values_name='_point_scalars_list',
                                desc='scalar point data attribute to use')
     point_vectors_name = DEnum(values_name='_point_vectors_list',
@@ -74,16 +83,31 @@ class SlimCUDSSource(Source):
             Item(name='cell_vectors_name'),
             Item(name='data')))
 
+    # The VTK dataset to manage. It is taken from the vtk_cuds.
+    # Name is unfortunately generic, but is for compatibility with
+    # CUDSSource. It is unsure if it needs to be public at all.
+    data = Property(Instance(tvtk.DataSet), depends_on="_vtk_cuds")
+
     # Private traits #############################
 
     # These private traits store the list of available data
     # attributes for the above x_y_name enumeration.
+    #: NOTE: these names must not change, as they are computed dynamically.
     _point_scalars_list = List(Str)
     _point_vectors_list = List(Str)
     _point_tensors_list = List(Str)
     _cell_scalars_list = List(Str)
     _cell_vectors_list = List(Str)
     _cell_tensors_list = List(Str)
+
+    #: This dictionary stores the user selected defaults as specified
+    #: at constructor. Differently from CUDSSource, this information is
+    #: required so that we can distinguish between an empty name that is empty
+    #: because no explicit default was specified and an empty name that is due
+    #: to the user actually setting the empty choice as default
+    #: Keys are "point_scalars", "point_vectors" etc. values are the default
+    #: as specified at construction.
+    _constructor_default_names = Dict(Str, Either(Str, None))
 
     #: The shadow trait for the cuds property.
     _cuds = Either(
@@ -97,11 +121,6 @@ class SlimCUDSSource(Source):
         Instance(VTKMesh),
         Instance(VTKParticles),
         Instance(VTKLattice))
-
-    # The VTK dataset to manage. It is taken from the vtk_cuds.
-    # Name is unfortunately generic, but is for compatibility with
-    # CUDSSource. It is unsure if it needs to be public at all.
-    data = Property(Instance(tvtk.DataSet), depends_on="_vtk_cuds")
 
     # This filter allows us to change the attributes of the data
     # object and will ensure that the pipeline is properly taken care
@@ -166,26 +185,23 @@ class SlimCUDSSource(Source):
         """
         super(SlimCUDSSource, self).__init__(**traits)
 
+        # I don't want to use locals(). Too risky.
+        arguments = {
+            "point_scalars": point_scalars,
+            "point_vectors": point_vectors,
+            "cell_scalars": cell_scalars,
+            "cell_vectors": cell_vectors
+        }
+
+        defaults = {}
+        for data_type_attr in ["{}_{}".format(data_type, attr)
+                               for data_type, attr in data_type_attrs()]:
+            defaults[data_type_attr] = arguments[data_type_attr]
+
+        self._constructor_default_names = defaults
+
         if cuds:
-            # As a side effect, this populates all the
-            # scalar lists, the VTKCUDS, and the vtk_dataset
-            # (although by the nature of this class, it will be
-            # empty until data to show is chosen)
             self.cuds = cuds
-
-        # Set the name to the user choice. If cuds is not defined,
-        # _point_scalars_list (etc.) is empty and nothing is selected.
-        if self._point_scalars_list and point_scalars is not None:
-            self.point_scalars_name = point_scalars
-
-        if self._point_vectors_list and point_vectors is not None:
-            self.point_vectors_name = point_vectors
-
-        if self._cell_scalars_list and cell_scalars is not None:
-            self.cell_scalars_name = cell_scalars
-
-        if self._cell_vectors_list and cell_vectors is not None:
-            self.cell_vectors_name = cell_vectors
 
     # Public
     # -------------------------------------------------------------------------
@@ -197,8 +213,7 @@ class SlimCUDSSource(Source):
         if self.running:
             return
 
-        self._fill_datatype_enums()
-        self._update_vtk_cuds_from_cuds()
+        self._do_full_refresh()
 
         super(SlimCUDSSource, self).start()
 
@@ -206,8 +221,7 @@ class SlimCUDSSource(Source):
         """ Recalculate the VTK data from the CUDS dataset
         Useful when ``cuds`` is modified after assignment
         """
-        self._fill_datatype_enums()
-        self._update_vtk_cuds_from_cuds()
+        self._do_full_refresh()
 
     # Properties
     # -------------------------------------------------------------------------
@@ -218,8 +232,7 @@ class SlimCUDSSource(Source):
     def _set_cuds(self, cuds):
         """Sets the new cuds, and updates the pipeline appropriately"""
         self._cuds = cuds
-        self._fill_datatype_enums()
-        self._update_vtk_cuds_from_cuds()
+        self._do_full_refresh()
 
         # Change our name according to the nature of the new cuds,
         # so that our label on the tree is updated.
@@ -280,9 +293,29 @@ class SlimCUDSSource(Source):
     # Private
     # -------------------------------------------------------------------------
 
+    def _do_full_refresh(self):
+        """Performs appropriate refresh against the current cuds data,
+        and chooses the appropriate defaults considering the current
+        selected combobox names (if present), or the defaults specified
+        at construction"""
+
+        current_names = self._collect_current_names()
+
+        self._fill_datatype_enums()
+        self._select_names_silently(
+            default_names=self._constructor_default_names,
+            current_names=current_names,
+        )
+        self._update_vtk_cuds_from_cuds()
+
     def _fill_datatype_enums(self):
         """Fills the "comboboxes" enumeration options from the current cuds.
         Works appropriately if the cuds is None.
+
+        Note that after filling the comboboxes, the selected entry is enforced
+        to the empty selection "". This is because we want to postpone this
+        selection to have more flexibility and reduce wasted setting
+        as much as possible.
         """
         cuds = self.cuds
         available_keys = _available_keys(cuds) if cuds is not None else {}
@@ -291,28 +324,75 @@ class SlimCUDSSource(Source):
         # and using reflection, populating each _list with the keys available,
         # adding a space for "no selection" and finally setting the appropriate
         # default in the _name trait
-        for data_type in ["point", "cell"]:
-            for attr in ["scalars", "vectors"]:
-                data_type_attr = "{}_{}".format(data_type, attr)
-                keys = available_keys.get(data_type_attr, set())
-                entries = sorted([key.name for key in keys])
+        for data_type, attr in data_type_attrs():
+            data_type_attr = "{}_{}".format(data_type, attr)
+            keys = available_keys.get(data_type_attr, set())
+            entries = sorted([key.name for key in keys])
 
-                # Add an empty entry so that we always have something to
-                # select, and selecting this one will disable the visualization
-                # of that dataset.
-                entries.append('')
+            # Add an empty entry so that we always have something to
+            # select, and selecting this one will disable the visualization
+            # of that dataset.
+            entries.append('')
 
-                # Set the list content for the enumeration
-                lst = getattr(self, "_{}_list".format(data_type_attr))
-                lst[:] = entries
+            # Set the list content for the enumeration
+            lst = getattr(self, "_{}_list".format(data_type_attr))
+            lst[:] = entries
 
-                # and set the name as the default. We choose the first one
-                # available. However, we want to set it silently, because
-                # otherwise it would trigger the update of the vtk cuds,
-                # and we are not ready to do so in most circumstances.
-                self.trait_setq(
-                    **{"{}_name".format(data_type_attr): entries[0]}
-                )
+            # we want to set it silently, because
+            # otherwise it would trigger the update of the vtk cuds,
+            # and we are not ready to do so in most circumstances.
+            # Later, the update of the vtk cuds will use the value
+            # to present the correct entry
+            self.trait_setq(
+                **{"{}_name".format(data_type_attr): ""}
+            )
+
+    def _collect_current_names(self):
+        """Retrieves the current combobox selection, and returns a dictionary
+        for each of the keys "point_scalars", "point_vectors" etc...
+
+        Important to note is that if there are no available options in the
+        _list entries, the current name will be None, not ''. It will be
+        '' only if this entry is actually available and selected in the
+        combobox.
+        """
+        result = {}
+
+        for data_type, attr in data_type_attrs():
+            data_type_attr = "{}_{}".format(data_type, attr)
+            name = getattr(self, "{}_name".format(data_type_attr))
+            available = getattr(self, "_{}_list".format(data_type_attr))
+
+            if name not in available:
+                name = None
+
+            result[data_type_attr] = name
+
+        return result
+
+    def _select_names_silently(self, default_names, current_names):
+        """Decides, and set silently, the names to select according
+        to the current available entries in the _lists, the default
+        as specified at construction, and the names that were selected
+        before the change"""
+
+        for data_type, attr in data_type_attrs():
+            data_type_attr = "{}_{}".format(data_type, attr)
+            default = default_names[data_type_attr]
+            previous = current_names[data_type_attr]
+            currently_available = getattr(self,
+                                          "_{}_list".format(data_type_attr))
+
+            if previous in currently_available:
+                selected = previous
+            elif default in currently_available:
+                selected = default
+            else:
+                selected = currently_available[0]
+
+            self.trait_setq(
+                **{"{}_name".format(data_type_attr): selected}
+            )
 
     def _update_vtk_cuds_from_cuds(self):
         """This private method converts the CUDS into a VTKCUDS.
@@ -350,7 +430,7 @@ class SlimCUDSSource(Source):
                 msg = 'Provided object {} is not of any known cuds type'
                 raise TraitError(msg.format(type(cuds)))
 
-        # Finally set the vtk cuds. This will update vtk_dataset as a
+        # Finally set the vtk cuds. This will update self.data as a
         # subsequent handler.
         self._vtk_cuds = vtk_cuds
 
