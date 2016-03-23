@@ -186,19 +186,12 @@ class SlimCUDSSource(Source):
         super(SlimCUDSSource, self).__init__(**traits)
 
         # I don't want to use locals(). Too risky.
-        arguments = {
+        self._constructor_default_names = {
             "point_scalars": point_scalars,
             "point_vectors": point_vectors,
             "cell_scalars": cell_scalars,
             "cell_vectors": cell_vectors
         }
-
-        defaults = {}
-        for data_type_attr in ["{}_{}".format(data_type, attr)
-                               for data_type, attr in data_type_attrs()]:
-            defaults[data_type_attr] = arguments[data_type_attr]
-
-        self._constructor_default_names = defaults
 
         if cuds:
             self.cuds = cuds
