@@ -96,3 +96,15 @@ class TestCUBADataAccumulator(unittest.TestCase):
             [[None, None, None], dummy_cuba_value(CUBA.VELOCITY)], dtype=float)
         assert_array_equal(vtk_data.get_array(0), expected)
         assert_array_equal(vtk_data.get_array(CUBA.VELOCITY.name), expected)
+
+    def test_accumulate_with_empty_keys(self):
+        accumulator = CUBADataAccumulator([])
+        accumulator.append(create_data_container(restrict=[CUBA.NAME]))
+        accumulator.append(
+            create_data_container(restrict=[CUBA.NAME, CUBA.VELOCITY,
+                                            CUBA.LATTICE_VECTORS]))
+
+        self.assertEqual(len(accumulator.keys), 0)
+        vtk_data = tvtk.PointData()
+        accumulator.load_onto_vtk(vtk_data)
+        self.assertEqual(vtk_data.number_of_arrays, 0)

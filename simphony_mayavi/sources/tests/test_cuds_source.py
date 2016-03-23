@@ -27,6 +27,7 @@ from simphony_mayavi.tests.testing_utils import is_mayavi_older
 
 
 class TestMeshSource(unittest.TestCase):
+    tested_class = CUDSSource
 
     def setUp(self):
         self.points = points = numpy.array([
@@ -54,7 +55,7 @@ class TestMeshSource(unittest.TestCase):
         container = self.container
 
         # when
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
 
         # then
         number_of_points = len(self.points)
@@ -79,7 +80,7 @@ class TestMeshSource(unittest.TestCase):
         container.add_cells(cell_iter)
 
         # when
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
         vtk_dataset = source.data
         vtk_cuds = source._vtk_cuds
         number_of_cells = len(self.cells)
@@ -108,7 +109,7 @@ class TestMeshSource(unittest.TestCase):
         container.add_edges(edge_iter)
 
         # when
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
 
         # then
         vtk_dataset = source.data
@@ -139,7 +140,7 @@ class TestMeshSource(unittest.TestCase):
         container.add_faces(face_iter)
 
         # when
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
 
         # then
         vtk_cuds = source._vtk_cuds
@@ -182,7 +183,7 @@ class TestMeshSource(unittest.TestCase):
         container.add_cells(cell_iter)
 
         # when
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
         vtk_dataset = source.data
         vtk_cuds = source._vtk_cuds
         elements = [
@@ -223,7 +224,7 @@ class TestMeshSource(unittest.TestCase):
         vtk_container = VTKMesh.from_mesh(container)
 
         # when
-        source = CUDSSource(cuds=vtk_container)
+        source = self.tested_class(cuds=vtk_container)
 
         # then
         vtk_cuds = source._vtk_cuds
@@ -233,9 +234,12 @@ class TestMeshSource(unittest.TestCase):
     def test_mesh_source_and_set_point_scalars(self):
         # when
         # all data attributes are turned off except for point_scalars
-        source = CUDSSource(cuds=self.container,
-                            point_scalars="TEMPERATURE", point_vectors="",
-                            cell_scalars="", cell_vectors="")
+        source = self.tested_class(
+            cuds=self.container,
+            point_scalars="TEMPERATURE",
+            point_vectors="",
+            cell_scalars="",
+            cell_vectors="")
 
         # then
         self.assertEqual(source.point_scalars_name, "TEMPERATURE")
@@ -246,22 +250,24 @@ class TestMeshSource(unittest.TestCase):
     def test_mesh_source_and_set_point_vectors_default_point_scalars(self):
         # when
         # only define point_vectors
-        source = CUDSSource(cuds=self.container, point_vectors="VELOCITY")
+        source = self.tested_class(cuds=self.container,
+                                   point_vectors="VELOCITY")
 
         # then
         # this is defined
         self.assertEqual(source.point_vectors_name, "VELOCITY")
 
         # this is assumed (first available)
-        self.assertIn(source.point_scalars_name, ("TEMPERATURE", "MASS"))
+        self.assertIn(source.point_scalars_name, ("", "TEMPERATURE", "MASS"))
 
 
 class TestLatticeSource(unittest.TestCase):
+    tested_class = CUDSSource
 
     def test_source_from_a_cubic_lattice(self):
         lattice = make_cubic_lattice('test', 0.4, (14, 24, 34), (4, 5, 6))
         self.add_velocity(lattice)
-        source = CUDSSource(cuds=lattice)
+        source = self.tested_class(cuds=lattice)
         data = source.data
         self.assertEqual(data.number_of_points, 14 * 24 * 34)
         assert_array_equal(data.origin, (4.0, 5.0, 6.0))
@@ -278,7 +284,7 @@ class TestLatticeSource(unittest.TestCase):
         lattice = make_orthorhombic_lattice(
             'test',  (0.5, 0.54, 0.58), (15, 25, 35), (7, 9, 8))
         self.add_velocity(lattice)
-        source = CUDSSource(cuds=lattice)
+        source = self.tested_class(cuds=lattice)
         data = source.data
         self.assertEqual(data.number_of_points, 15 * 25 * 35)
         assert_array_equal(data.origin, (7.0, 9.0, 8.0))
@@ -296,7 +302,7 @@ class TestLatticeSource(unittest.TestCase):
         yspace = 0.1*numpy.sqrt(3.)/2.
         lattice = make_hexagonal_lattice('test', xspace, 0.2, (5, 4, 1))
         self.add_velocity(lattice)
-        source = CUDSSource(cuds=lattice)
+        source = self.tested_class(cuds=lattice)
         data = source.data
         self.assertEqual(data.number_of_points, 5 * 4 * 1)
 
@@ -326,7 +332,7 @@ class TestLatticeSource(unittest.TestCase):
         lattice = Lattice('test', primitive_cell, (5, 4, 3), (0, 0, 0))
         # bravais_lattice should be a BravaisLattice(IntEnum)
         with self.assertRaises(ValueError):
-            CUDSSource(cuds=lattice)
+            self.tested_class(cuds=lattice)
 
     def test_source_from_a_vtk_lattice(self):
         # given
@@ -335,7 +341,7 @@ class TestLatticeSource(unittest.TestCase):
             'test', primitive_cell, (5, 10, 12), (0, 0, 0))
 
         # when
-        source = CUDSSource(cuds=lattice)
+        source = self.tested_class(cuds=lattice)
 
         # then
         self.assertIs(source._vtk_cuds, lattice)
@@ -348,7 +354,7 @@ class TestLatticeSource(unittest.TestCase):
                                    (5, 10, 12), (0, 0, 0))
 
         # when
-        source = CUDSSource(cuds=lattice)
+        source = self.tested_class(cuds=lattice)
 
         # then
         self.assertEqual(source.name, 'my_lattice (CUDS Lattice)')
@@ -362,6 +368,7 @@ class TestLatticeSource(unittest.TestCase):
 
 
 class TestParticlesSource(unittest.TestCase):
+    tested_class = CUDSSource
 
     def setUp(self):
         self.points = [
@@ -402,7 +409,7 @@ class TestParticlesSource(unittest.TestCase):
         container.add_bonds(self.container.iter_bonds())
 
         # when
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
 
         # then
         self.assertIs(source.data, container.data_set)
@@ -413,7 +420,7 @@ class TestParticlesSource(unittest.TestCase):
         container = self.container
 
         # when
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
 
         # then
         points = source.data.points.to_array()
@@ -435,7 +442,7 @@ class TestParticlesSource(unittest.TestCase):
         container = self.container
 
         # when
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
 
         # then
         dataset = source.data
@@ -459,7 +466,7 @@ class TestParticlesSource(unittest.TestCase):
         particles = Particles(name='my_particles')
 
         # when
-        source = CUDSSource(cuds=particles)
+        source = self.tested_class(cuds=particles)
 
         # then
         self.assertEqual(source.name, 'my_particles (CUDS Particles)')
@@ -467,7 +474,7 @@ class TestParticlesSource(unittest.TestCase):
     def check_save_load_visualization(self, engine):
         # set up the visualization
         container = self.container
-        source = CUDSSource(cuds=container)
+        source = self.tested_class(cuds=container)
         engine.add_source(source)
 
         # save the visualization

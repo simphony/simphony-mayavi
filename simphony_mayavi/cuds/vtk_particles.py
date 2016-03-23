@@ -124,13 +124,21 @@ class VTKParticles(ABCParticles):
         self._data = DataContainer(value)
 
     @classmethod
-    def from_particles(cls, particles):
+    def from_particles(cls, particles, particle_keys=None, bond_keys=None):
         """ Create a new VTKParticles copy from a CUDS particles instance.
 
         Parameters
         ----------
         particles : ABCParticles
             CUDS Particles dataset
+
+        particle_keys : list
+            A list of point CUBA keys that we want to copy, and only those.
+            If None, all available and compatible keys will be copied.
+
+        bond_keys : list
+            A list of cell CUBA keys that we want to copy, and only those.
+            If None, all available and compatible keys will be copied.
         """
         points = []
         lines = []
@@ -138,8 +146,8 @@ class VTKParticles(ABCParticles):
         bond2index = {}
         index2particle = {}
         index2bond = {}
-        particle_data = CUBADataAccumulator()
-        bond_data = CUBADataAccumulator()
+        particle_data = CUBADataAccumulator(particle_keys)
+        bond_data = CUBADataAccumulator(bond_keys)
 
         for index, particle in enumerate(particles.iter_particles()):
             uid = particle.uid

@@ -102,17 +102,29 @@ class VTKMesh(ABCMesh):
         self.elements = CellCollection(data_set.get_cells())
 
     @classmethod
-    def from_mesh(cls, mesh):
+    def from_mesh(cls, mesh, point_keys=None, cell_keys=None):
         """ Create a new VTKMesh copy from a CUDS mesh instance.
 
+        Parameters
+        ----------
+        mesh : ABCMesh
+            The original mesh to create the new one.
+
+        point_keys : list
+            A list of point CUBA keys that we want to copy, and only those.
+            If None, all available and compatible keys will be copied.
+
+        cell_keys : list
+            A list of cell CUBA keys that we want to copy, and only those.
+            If None, all available and compatible keys will be copied.
         """
         points = []
         point2index = {}
         element2index = {}
         counter = count()
 
-        point_data = CUBADataAccumulator()
-        cell_data = CUBADataAccumulator()
+        point_data = CUBADataAccumulator(point_keys)
+        cell_data = CUBADataAccumulator(cell_keys)
 
         for index, point in enumerate(mesh.iter_points()):
             point2index[point.uid] = index
