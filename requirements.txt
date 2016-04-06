@@ -1,4 +1,3 @@
 traitsui!=4.5.0
-hypothesis
 envisage
 mayavi
