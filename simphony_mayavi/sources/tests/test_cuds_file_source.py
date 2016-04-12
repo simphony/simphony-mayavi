@@ -39,7 +39,8 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
         source = CUDSFileSource()
         source.initialize(self.filename)
         self.assertSequenceEqual(
-            set(source.datasets), set(('mesh1', 'particles1', 'particles3', 'lattice0')))
+            set(source.datasets),
+            set(('mesh1', 'particles1', 'particles3', 'lattice0')))
         self.assertIn(source.dataset, source.datasets)
 
     def test_update(self):
