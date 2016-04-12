@@ -95,7 +95,7 @@ class TestAddSourcePanel(UnittestTools, unittest.TestCase):
 
         sources = self.mayavi_engine.current_scene.children
         self.assertEqual(len(sources), 1)
-        self.assertEqual(sources[0].dataset, "particles")
+        self.assertIn(sources[0].dataset, self.engine.get_dataset_names())
 
     def test_pass_add_nothing_to_scene(self):
         ui = self.panel.show_config()

@@ -78,7 +78,7 @@ class TestVTKParticlesAddingBonds(
         container = self.container
         bonds = []
         particle_ids = [particle.uid for particle in self.particle_list]
-        for i in xrange(5):
+        for i in range(5):
             data = create_data_container()
             ids = random.sample(particle_ids, 5)
             bonds.append(Bond(particles=ids, data=data))
@@ -129,14 +129,14 @@ class TestVTKParticlesManipulatingBonds(
             bond.particles = tuple(random.sample(particle_uids, 3))
 
         # update_bonds not yet called
-        for uid, bond in map(None, self.ids, bonds):
+        for uid, bond in zip(self.ids, bonds):
             retrieved = container.get_bond(uid)
             self.assertNotEqual(retrieved, bond)
 
         # when
         container.update_bonds(bonds)
         # then
-        for uid, bond in map(None, self.ids, bonds):
+        for uid, bond in zip(self.ids, bonds):
             retrieved = container.get_bond(uid)
             self.assertEqual(retrieved, bond)
 
@@ -148,7 +148,7 @@ class TestVTKParticlesManipulatingBonds(
         # given
         container = self.container
         bonds = self.bond_list
-        new_ids = [uuid.uuid4() for x in xrange(10)]
+        new_ids = [uuid.uuid4() for x in range(10)]
         for bond in bonds:
             bond.particles = random.sample(new_ids, 5)
 
@@ -162,7 +162,7 @@ class TestVTKParticlesManipulatingBonds(
 
         # given
         container = self.container
-        new_ids = [uuid.uuid4() for x in xrange(5)]
+        new_ids = [uuid.uuid4() for x in range(5)]
 
         # when
         bond = container.get_bond(self.ids[1])

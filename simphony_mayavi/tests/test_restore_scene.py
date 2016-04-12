@@ -178,10 +178,9 @@ class TestRestoreScene(unittest.TestCase):
 
     def check_camera_view(self, actual_view, desired_view):
         for this_view, ref_view in zip(actual_view, desired_view):
-            if isinstance(this_view, Iterable):
-                self.assertItemsEqual(this_view, ref_view)
-            else:
-                self.assertEqual(this_view, ref_view)
+            this_view = numpy.array(this_view)
+            ref_view = numpy.array(ref_view)
+            self.assertTrue(numpy.allclose(this_view, ref_view))
 
     def check_items_same_types(self, actual_items, desired_items):
         for actual, desired in zip(actual_items, desired_items):

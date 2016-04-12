@@ -54,7 +54,7 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
             extractor.selected = CUBA.TEMPERATURE
 
         self.assertEqual(len(extractor.data), 4)
-        for uid, data in extractor.data.iteritems():
+        for uid, data in extractor.data.items():
             particle = container.get_particle(uid)
             self.assertEqual(particle.data[CUBA.TEMPERATURE], data)
 
@@ -75,7 +75,7 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
             extractor.selected = CUBA.NAME
 
         self.assertEqual(len(extractor.data), 4)
-        for uid, data in extractor.data.iteritems():
+        for uid, data in extractor.data.items():
             self.assertTrue(container.has_particle(uid))
             self.assertEqual(data, None)
 
@@ -108,6 +108,6 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
             extractor.keys = set(self.point_uids)
 
         self.assertEqual(len(extractor.data), 4)
-        for uid, data in extractor.data.iteritems():
+        for uid, data in extractor.data.items():
             particle = container.get_particle(uid)
             self.assertEqual(particle.data[CUBA.TEMPERATURE], data)

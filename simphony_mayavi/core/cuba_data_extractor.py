@@ -80,12 +80,12 @@ class CUBADataExtractor(HasStrictTraits):
         selected = self.selected
         if selected is None:
             for item in generator:
-                available.update(item.data.viewkeys())
+                available.update(item.data.keys())
         else:
             data = {}
             for item in generator:
                 data[item.uid] = item.data.get(selected, None)
-                available.update(item.data.viewkeys())
+                available.update(item.data.keys())
             self._data = data
         self._available = available
 

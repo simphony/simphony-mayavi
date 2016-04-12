@@ -68,11 +68,11 @@ class VTKParticles(ABCParticles):
         else:
             self.initialized = False
             if mappings is None:
-                for index in xrange(data_set.number_of_points):
+                for index in range(data_set.number_of_points):
                     uid = uuid.uuid4()
                     self.particle2index[uid] = index
                     self.index2particle[index] = uid
-                for index in xrange(data_set.number_of_cells):
+                for index in range(data_set.number_of_cells):
                     uid = uuid.uuid4()
                     self.bond2index[uid] = index
                     self.index2bond[index] = uid

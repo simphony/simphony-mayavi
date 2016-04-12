@@ -29,7 +29,7 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
 
     def test_datasets(self):
         source = EngineSource(engine=self.engine)
-        self.assertItemsEqual(source.datasets, self.datasets)
+        self.assertSequenceEqual(set(source.datasets), set(self.datasets))
         self.assertIn(source.dataset, source.datasets)
 
     def test_update(self):
@@ -133,11 +133,18 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
         engine = NullEngine()
 
         # When the source is added to an engine it should load the dataset.
+        # Since the dataset is not defined during initialisation,
+        # one of the available datasets is randomly selected
         with self.assertTraitChanges(source, 'data_changed'):
             engine.add_source(source)
-        self.assertIsInstance(source.cuds, Particles)
-        self.assertIsInstance(source._vtk_cuds, VTKParticles)
-        self.assertIsInstance(source.outputs[0], tvtk.PolyData)
+
+        self.assertIsInstance(source.cuds,
+                              (Particles, Lattice, Mesh))
+        self.assertIsInstance(source._vtk_cuds,
+                              (VTKParticles, VTKLattice, VTKMesh))
+        self.assertIsInstance(source.outputs[0],
+                              (tvtk.PolyData, tvtk.ImageData,
+                               tvtk.UnstructuredGrid))
 
     def test_save_load_visualization(self):
         # set up the visualization
@@ -160,7 +167,7 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
         # data is restored
         self.assertIsNotNone(source_in_scene.data)
         self.assertEqual(source_in_scene.dataset, "particles")
-        self.assertItemsEqual(source_in_scene.datasets, ["particles"])
+        self.assertSequenceEqual(source_in_scene.datasets, ["particles"])
         self.assertEqual(source_in_scene.name, source.name)
 
         # But engine, cuds and vtk_cuds are not available

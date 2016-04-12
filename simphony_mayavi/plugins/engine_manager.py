@@ -72,7 +72,7 @@ class EngineManager(HasTraits):
         if name in self.engines:
             raise ValueError("{} is already added".format(name))
         self.engines[name] = modeling_engine
-        self._engine_names = self.engines.keys()
+        self._engine_names = [name for name in self.engines.keys()]
 
     def remove_engine(self, name):
         ''' Remove a modeling engine from the manager.
@@ -94,6 +94,4 @@ class EngineManager(HasTraits):
             raise IndexError(msg.format(name))
 
         self.engines.pop(name)
-        if self.engine_name == name:
-            self.engine_name = self.engines.keys()[0]
-        self._engine_names = self.engines.keys()
+        self._engine_names = [name for name in self.engines.keys()]

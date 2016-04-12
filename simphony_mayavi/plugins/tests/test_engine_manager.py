@@ -89,11 +89,13 @@ class TestEngineManager(UnittestTools, unittest.TestCase):
         manager.add_engine("test", engine1)
         manager.add_engine("test2", engine2)
 
-        # Both engine and engine_name change together
-        with self.assertMultiTraitChanges([manager],
-                                          ["engine", "engine_name"], []):
-            manager.remove_engine("test")
+        # Select "test"
+        manager.engine_name = "test"
 
+        # Remove it
+        manager.remove_engine("test")
+
+        # Should automatically select test2 instead
         self.assertEqual(manager.engine_name, "test2")
         self.assertEqual(manager.engine, engine2)
 

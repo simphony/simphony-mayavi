@@ -155,7 +155,7 @@ class AddSourcePanel(HasTraits):
                 message_format = ("{err_type} (while adding {source}):\n"
                                   "   {message}")
                 text = message_format.format(err_type=type(exception).__name__,
-                                             message=exception.message,
+                                             message=str(exception),
                                              source=source.dataset)
                 err_messages.append(text)
             else:

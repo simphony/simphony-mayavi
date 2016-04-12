@@ -95,7 +95,7 @@ class RunAndAnimate(object):
             # the animation would terminate
             engine_on_start = self.engine
 
-            for _ in xrange(number_of_runs):
+            for _ in range(number_of_runs):
                 if self.engine is not engine_on_start:
                     message = "Engine changed while animating. Stop running"
                     logger.warning(message)

@@ -73,7 +73,7 @@ class RunAndAnimatePanel(HasTraits):
                                  update_all_scenes=self._update_all_scenes)
         except RuntimeError as exception:
             message_dialog = MessageDialog()
-            message_dialog.error(exception.message)
+            message_dialog.error(str(exception))
 
     # ----------------------------------------------------------
     # Trait handlers

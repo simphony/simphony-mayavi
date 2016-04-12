@@ -59,11 +59,11 @@ class VTKMesh(ABCMesh):
             data_set = tvtk.UnstructuredGrid(points=points)
         else:
             if mappings is None:
-                for index in xrange(data_set.number_of_points):
+                for index in range(data_set.number_of_points):
                     uid = uuid.uuid4()
                     self.point2index[uid] = index
                     self.index2point[index] = uid
-                for index in xrange(data_set.number_of_cells):
+                for index in range(data_set.number_of_cells):
                     uid = uuid.uuid4()
                     self.element2index[uid] = index
                     self.index2element[index] = uid
@@ -161,10 +161,10 @@ class VTKMesh(ABCMesh):
 
         mappings = {
             'index2point': {
-                value: key for key, value in point2index.iteritems()},
+                value: key for key, value in point2index.items()},
             'point2index': point2index,
             'index2element': {
-                value: key for key, value in element2index.iteritems()},
+                value: key for key, value in element2index.items()},
             'element2index': element2index}
 
         return cls(

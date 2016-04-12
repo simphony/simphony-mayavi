@@ -1,6 +1,6 @@
+import sys
 import unittest
 from functools import partial
-
 
 import numpy
 from tvtk.api import tvtk
@@ -214,7 +214,8 @@ class TestCubaData(unittest.TestCase):
 
         # when/then
         for index in range(3):
-            result = data[long(index)]
+            long_index = index if sys.version_info.major >= 3 else long(index)
+            result = data[long_index]
             expected = DataContainer(
                 RADIUS=values['RADIUS'][index],
                 TEMPERATURE=values['TEMPERATURE'][index],
@@ -223,7 +224,10 @@ class TestCubaData(unittest.TestCase):
 
         # when/then
         with self.assertRaises(IndexError):
-            data[long(4)]
+            if sys.version_info.major >= 3:
+                data[4]
+            else:
+                data[long(4)]
 
     def test_getitem_with_integer_values(self):
         # given
@@ -243,7 +247,8 @@ class TestCubaData(unittest.TestCase):
 
         # when/then
         for index in range(3):
-            result = data[long(index)]
+            long_index = index if sys.version_info.major >= 3 else long(index)
+            result = data[long_index]
             expected = DataContainer(
                 RADIUS=values['RADIUS'][index],
                 TEMPERATURE=values['TEMPERATURE'][index],
@@ -253,7 +258,10 @@ class TestCubaData(unittest.TestCase):
 
         # when/then
         with self.assertRaises(IndexError):
-            data[long(4)]
+            if sys.version_info.major >= 3:
+                data[4]
+            else:
+                data[long(4)]
 
     def test_setitem(self):
         # given
@@ -355,7 +363,8 @@ class TestCubaData(unittest.TestCase):
 
         # when
         for index in range(3):
-            data[long(index)] = DataContainer(
+            long_index = index if sys.version_info.major >= 3 else long(index)
+            data[long_index] = DataContainer(
                 RADIUS=[34, 32, 31][index],
                 TEMPERATURE=[-1, -2, -3][index],
                 VELOCITY=[0.2, -0.1, -0.54])

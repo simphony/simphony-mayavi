@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from tvtk.api import tvtk
@@ -54,11 +55,15 @@ class TestCellCollection(unittest.TestCase):
 
         # when/then
         for index in range(5):
-            self.assertSequenceEqual(collection[long(index)], cells[index])
+            long_int = index if sys.version_info.major >= 3 else long(index)
+            self.assertSequenceEqual(collection[long_int], cells[index])
 
         # when/then
         with self.assertRaises(IndexError):
-            collection[long(5)]
+            if sys.version_info.major >= 3:
+                collection[5]
+            else:
+                collection[long(5)]
 
     def test_setitem_with_same_number_of_points(self):
         # given

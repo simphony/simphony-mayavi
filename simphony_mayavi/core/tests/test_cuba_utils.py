@@ -39,7 +39,7 @@ class TestCubaUtils(unittest.TestCase):
         supported = supported_cuba()
 
         # then
-        self.assertItemsEqual(supported, expected)
+        self.assertSequenceEqual(supported, set(expected))
 
     def test_default_cuba_value(self):
         for cuba in self.float_scalar_cuba:

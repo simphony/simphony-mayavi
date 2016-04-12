@@ -52,13 +52,15 @@ class TabbedPanelCollection(HasTraits):
 
         instance = cls()
 
+        instance.panels = []
+
         for key, panel in kwargs.items():
             if hasattr(instance, key):
                 message = "'{}' is a predefined attribute"
                 raise AttributeError(message.format(key))
             setattr(instance, key, panel)
+            instance.panels.append(panel)
 
-        instance.panels = kwargs.values()
         return instance
 
     def __iter__(self):

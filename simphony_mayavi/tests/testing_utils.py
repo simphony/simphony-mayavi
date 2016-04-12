@@ -206,4 +206,4 @@ class DummyEngine(ABCModelingEngine):
                 yield self.get_dataset(name)
 
     def get_dataset_names(self):
-        return self.datasets.keys()
+        return list(self.datasets.keys())

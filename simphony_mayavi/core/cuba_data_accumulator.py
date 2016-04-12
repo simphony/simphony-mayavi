@@ -224,7 +224,7 @@ def gather_cells(
     element2index = {}
 
     for element in iter(iterable):
-        element2index[element.uid] = counter.next()
+        element2index[element.uid] = next(counter)
         npoints = len(element.points)
         cells_size.append(npoints + 1)
         cells.append(npoints)

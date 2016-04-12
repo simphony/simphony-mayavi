@@ -1,5 +1,4 @@
 from __future__ import division
-from itertools import izip
 
 import numpy
 from tvtk.api import tvtk
@@ -270,7 +269,7 @@ class VTKLattice(ABCLattice):
             # this setup has been supported by tests.
             y, z, x = numpy.meshgrid(
                 range(size[1]), range(size[2]), range(size[0]))
-            indices = izip(x.ravel(), y.ravel(), z.ravel())
+            indices = zip(x.ravel(), y.ravel(), z.ravel())
         elif lattice_type in BravaisLattice:
             # This includes any other BravaisLattice type that cannot be
             # represented by ImageData.  PolyData is required.
@@ -286,7 +285,7 @@ class VTKLattice(ABCLattice):
                 points[:, idim] += origin[idim]
 
             data_set = tvtk.PolyData(points=points)
-            indices = izip(x.ravel(), y.ravel(), z.ravel())
+            indices = zip(x.ravel(), y.ravel(), z.ravel())
         else:
             message = 'Unknown lattice type: {}'.format(lattice_type)
             raise ValueError(message)

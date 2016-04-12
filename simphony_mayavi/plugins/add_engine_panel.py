@@ -117,7 +117,7 @@ class AddEnginePanel(HasTraits):
             try:
                 self.new_engine = factory.create()
             except Exception as exception:
-                self._display_message(exception.message)
+                self._display_message(str(exception))
                 self.new_engine = None
         else:
             self.new_engine = None
@@ -152,4 +152,4 @@ class AddEnginePanel(HasTraits):
         return DEFAULT_ENGINE_FACTORIES
 
     def _factory_names_default(self):
-        return [""] + self.factories.keys()
+        return [""] + list(self.factories.keys())

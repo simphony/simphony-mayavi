@@ -38,8 +38,8 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
     def test_initialization(self):
         source = CUDSFileSource()
         source.initialize(self.filename)
-        self.assertItemsEqual(
-            source.datasets, ['mesh1', 'particles1', 'particles3', 'lattice0'])
+        self.assertSequenceEqual(
+            set(source.datasets), set(('mesh1', 'particles1', 'particles3', 'lattice0')))
         self.assertIn(source.dataset, source.datasets)
 
     def test_update(self):
@@ -116,9 +116,9 @@ class TestLatticeSource(unittest.TestCase, UnittestTools):
         source_in_scene = engine.current_scene.children[0]
 
         # check
-        self.assertItemsEqual(
-            source_in_scene.datasets,
-            ['mesh1', 'particles1', 'particles3', 'lattice0'])
+        self.assertSequenceEqual(
+            set(source_in_scene.datasets),
+            set(['mesh1', 'particles1', 'particles3', 'lattice0']))
         self.assertIn(source_in_scene.dataset,
                       source_in_scene.datasets)
 
