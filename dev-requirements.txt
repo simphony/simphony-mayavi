@@ -1,3 +1,4 @@
+hypothesis
 Pillow
 coverage
 flake8

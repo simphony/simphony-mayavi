@@ -20,18 +20,18 @@ if on_rtd:
     requirements = []
 else:
     requirements = [
-        "simphony[H5IO]>=0.2.1", "mayavi[app]", "hypothesis"]
+        "simphony[H5IO]>=0.2.1", "mayavi[app]"]
 
 
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
 
 if on_rtd:
-    requirements = ["hypothesis", "traits"],
+    requirements = ["traits"],
 else:
     requirements = [
         "simphony[H5IO]>=0.2.1",
-        "mayavi[app]",
-        "hypothesis"],
+        "mayavi[app]"
+        ],
 
 
 # Return the git revision as a string
