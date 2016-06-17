@@ -13,7 +13,9 @@ from simphony_mayavi.modules.default_module import default_module
 
 @contextmanager
 def get_figure(*args, **kwargs):
+    old_option = mlab.options.offscreen
     try:
+        # offscreen on Windows works reliably
         if sys.platform == "win32":
             mlab.options.offscreen = True
 
@@ -25,7 +27,7 @@ def get_figure(*args, **kwargs):
         yield figure
 
     finally:
-        mlab.options.offscreen = False
+        mlab.options.offscreen = old_option
         mlab.clf()
         mlab.close()
 
