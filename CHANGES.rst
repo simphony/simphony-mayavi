@@ -1,6 +1,15 @@
 SimPhoNy-Mayavi CHANGELOG
 =========================
 
+Release 0.4.1
+-------------
+
+- Implemented SlimCUDSSource for improved memory consumption (#175)
+- Fix keeping mlab.offscren option in snapshot (#178)
+- Skip tests that require qt4 (#176)
+- hypothesis is a development requirement, not a user's requirement (#179)
+
+
 Release 0.4.0
 -------------
 
