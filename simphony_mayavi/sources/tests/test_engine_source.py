@@ -147,9 +147,9 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
                               vtk_cuds_types[type(source._vtk_cuds)])
 
         # Mapping for the TVTK dataset types
-        tvtk_datasets = {Lattice: (tvtk.ImageData, tvtk.PolyData),
-                         Particles: tvtk.PolyData,
-                         Mesh: tvtk.UnstructuredGrid}
+        tvtk_datasets = {VTKLattice: (tvtk.ImageData, tvtk.PolyData),
+                         VTKParticles: tvtk.PolyData,
+                         VTKMesh: tvtk.UnstructuredGrid}
 
         self.assertIsInstance(source.outputs[0],
                               tvtk_datasets[type(source._vtk_cuds)])
