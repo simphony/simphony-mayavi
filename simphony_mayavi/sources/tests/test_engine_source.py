@@ -137,12 +137,22 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
             engine.add_source(source)
 
         self.assertIsInstance(source.cuds, (Lattice, Particles, Mesh))
-        self.assertIsInstance(source._vtk_cuds, (VTKLattice,
-                                                 VTKParticles,
-                                                 VTKMesh))
-        self.assertIsInstance(source.outputs[0], (tvtk.ImageData,
-                                                  tvtk.PolyData,
-                                                  tvtk.UnstructuredGrid))
+
+        # Mapping from the CUDS type to VTK CUDS types
+        vtk_cuds_types = {Lattice: VTKLattice,
+                          Particles: VTKParticles,
+                          Mesh: VTKMesh}
+
+        self.assertIsInstance(source._vtk_cuds,
+                              vtk_cuds_types[type(source.cuds)])
+
+        # Mapping for the TVTK dataset types
+        tvtk_datasets = {Lattice: (tvtk.ImageData, tvtk.PolyData),
+                         Particles: tvtk.PolyData,
+                         Mesh: tvtk.UnstructuredGrid}
+
+        self.assertIsInstance(source.outputs[0],
+                              tvtk_datasets[type(source.cuds)])
 
     def test_save_load_visualization(self):
         # set up the visualization
