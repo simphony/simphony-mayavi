@@ -135,9 +135,14 @@ class TestEngineSource(unittest.TestCase, UnittestTools):
         # When the source is added to an engine it should load the dataset.
         with self.assertTraitChanges(source, 'data_changed'):
             engine.add_source(source)
-        self.assertIsInstance(source.cuds, Particles)
-        self.assertIsInstance(source._vtk_cuds, VTKParticles)
-        self.assertIsInstance(source.outputs[0], tvtk.PolyData)
+
+        self.assertIsInstance(source.cuds, (Lattice, Particles, Mesh))
+        self.assertIsInstance(source._vtk_cuds, (VTKLattice,
+                                                 VTKParticles,
+                                                 VTKMesh))
+        self.assertIsInstance(source.outputs[0], (tvtk.ImageData,
+                                                  tvtk.PolyData,
+                                                  tvtk.UnstructuredGrid))
 
     def test_save_load_visualization(self):
         # set up the visualization
