@@ -1,5 +1,6 @@
 Pillow
 coverage
-flake8
+# Flake 3.0.4 produces a KeyError 'default' for some reason
+flake8!=3.0.4
 hypothesis
 mock
