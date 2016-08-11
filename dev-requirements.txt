@@ -1,5 +1,6 @@
-hypothesis
 Pillow
 coverage
-flake8
+# Flake 3 produces a KeyError 'default' for some reason
+flake8<3
+hypothesis
 mock
