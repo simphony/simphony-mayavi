@@ -8,6 +8,7 @@ import os
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__name__), '..', '..')))
 
+
 def mock_modules():
 
     MOCK_MODULES = ['pyface.ui.qt4.code_editor.pygments_highlighter']
