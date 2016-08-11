@@ -53,7 +53,7 @@ class CUBADataAccumulator(object):
     KeyError(...)
 
     """
-    def __init__(self, keys=()):
+    def __init__(self, keys=None):
         """Constructor
 
         Parameters
@@ -62,12 +62,17 @@ class CUBADataAccumulator(object):
 
             The list of keys that the accumulator should care
             about. Providing this value at initialisation sets up the
-            accumulator to operate in ``fixed`` mode. If no keys are
-            provided then accumulator operates in ``expand`` mode.
+            accumulator to operate in ``fixed`` mode. An empty list is
+            acceptable, and returns a trivial accumulator providing no
+            data. If None is passed, then the accumulator operates in
+            ``expand`` mode.
 
         """
+        self._expand_mode = keys is None
+
+        keys = keys if keys is not None else ()
+
         self._keys = set(keys)
-        self._expand_mode = len(keys) == 0
         self._data = {}
         self._record_size = 0
         self._expand(self._keys)
@@ -87,8 +92,6 @@ class CUBADataAccumulator(object):
         data : DataContainer
             The data information to append.
 
-        Notes
-        -----
         If the accumulator operates in ``fixed`` mode:
 
         - Any keys in :code:`self.keys()` that have values in ``data``

@@ -71,7 +71,7 @@ class AddSourcePanel(HasTraits):
     ''' Standalone UI for adding datasets from a modeling engine to
     a Mayavi scene
 
-    Parameters
+    Attributes
     ----------
     engine : ABCModelingEngine
         Simphony Modeling Engine wrapper

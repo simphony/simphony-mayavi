@@ -13,9 +13,9 @@ from mayavi.modules.text3d import Text3D
 from mayavi.tests import datasets
 
 from mayavi import mlab
-from mayavi import __version__ as MAYAVI_VERSION
 
 from simphony_mayavi.restore_scene import restore_scene
+from simphony_mayavi.tests.testing_utils import is_mayavi_older
 
 
 def finally_mlab_close(func):
@@ -27,17 +27,6 @@ def finally_mlab_close(func):
         finally:
             mlab.close(all=True)
     return new_func
-
-
-def is_mayavi_older(version):
-    # current mayavi version
-    this_version = map(int, MAYAVI_VERSION.split(".")[:3])
-
-    # if older than target_version, skip
-    target_version = map(int, version.split(".")[:3])
-
-    return any(this_version[i] < target_version[i]
-               for i in range(3))
 
 
 @unittest.skipIf(is_mayavi_older("4.4.4"),
