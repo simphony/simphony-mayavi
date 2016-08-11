@@ -1,4 +1,4 @@
-traitsui!=4.5.0
-hypothesis
-envisage
-mayavi
+traitsui==5.0.0
+hypothesis==3.1.0
+envisage==4.5.1
+mayavi==4.4.4
