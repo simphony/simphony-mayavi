@@ -12,6 +12,7 @@ plug-in to the simphony library.
 .. autosummary::
    :nosignatures:
 
+   ~EngineManagerStandalone
    ~EngineManagerStandaloneUI
 
 .. rubric:: Functions
@@ -45,6 +46,10 @@ Description
 
 .. autofunction:: simphony_mayavi.plugin.restore_scene
 		  
+.. autoclass:: simphony_mayavi.plugin.EngineManagerStandalone
+   :members:
+   :show-inheritance:
+
 .. autoclass:: simphony_mayavi.plugin.EngineManagerStandaloneUI	   
    :members:  add_engine, remove_engine
    :show-inheritance:

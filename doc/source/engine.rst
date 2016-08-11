@@ -27,6 +27,33 @@ Making a video is just a step away!
 Interactive scripting
 ---------------------
 
+Non-GUI approach
+................
+
+The :class:`~simphony_mayavi.plugin.EngineManagerStandalone`
+is available for the user to select and visualise datasets from a Simphony Modeling
+Engine via the Python shell.  It also allows the user to run the engine (locally) and
+animate the visualisation after each run.
+
+.. rubric:: Example (EngineManagerStandalone)
+
+.. literalinclude:: ../../examples/engine_manager_standalone_example.py
+
+.. figure:: _images/engine_manager_standalone_animate.png
+	    
+One can visualise multiple datasets in different scenes and animate all
+of them as the engine runs.
+
+.. literalinclude:: ../../examples/engine_manager_standalone_scenes_example.py
+
+.. figure:: _images/engine_manager_standalone_scenes_animate.png
+
+
+.. _enginemanagerstandaloneui:
+
+GUI approach
+............
+
 :class:`EngineManagerStandaloneUI <simphony_mayavi.plugin.EngineManagerStandaloneUI>`
 provides a user-friendly and interactive approach to manage multiple engines, visualise
 datasets from a particular engine, locally run an engine and animate the results.
