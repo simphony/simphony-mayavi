@@ -8,8 +8,7 @@ from pyface.ui.qt4.util.modal_dialog_tester import ModalDialogTester
 
 from simphony.core.cuba import CUBA
 
-from simphony_mayavi.plugins.add_engine_source_to_mayavi import (
-    AddEngineSourceToMayavi)
+from simphony_mayavi.sources.api import EngineSource
 from simphony_mayavi.plugins.run_and_animate_panel import RunAndAnimatePanel
 from simphony_mayavi.tests.testing_utils import (
     is_current_backend,
@@ -26,10 +25,9 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         self.mayavi_engine = NullEngine()
 
         # Add a dataset to scene
-        self.add_source_handler = AddEngineSourceToMayavi(self.engine,
-                                                          self.mayavi_engine)
-        self.add_source_handler.add_dataset_to_scene("particles")
-        self.engine_source = self.mayavi_engine.current_scene.children[0]
+        self.engine_source = EngineSource(engine=self.engine,
+                                          dataset="particles")
+        self.mayavi_engine.add_source(self.engine_source)
 
         # RunAndAnimatePanel
         self.panel = RunAndAnimatePanel(engine=self.engine,
@@ -126,9 +124,8 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         engine_source1 = self.mayavi_engine.current_scene.children[0]
 
         self.mayavi_engine.new_scene()
-        self.add_source_handler.add_dataset_to_scene(
-            "lattice", point_scalars="TEMPERATURE")
-        engine_source2 = self.mayavi_engine.current_scene.children[0]
+        engine_source2 = EngineSource(engine=self.engine, dataset="lattice")
+        self.mayavi_engine.add_source(engine_source2)
 
         # when
         self.panel._update_all_scenes = True
