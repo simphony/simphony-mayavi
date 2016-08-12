@@ -40,7 +40,6 @@ class TestRunAndAnimatePanel(GuiTestAssistant, unittest.TestCase):
         ui = self.panel.show_config()
 
         def engine_ran_twice(source):
-            print("XXXXXXXXXXXXXXXXXXXXXXXXX", source.engine.time)
             return source.engine.time >= 20.
 
         # animate as the engine ran for 2 times
