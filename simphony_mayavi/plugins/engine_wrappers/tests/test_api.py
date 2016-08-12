@@ -11,6 +11,10 @@ class TestDefaultEngineFactoryAPI(unittest.TestCase):
            ("kratos", "jyulb_fileio_isothermal"))
     def test_default_engine_factories(self):
 
+        # DEFAULT_ENGINE_FACTORIES is populated at import time. Make sure it's
+        # up-to-date with the above patching by forcing reloading.
+        import simphony_mayavi.plugins.engine_wrappers.api
+        reload(simphony_mayavi.plugins.engine_wrappers.api)
         from simphony_mayavi.plugins.engine_wrappers.api import (
             DEFAULT_ENGINE_FACTORIES)
 
