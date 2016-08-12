@@ -13,7 +13,8 @@ class TestDefaultEngineFactoryAPI(unittest.TestCase):
 
         # DEFAULT_ENGINE_FACTORIES is populated at import time. Make sure it's
         # up-to-date with the above patching by forcing reloading.
-        reload("simphony_mayavi.plugins.engine_wrappers.api")
+        import simphony_mayavi.plugins.engine_wrappers.api
+        reload(simphony_mayavi.plugins.engine_wrappers.api)
         from simphony_mayavi.plugins.engine_wrappers.api import (
             DEFAULT_ENGINE_FACTORIES)
 
