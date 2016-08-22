@@ -5,14 +5,6 @@ from traitsui.api import View, Item, VGroup, ListEditor
 class TabbedPanelCollection(HasTraits):
     """Collect a list of HasTraits instances and display each
     of them as a tab in a tabbed notebook using ListEditor
-
-    Attributes
-    ----------
-    panels : list
-        Instances of HasTraits to be displayed in tabs
-
-    selected_panel : HasTraits
-        Currectly selected (visible) instance
     """
 
     # List of Traits object to be displayed in the notebook
@@ -73,31 +65,3 @@ class TabbedPanelCollection(HasTraits):
                                    selected="selected_panel",
                                    page_name=".label"))),
         dock="horizontal")
-
-
-if __name__ == "__main__":
-    from traits.api import Str, Instance
-
-    class A(HasTraits):
-        text = Str("hello")
-
-    class B(HasTraits):
-        text = Str("Bye")
-        text2 = Str("Bye again")
-        label = "B Panel"
-
-    class C(HasTraits):
-        items = Instance(TabbedPanelCollection)
-
-        view = View(Item("items", style="custom"))
-
-        def _items_default(self):
-            return TabbedPanelCollection.create(a=A(), b=B())
-
-    c = C()
-    c.configure_traits()
-
-    d = TabbedPanelCollection.create(a=A(), b=B())
-    d.configure_traits(view="traits_view")
-
-    d.a.configure_traits()

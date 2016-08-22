@@ -11,11 +11,11 @@ from simphony_mayavi.plugins.tabbed_panel_collection import (
 
 
 class EngineManagerStandaloneUI(EngineManager):
-    ''' Standalone GUI for visualising datasets from a modeling engine,
+    """Standalone GUI for visualising datasets from a modeling engine,
     running the engine and animating the results
+    """
 
-    '''
-
+    #: The collection of panels
     panels = Instance(TabbedPanelCollection)
 
     traits_view = View(

@@ -18,7 +18,10 @@ logger = logging.getLogger(__name__)
 class EngineManagerMayavi2(EngineManager):
     """ The Simphony panel in the Mayavi2 application """
 
+    #: The workbench window
     window = Instance("pyface.workbench.api.WorkbenchWindow")
+
+    #: The panels
     panels = Instance(TabbedPanelCollection)
 
     view = View(

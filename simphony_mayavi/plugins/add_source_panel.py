@@ -10,7 +10,7 @@ from simphony_mayavi.modules.default_module import default_module
 
 
 def add_source_and_modules_to_scene(mayavi_engine, source):
-    ''' Add a data source to the current Mayavi scene
+    """ Add a data source to the current Mayavi scene
     in a given Mayavi engine and add the modules appropriate
     for the data
 
@@ -21,7 +21,7 @@ def add_source_and_modules_to_scene(mayavi_engine, source):
     source : VTKDataSource
        Examples are CUDSSource, CUDSFileSource, EngineSource,
        which are subclasses of VTKDataSource
-    '''
+    """
     if mayavi_engine is None:
         raise RuntimeError("mayavi_engine cannot be None")
 
@@ -35,15 +35,15 @@ def add_source_and_modules_to_scene(mayavi_engine, source):
 
 
 class EngineSourceAdapter(ListStrAdapter):
-    ''' ListStrAdapter for EngineSource to be used by ListStrEditor
+    """ ListStrAdapter for EngineSource to be used by ListStrEditor
     for displaying info of EngineSource that is pending to be sent
-    to Mayavi '''
+    to Mayavi """
 
     # The displayed text cannot be edited
     can_edit = Bool(False)
 
     def get_text(self, object, trait, index):
-        ''' Text for representing the EngineSource '''
+        """ Text for representing the EngineSource """
         # All the point/cell data names being added
         source = getattr(object, trait)[index]
         data_names = ",".join([name for name in (source.point_scalars_name,
@@ -58,45 +58,44 @@ class EngineSourceAdapter(ListStrAdapter):
 
 
 class PendingEngineSourceHandler(Handler):
-    ''' UI Handler for adding dataset as a source in EngineSourceManager
-    The source is appended to the ``_pending_engine_sources`` list '''
+    """ UI Handler for adding dataset as a source in EngineSourceManager
+    The source is appended to the ``_pending_engine_sources`` list """
 
     def append_list(self, info):
-        ''' Confirm and add the EngineSource to the pending list '''
+        """ Confirm and add the EngineSource to the pending list """
         info.manager._pending_engine_sources.append(info.object)
         info.ui.dispose()
 
 
 class AddSourcePanel(HasTraits):
-    ''' Standalone UI for adding datasets from a modeling engine to
-    a Mayavi scene
+    """ Standalone UI for adding datasets from a modeling engine to
+    a Mayavi scene"""
 
-    Attributes
-    ----------
-    engine : ABCModelingEngine
-        Simphony Modeling Engine wrapper
-
-    engine_name : str
-        Name of the modeling engine
-
-    mayavi_engine : mayavi.api.Engine
-        the mayavi engine that manages the scenes
-    '''
+    #: Simphony Modeling Engine wrapper
     engine = Instance(ABCModelingEngine)
+
+    #: Name of the modeling engine
     engine_name = Str
+
+    #: The mayavi engine that manages the scenes
     mayavi_engine = Instance("mayavi.core.engine.Engine")
 
+    #: The label of the dialog
     label = "Add to Mayavi"
 
-    # UI functions
+    #: Event triggered when add dataset button is clicked
     _add_dataset = Event
+
+    #: Event triggered when remove dataset button is clicked
     _remove_dataset = Event
+
+    #: Event triggered when send to scene button is clicked
     _add_to_scene = Event
 
-    # Pending EngineSource to be added to Mayavi
+    #: Pending EngineSource to be added to Mayavi
     _pending_engine_sources = List(Instance(EngineSource))
 
-    # Selected pending EngineSource (as an index of the list)
+    #: Selected pending EngineSource (as an index of the list)
     _pending_source = Enum(values="_pending_engine_sources")
     _pending_source_index = Int
 
@@ -126,7 +125,7 @@ class AddSourcePanel(HasTraits):
     # --------------------------------------------------
 
     def show_config(self):
-        ''' Show the GUI '''
+        """ Show the GUI """
         return self.edit_traits(view="panel_view", kind="live")
 
     # -------------------------------------------------

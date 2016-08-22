@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class RunAndAnimate(object):
 
     def __init__(self, engine, mayavi_engine):
-        ''' Standalone non-GUI based controller for running a Simphony
+        """ Standalone non-GUI based controller for running a Simphony
         Modeling Engine and animating the CUDS dataset in Mayavi.
 
         Precondition: The required CUDS datasets are already visible
@@ -21,14 +21,14 @@ class RunAndAnimate(object):
 
         mayavi_engine : mayavi.api.Engine
             for retrieving scenes and visible datasets
-        '''
+        """
         self.engine = engine
         self.mayavi_engine = mayavi_engine
         self._animator = None
 
     def animate(self, number_of_runs, delay=None, ui=False,
                 update_all_scenes=False):
-        ''' Run the modeling engine, and animate the scene.
+        """ Run the modeling engine, and animate the scene.
         If there is no source in the scene or none of the sources
         belongs to the selected Engine ``engine``, a RuntimeError
         is raised.
@@ -53,7 +53,7 @@ class RunAndAnimate(object):
         ------
         RuntimeError
             if nothing in scene(s) belongs to ``engine``
-        '''
+        """
         if self.mayavi_engine is None:
             message = "Mayavi engine is not defined in the manager"
             raise RuntimeError(message)
@@ -112,32 +112,32 @@ class RunAndAnimate(object):
     # -------------------------------------------------
 
     def _update_sources(self, sources):
-        ''' Update multiple sources in scene'''
+        """ Update multiple sources in scene"""
         for source in sources:
             source.update()
 
     def _get_current_sources(self):
-        ''' Return the current scene's sources that belong
+        """ Return the current scene's sources that belong
         to this manager's modeling engine
         Note that this is not a Trait Property getter
 
         Returns
         -------
         sources : set of EngineSource
-        '''
+        """
         sources = self.mayavi_engine.current_scene.children
         return {source for source in sources
                 if (hasattr(source, "engine") and
                     source.engine == self.engine)}
 
     def _get_all_sources(self):
-        ''' Return sources from all the scenes and that the sources
+        """ Return sources from all the scenes and that the sources
         belong to this manager's modeling engine
 
         Returns
         -------
         sources : set of EngineSource
-        '''
+        """
         sources = {source
                    for scene in self.mayavi_engine.scenes
                    for source in scene.children

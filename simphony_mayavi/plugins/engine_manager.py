@@ -7,30 +7,21 @@ from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 
 
 class EngineManager(HasTraits):
-    ''' A basic container of Simphony Engine that comes with a GUI.
+    """A basic container of Simphony Engine that comes with a GUI.
 
     Additional panel can be added to support more operations related
-    to the modeling engines
+    to the modeling engines"""
 
-    Attributes
-    ----------
-    engines : dict
-        Mappings of Simphony Modeling Engines in this manager
-    engine_name : str
-        Name of the Simphony Modeling Engine
-    engine : ABCModelingEngine
-        Simphony Modeling Engine
-    '''
-    # Engines that are added to the manager
+    #: Mappings of Simphony Modeling Engines in this manager
     engines = Dict(Str, Instance(ABCModelingEngine))
 
-    # Names of engines in the Manager
+    #: Names of engines in the Manager
     _engine_names = ListStr
 
-    # Selected engine
+    #: Selected engine
     engine = Property(depends_on="engine_name")
 
-    # Selected engine name
+    #: Selected engine name
     engine_name = DEnum(values_name="_engine_names")
 
     # Traits view
