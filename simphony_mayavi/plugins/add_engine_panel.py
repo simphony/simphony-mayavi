@@ -15,35 +15,39 @@ logger = logging.getLogger(__name__)
 
 
 class AddEnginePanel(HasTraits):
-    ''' A panel to add a new modeling engine by creating one from
+    """A panel to add a new modeling engine by creating one from
     a factory function. Then send it to the EngineManager instance
     ``engine_manager``
-    '''
+    """
 
+    #: The engine manager
     engine_manager = Instance(EngineManager, allow_none=False)
 
-    # the new engine to be added to engine_manager
+    #: The new engine to be added to engine_manager
     new_engine = Instance(ABCModelingEngine)
 
-    # for calling engine_manager.add_engine()
+    #: Event for UI button to call engine_manager.add_engine()
     add_engine = Event
 
-    # Name of the panel
+    #: Name of the panel
     label = "Add Engine"
 
-    # Instantiate from a factory
+    #: Instantiate from a factory
     factories = Dict(Str, Instance(ABCEngineFactory))
     factory_names = List(Str)
     factory_name = Str
 
-    # user needs to name the engine before adding
+    #: User needs to name the engine before adding
     new_engine_name = Str
-    # check if the name is valiud
+
+    #: Check if the name is valid
     engine_name_is_invalid = Property(Bool,
                                       depends_on="new_engine_name")
-    # display a message if the engine_name is invalid
+
+    #: Display a message if the engine_name is invalid
     status = Property(Str, depends_on="new_engine,new_engine_name")
-    # last sanity check before the "Add engine" button is enabled
+
+    #: Last sanity check before the "Add engine" button is enabled
     ready_to_add = Property(Bool, depends_on="new_engine,new_engine_name")
 
     panel_view = View(

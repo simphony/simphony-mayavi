@@ -9,28 +9,16 @@ from .run_and_animate import RunAndAnimate
 
 
 class RunAndAnimatePanel(HasTraits):
-    ''' GUI for running a Simphony Modeling Engine and animating
-    the result in an existing scene
+    """GUI for running a Simphony Modeling Engine and animating
+    the result in an existing scene"""
 
-    Attributes
-    ----------
-    engine : ABCModelingEngine
-        Simphony Engine
-
-    mayavi_engine : mayavi.api.Engine
-        The mayavi engine that manages the scenes
-
-    time_step : float
-        CUBA.TIME_STEP of the Simphony Engine
-
-    number_of_time_steps : float
-        CUBA.NUMBER_OF_TIME_STEPS of the Simphony Engine
-    '''
-
+    #: The Simphony Engine
     engine = Instance(ABCModelingEngine)
 
+    #: The mayavi engine that manages the scenes
     mayavi_engine = Instance("mayavi.core.engine.Engine")
 
+    #: The handler providing run and animate services.
     handler = Instance(RunAndAnimate)
 
     # Label to be displayed in tab
@@ -39,7 +27,11 @@ class RunAndAnimatePanel(HasTraits):
     # -------------------------------------------------------
     # Basic time step parameters to interact with the engine
     # -------------------------------------------------------
+    #: Time step. From CUBA.TIME_STEP of the Simphony Engine
     time_step = Float(allow_none=False)
+
+    #: Number of time steps. From CUBA.NUMBER_OF_TIME_STEPS of
+    #: the Simphony Engine
     number_of_time_steps = Int(allow_none=False)
 
     # ----------------------------------------------
