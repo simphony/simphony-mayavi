@@ -18,7 +18,7 @@ class EngineManager(HasTraits):
     #: Names of engines in the Manager
     _engine_names = ListStr
 
-    #:Selected engine
+    #: Selected engine
     engine = Property(depends_on="engine_name")
 
     #: Selected engine name
