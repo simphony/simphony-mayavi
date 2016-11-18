@@ -241,7 +241,10 @@ class VTKMesh(ABCMesh):
 
     # Point operations ####################################################
 
-    def add_points(self, points):
+    def _has_points(self):
+        return self._has_elements(Point)
+
+    def _add_points(self, points):
         data_set = self.data_set
         own_points = data_set.points
         point2index = self.point2index
@@ -255,7 +258,7 @@ class VTKMesh(ABCMesh):
                 new_uids.append(item.uid)
         return new_uids
 
-    def get_point(self, uid):
+    def _get_point(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = int(self.point2index[uid])
@@ -264,7 +267,7 @@ class VTKMesh(ABCMesh):
             coordinates=self.data_set.points[index],
             data=self.point_data[index])
 
-    def update_points(self, points):
+    def _update_points(self, points):
         for point in points:
             try:
                 index = self.point2index[point.uid]
@@ -274,7 +277,7 @@ class VTKMesh(ABCMesh):
             self.data_set.points[index] = point.coordinates
             self.point_data[index] = point.data
 
-    def iter_points(self, uids=None):
+    def _iter_points(self, uids=None):
         if uids is None:
             for uid in self.point2index:
                 yield self.get_point(uid)
@@ -297,16 +300,16 @@ class VTKMesh(ABCMesh):
 
     # Edge operations ########################################################
 
-    def get_edge(self, uid):
+    def _get_edge(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
         return self._get_element(index, Edge)
 
-    def has_edges(self):
+    def _has_edges(self):
         return self._has_elements(Edge)
 
-    def iter_edges(self, uids=None):
+    def _iter_edges(self, uids=None):
         if uids is None:
             for edge in self._iter_elements(Edge):
                 yield edge
@@ -314,27 +317,27 @@ class VTKMesh(ABCMesh):
             for uid in uids:
                 yield self.get_edge(uid)
 
-    def add_edges(self, edges):
+    def _add_edges(self, edges):
         uids = []
         for edge in edges:
             uids.append(self._add_element(edge, mapping=EDGE2VTKCELL))
         return uids
 
-    def update_edges(self, edges):
+    def _update_edges(self, edges):
         return self._update_elements(edges)
 
     # Face operations ########################################################
 
-    def get_face(self, uid):
+    def _get_face(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
         return self._get_element(index, Face)
 
-    def has_faces(self):
+    def _has_faces(self):
         return self._has_elements(Face)
 
-    def iter_faces(self, uids=None):
+    def _iter_faces(self, uids=None):
         if uids is None:
             for face in self._iter_elements(Face):
                 yield face
@@ -342,27 +345,27 @@ class VTKMesh(ABCMesh):
             for uid in uids:
                 yield self.get_face(uid)
 
-    def add_faces(self, faces):
+    def _add_faces(self, faces):
         uids = []
         for face in faces:
             uids.append(self._add_element(face, mapping=FACE2VTKCELL))
         return uids
 
-    def update_faces(self, faces):
+    def _update_faces(self, faces):
         return self._update_elements(faces)
 
     # Cell operations ########################################################
 
-    def get_cell(self, uid):
+    def _get_cell(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
         return self._get_element(index, Cell)
 
-    def has_cells(self):
+    def _has_cells(self):
         return self._has_elements(Cell)
 
-    def iter_cells(self, uids=None):
+    def _iter_cells(self, uids=None):
         if uids is None:
             for cell in self._iter_elements(Cell):
                 yield cell
@@ -370,13 +373,13 @@ class VTKMesh(ABCMesh):
             for uid in uids:
                 yield self.get_cell(uid)
 
-    def add_cells(self, cells):
+    def _add_cells(self, cells):
         uids = []
         for cell in cells:
             uids.append(self._add_element(cell, mapping=CELL2VTKCELL))
         return uids
 
-    def update_cells(self, cells):
+    def _update_cells(self, cells):
         return self._update_elements(cells)
 
     # Private interface ######################################################
@@ -402,6 +405,12 @@ class VTKMesh(ABCMesh):
         data_set = self.data_set
         if type_ is None:
             type_ = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
+
+        if type_ != VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]:
+            # Recheck the type if it matches with the request, if it
+            # was specified. If it doesn't match, raise a KeyError
+            # exception, which indicates we need to try something else.
+            raise KeyError()
 
         # data_set.get_cell may return the wrong point ids
         # if the cell type is updated

@@ -128,16 +128,16 @@ class VTKLattice(ABCLattice):
 
     # Node operations ########################################################
 
-    def get_node(self, index):
+    def _get_node(self, index):
         point_id = self._get_point_id(index)
         return LatticeNode(index, data=self.point_data[point_id])
 
-    def update_nodes(self, nodes):
+    def _update_nodes(self, nodes):
         for node in nodes:
             point_id = self._get_point_id(node.index)
             self.point_data[point_id] = node.data
 
-    def iter_nodes(self, indices=None):
+    def _iter_nodes(self, indices=None):
         if indices is None:
             for index in numpy.ndindex(*self.size):
                 yield self.get_node(index)
