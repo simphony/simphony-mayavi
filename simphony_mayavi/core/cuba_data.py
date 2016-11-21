@@ -31,7 +31,7 @@ class CubaData(MutableSequence):
     access provided by a list of
     :class:`~.DataContainer<DataContainers>`.
 
-    While the wrapped tvkt container is empty the following behaviour is
+    While the wrapped tvtk container is empty the following behaviour is
     active:
 
     - Using ``len`` will return the ``initial_size``, if defined, or 0.
@@ -148,8 +148,9 @@ class CubaData(MutableSequence):
                 array = data.get_array(array_id)
                 mask = masks.get_array(array_id)
                 cuba = CUBA[array.name]
-                array[index] = value.get(cuba, self._defaults[cuba])
-                mask[index] = cuba in value
+                value_to_set = value.get(cuba, self._defaults[cuba])
+                array[index] = value_to_set if value_to_set is not None else 0.0
+                mask[index] = (cuba in value, value_to_set is None)
         else:
             raise IndexError('{} is out of index range'.format(index))
 
@@ -164,8 +165,11 @@ class CubaData(MutableSequence):
         arrays = [data.get_array(name) for name in names]
         masks = [self.masks.get_array(name) for name in names]
         values = {
-            CUBA[array.name]: KEYWORDS[array.name].dtype(array[index])
-            for mask, array in zip(masks, arrays) if mask[index] == 1.0}
+            CUBA[array.name]: (
+                KEYWORDS[array.name].dtype(array[index])
+                    if mask[index][1] == 0.0
+                    else None)
+            for mask, array in zip(masks, arrays) if mask[index][0] == 1.0}
         return DataContainer(values)
 
     def __delitem__(self, index):
@@ -232,11 +236,16 @@ class CubaData(MutableSequence):
                 name = temp.name
                 cuba = CUBA[name]
                 new_value = value.get(cuba, self._defaults[cuba])
-                temp = numpy.insert(temp.to_array(), index, new_value, axis=0)
+                temp = numpy.insert(temp.to_array(), index,
+                                    (new_value
+                                     if new_value is not None
+                                     else 0.0), axis=0)
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
                 temp = masks.get_array(0)
-                temp = numpy.insert(temp.to_array(), index, cuba in value)
+                temp = numpy.insert(temp.to_array(),
+                                    index,
+                                    (cuba in value, new_value is None))
                 mask_arrays.append((name, temp))
                 masks.remove_array(name)  # remove array from vtk container.
 
@@ -244,8 +253,10 @@ class CubaData(MutableSequence):
             for cuba in new_cubas:
                 array = empty_array(cuba, length + 1)
                 mask = numpy.zeros(shape=length + 1, dtype=numpy.int8)
-                array[index] = value.get(cuba, self._defaults[cuba])
-                mask[index] = int(cuba in value)
+                value_to_set = value.get(cuba, self._defaults[cuba])
+
+                array[index] = value_to_set if value_to_set is not None else 0.0
+                mask[index] = (int(cuba in value), int(value_to_set is None))
                 arrays.append((cuba.name, array))
                 mask_arrays.append((cuba.name, mask))
 
@@ -263,12 +274,13 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 cuba = CUBA[array.name]
-                array.append(value.get(cuba, self._defaults[cuba]))
+                value_to_set = value.get(cuba, self._defaults[cuba])
+                array.append(value_to_set if value_to_set is not None else 0.0)
                 # invalidate the numpy cache, see issue
                 # https://github.com/enthought/mayavi/issues/197
                 _array_cache._remove_array(tvtk.to_vtk(array).__this__)
                 array = masks.get_array(array_id)
-                array.append(cuba in value)
+                array.append((cuba in value, value_to_set is None))
                 # invalidate the numpy cache, see issue
                 # https://github.com/enthought/mayavi/issues/197
                 _array_cache._remove_array(tvtk.to_vtk(array).__this__)
@@ -329,7 +341,7 @@ class CubaData(MutableSequence):
         new_masks = []
         for cuba in cubas:
             array = empty_array(cuba, length)
-            mask = numpy.zeros(shape=length, dtype=numpy.int8)
+            mask = numpy.zeros(shape=(length, 2), dtype=numpy.int8)
             new_arrays.append((cuba.name, array))
             new_masks.append((cuba.name, mask))
         self._add_arrays(new_arrays)
@@ -355,10 +367,18 @@ class CubaData(MutableSequence):
             if CUBA[name] not in self._stored_cuba:
                 continue
             mask = tvtk.BitArray()
+            # First bit is value 1: present 0: not present.
+            mask.number_of_components = 2
             if default is not None and default.has_array(name):
-                array = default.get_array(name).to_array()
+                presence_array = default.get_array(name).to_array()
             else:
-                array = numpy.ones(shape=length, dtype=numpy.int8)
+                presence_array = numpy.ones(shape=length, dtype=numpy.int8)
+
+            # Second bit is 1: None, 0: not None.
+            is_none_array = numpy.zeros(len(presence_array))
+
+            array=numpy.stack([presence_array, is_none_array], axis=1)
+
             mask.from_array(array)
             mask.name = name
             masks.add_array(mask)
