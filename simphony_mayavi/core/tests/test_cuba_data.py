@@ -84,7 +84,8 @@ class TestCubaData(unittest.TestCase):
         index = point_data.add_array([4, 2, 1])
         point_data.get_array(index).name = CUBA.RADIUS.name
         masks = tvtk.FieldData()
-        index = masks.add_array(numpy.array([(1, 0), (0, 0), (1, 0)], dtype=numpy.int8))
+        index = masks.add_array(numpy.array([(1, 0), (0, 0), (1, 0)],
+                                            dtype=numpy.int8))
         masks.get_array(index).name = CUBA.RADIUS.name
 
         # when
@@ -98,9 +99,11 @@ class TestCubaData(unittest.TestCase):
         self.assertSequenceEqual(
             point_data.get_array(CUBA.RADIUS.name), [4, 2, 1])
         self.assertSequenceEqual(
-            data.masks.get_array(CUBA.TEMPERATURE.name), [(1, 0), (1, 0), (1, 0)])
+            data.masks.get_array(CUBA.TEMPERATURE.name),
+            [(1, 0), (1, 0), (1, 0)])
         self.assertSequenceEqual(
-            data.masks.get_array(CUBA.RADIUS.name), [(1, 0), (0, 0), (1, 0)])
+            data.masks.get_array(CUBA.RADIUS.name),
+            [(1, 0), (0, 0), (1, 0)])
 
     def test_initialize_with_unmasked_point_data(self):
         # given
@@ -121,7 +124,8 @@ class TestCubaData(unittest.TestCase):
         self.assertSequenceEqual(
             point_data.get_array(CUBA.RADIUS.name), [4, 2, 1])
         self.assertSequenceEqual(
-            data.masks.get_array(CUBA.TEMPERATURE.name), [(1, 0), (1, 0), (1, 0)])
+            data.masks.get_array(CUBA.TEMPERATURE.name),
+            [(1, 0), (1, 0), (1, 0)])
         self.assertSequenceEqual(
             data.masks.get_array(CUBA.RADIUS.name), [(1, 0), (1, 0), (1, 0)])
 

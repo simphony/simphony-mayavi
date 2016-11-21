@@ -150,7 +150,8 @@ class CubaData(MutableSequence):
                 mask = masks.get_array(array_id)
                 cuba = CUBA[array.name]
                 value_to_set = value.get(cuba, self._defaults[cuba])
-                array[index] = value_to_set if value_to_set is not None else 0.0
+                array[index] = (value_to_set
+                                if value_to_set is not None else 0.0)
                 mask[index] = (cuba in value, value_to_set is None)
         else:
             raise IndexError('{} is out of index range'.format(index))
@@ -168,8 +169,9 @@ class CubaData(MutableSequence):
         values = {
             CUBA[array.name]: (
                 KEYWORDS[array.name].dtype(array[index])
-                    if mask[index][1] == 0.0
-                    else None)
+                if mask[index][1] == 0.0
+                else None
+            )
             for mask, array in zip(masks, arrays) if mask[index][0] == 1.0}
         return DataContainer(values)
 
@@ -204,7 +206,8 @@ class CubaData(MutableSequence):
                     masks.remove_array(name)
 
     def insert(self, index, value):
-        """ Insert the values of the DataContainer in the arrays at row=``index``.
+        """ Insert the values of the DataContainer in the arrays at
+        row=``index``.
 
         If the provided DataContainer contains new, but supported, cuba keys
         then a new empty array is created for them and updated with
@@ -236,8 +239,11 @@ class CubaData(MutableSequence):
                 name = temp.name
                 cuba = CUBA[name]
                 new_value = value.get(cuba, self._defaults[cuba])
-                temp = numpy.insert(temp.to_array(), index,
-                                    (new_value if new_value is not None else 0.0),
+                temp = numpy.insert(temp.to_array(),
+                                    index,
+                                    (new_value
+                                     if new_value is not None else 0.0
+                                     ),
                                     axis=0)
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
@@ -255,8 +261,10 @@ class CubaData(MutableSequence):
                 mask = numpy.zeros(shape=(length + 1, 2), dtype=numpy.int8)
                 value_to_set = value.get(cuba, self._defaults[cuba])
 
-                array[index] = value_to_set if value_to_set is not None else 0.0
-                mask[index, :] = (int(cuba in value), int(value_to_set is None))
+                array[index] = (value_to_set
+                                if value_to_set is not None else 0.0)
+                mask[index, :] = (int(cuba in value),
+                                  int(value_to_set is None))
                 arrays.append((cuba.name, array))
                 mask_arrays.append((cuba.name, mask))
 
@@ -375,7 +383,7 @@ class CubaData(MutableSequence):
             else:
                 # First bit is value 1: present 0: not present.
                 # Second bit is 1: None, 0: not None.
-                array=numpy.stack([
+                array = numpy.stack([
                     numpy.ones(shape=length, dtype=numpy.int8),
                     numpy.zeros(shape=length, dtype=numpy.int8)
                 ], axis=1)
@@ -417,6 +425,7 @@ def check_attribute_arrays(attribute_data):
             for array_id in range(data.number_of_arrays)}
         message = "vtk object arrays are not the same size: {}"
         raise ValueError(message.format(info))
+
 
 def check_masks(masks):
     """Check if the masks in input comply with the expected (n, 2)
