@@ -132,7 +132,7 @@ class CUDSSource(VTKDataSource):
         # required by Traits
         super(CUDSSource, self).__init__(**traits)
 
-        if cuds:
+        if cuds is not None:
             self.cuds = cuds
 
         # if cuds is not defined, _point_scalars_list (etc.) is empty
