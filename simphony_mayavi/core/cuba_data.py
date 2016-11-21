@@ -78,6 +78,7 @@ class CubaData(MutableSequence):
 
         """
         check_attribute_arrays(attribute_data)
+        check_masks(masks)
 
         if attribute_data.number_of_arrays != 0 and size is not None:
             message = "Using initial_size for a non-empty dataset is invalid"
@@ -195,7 +196,7 @@ class CubaData(MutableSequence):
                         bit_array.remove_last_tuple(index)
                     else:
                         temp = bit_array.to_array()
-                        bit_array.from_array(numpy.delete(temp, index))
+                        bit_array.from_array(numpy.delete(temp, index, axis=0))
             else:
                 for array_id in reversed(range(n)):
                     name = data.get_array_name(array_id)
@@ -224,7 +225,6 @@ class CubaData(MutableSequence):
 
         new_cubas = (set(value.keys()) & stored_cuba) - cubas
         length = len(self)
-
         if 0 <= index < length:
             n = data.number_of_arrays
             arrays = []
@@ -237,26 +237,26 @@ class CubaData(MutableSequence):
                 cuba = CUBA[name]
                 new_value = value.get(cuba, self._defaults[cuba])
                 temp = numpy.insert(temp.to_array(), index,
-                                    (new_value
-                                     if new_value is not None
-                                     else 0.0), axis=0)
+                                    (new_value if new_value is not None else 0.0),
+                                    axis=0)
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
                 temp = masks.get_array(0)
                 temp = numpy.insert(temp.to_array(),
                                     index,
-                                    (cuba in value, new_value is None))
+                                    (cuba in value, new_value is None),
+                                    axis=0)
                 mask_arrays.append((name, temp))
                 masks.remove_array(name)  # remove array from vtk container.
 
             # Create data and mask arrays from new CUBA keys
             for cuba in new_cubas:
                 array = empty_array(cuba, length + 1)
-                mask = numpy.zeros(shape=length + 1, dtype=numpy.int8)
+                mask = numpy.zeros(shape=(length + 1, 2), dtype=numpy.int8)
                 value_to_set = value.get(cuba, self._defaults[cuba])
 
                 array[index] = value_to_set if value_to_set is not None else 0.0
-                mask[index] = (int(cuba in value), int(value_to_set is None))
+                mask[index, :] = (int(cuba in value), int(value_to_set is None))
                 arrays.append((cuba.name, array))
                 mask_arrays.append((cuba.name, mask))
 
@@ -332,6 +332,7 @@ class CubaData(MutableSequence):
         masks = self.masks
         for name, array in arrays:
             bit_array = tvtk.BitArray()
+            bit_array.number_of_components = 2
             bit_array.name = name
             bit_array.from_array(array)
             masks.add_array(bit_array)
@@ -367,17 +368,17 @@ class CubaData(MutableSequence):
             if CUBA[name] not in self._stored_cuba:
                 continue
             mask = tvtk.BitArray()
-            # First bit is value 1: present 0: not present.
             mask.number_of_components = 2
+
             if default is not None and default.has_array(name):
-                presence_array = default.get_array(name).to_array()
+                array = default.get_array(name).to_array()
             else:
-                presence_array = numpy.ones(shape=length, dtype=numpy.int8)
-
-            # Second bit is 1: None, 0: not None.
-            is_none_array = numpy.zeros(len(presence_array))
-
-            array=numpy.stack([presence_array, is_none_array], axis=1)
+                # First bit is value 1: present 0: not present.
+                # Second bit is 1: None, 0: not None.
+                array=numpy.stack([
+                    numpy.ones(shape=length, dtype=numpy.int8),
+                    numpy.zeros(shape=length, dtype=numpy.int8)
+                ], axis=1)
 
             mask.from_array(array)
             mask.name = name
@@ -416,3 +417,14 @@ def check_attribute_arrays(attribute_data):
             for array_id in range(data.number_of_arrays)}
         message = "vtk object arrays are not the same size: {}"
         raise ValueError(message.format(info))
+
+def check_masks(masks):
+    """Check if the masks in input comply with the expected (n, 2)
+    or are None"""
+    if masks is None:
+        return
+
+    for index in range(masks.number_of_arrays):
+        mask = masks.get_array(index)
+        if mask.number_of_components != 2:
+            raise ValueError("Mask must have two components")
