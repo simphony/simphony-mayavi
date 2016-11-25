@@ -30,7 +30,7 @@ if on_rtd:
 else:
     requirements = [
         "simphony[H5IO]>=0.2.1",
-        "mayavi[app]"
+        "mayavi[app]==4.4.4"
         ],
 
 
