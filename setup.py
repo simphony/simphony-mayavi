@@ -16,20 +16,13 @@ VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 # we need to set zip_safe = False
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
-if on_rtd:
-    requirements = []
-else:
-    requirements = [
-        "simphony[H5IO]>=0.2.1", "mayavi[app]"]
-
-
 plugin = ['mayavi_tools = simphony_mayavi.plugin']
 
 if on_rtd:
     requirements = ["traits"],
 else:
     requirements = [
-        "simphony[H5IO]>=0.2.1",
+        "simphony[H5IO]~=0.4",
         "mayavi[app]==4.4.4"
         ],
 
