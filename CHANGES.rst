@@ -1,6 +1,11 @@
 SimPhoNy-Mayavi CHANGELOG
 =========================
 
+Release 0.4.3/0.4.2
+-------------------
+
+- Adjustments against simphony-common v0.4
+
 Release 0.4.1
 -------------
 
