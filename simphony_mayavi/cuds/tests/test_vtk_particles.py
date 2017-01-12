@@ -60,7 +60,7 @@ class TestVTKParticlesAddingBonds(
                                      restrict=supported_cuba())
 
         # when
-        uids = container.add_bonds(bonds)
+        uids = container.add(bonds)
 
         # then
         for bond in bonds:
@@ -84,15 +84,15 @@ class TestVTKParticlesAddingBonds(
             bonds.append(Bond(particles=ids, data=data))
 
         # when
-        container.add_bonds(bonds)
+        container.add(bonds)
 
         # then
         for bond in bonds:
             bond.data = create_data_container(
                 restrict=self.supported_cuba())
             uid = bond.uid
-            self.assertTrue(container.has_bond(uid))
-            self.assertEqual(container.get_bond(uid), bond)
+            self.assertTrue(container.has(uid))
+            self.assertEqual(container.get(uid), bond)
 
     def test_exception_when_adding_multiple_invalid_bonds(self):
         # new test for adding bonds with particles that are
@@ -104,7 +104,7 @@ class TestVTKParticlesAddingBonds(
         bonds = create_bonds_with_id()
 
         with self.assertRaises(ValueError):
-            container.add_bonds(bonds)
+            container.add(bonds)
 
 
 class TestVTKParticlesManipulatingBonds(
@@ -130,14 +130,14 @@ class TestVTKParticlesManipulatingBonds(
 
         # update_bonds not yet called
         for uid, bond in map(None, self.ids, bonds):
-            retrieved = container.get_bond(uid)
+            retrieved = container.get(uid)
             self.assertNotEqual(retrieved, bond)
 
         # when
-        container.update_bonds(bonds)
+        container.update(bonds)
         # then
         for uid, bond in map(None, self.ids, bonds):
-            retrieved = container.get_bond(uid)
+            retrieved = container.get(uid)
             self.assertEqual(retrieved, bond)
 
     def test_exception_when_updating_mulitple_invalid_bond(self):
@@ -153,7 +153,7 @@ class TestVTKParticlesManipulatingBonds(
             bond.particles = random.sample(new_ids, 5)
 
         with self.assertRaises(ValueError):
-            container.update_bonds(bonds)
+            container.update(bonds)
 
     def test_exception_when_updating_invalid_bond(self):
         # new test for adding bonds with particles that are
@@ -169,7 +169,7 @@ class TestVTKParticlesManipulatingBonds(
         bond.particles = new_ids
 
         with self.assertRaises(ValueError):
-            container.update_bonds([bond])
+            container.update([bond])
 
 
 class TestVTKParticlesContainer(CheckParticlesContainer, unittest.TestCase):
@@ -209,11 +209,11 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         data_set = tvtk.PolyData(points=tvtk.Points(), lines=[])
         container = VTKParticles(name='test', data_set=data_set)
         particle = Particle(coordinates=(0.0, 1.0, 2.0), data=DataContainer())
-        uid = container.add_particles((particle,))[0]
-        self.assertTrue(container.has_particle(uid))
-        self.assertEqual(list(container.iter_bonds()), [])
-        self.assertEqual(len(tuple(container.iter_particles())), 1)
-        self.assertEqual(container.get_particle(uid), particle)
+        uid = container.add((particle,))[0]
+        self.assertTrue(container.has(uid))
+        self.assertEqual(list(container.iter(item_type=CUBA.BOND)), [])
+        self.assertEqual(len(tuple(container.iter(item_type=CUBA.PARTICLE))), 1)
+        self.assertEqual(container.get(uid), particle)
 
     def test_initialization_with_cuds(self):
         # given
@@ -228,26 +228,27 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         particle_iter = (Particle(coordinates=point,
                                   data=DataContainer(TEMPERATURE=temp))
                          for temp, point in zip(point_temperature, points))
-        point_uids = reference.add_particles(particle_iter)
+        point_uids = reference.add(particle_iter)
 
         # add bonds
         bond_iter = (Bond(particles=[point_uids[index] for index in indices],
                           data=DataContainer(TEMPERATURE=temp))
                      for temp, indices in zip(bond_temperature, bonds))
-        bond_uids = reference.add_bonds(bond_iter)
+        bond_uids = reference.add(bond_iter)
 
         # when
         container = VTKParticles.from_particles(reference)
 
         # then
-        number_of_particles = sum(1 for _ in container.iter_particles())
+        number_of_particles = sum(1 for _ in container.iter(
+            item_type=CUBA.PARTICLE))
         self.assertEqual(number_of_particles, len(point_uids))
-        for expected in reference.iter_particles():
-            self.assertEqual(container.get_particle(expected.uid), expected)
-        number_of_bonds = sum(1 for _ in container.iter_bonds())
+        for expected in reference.iter(item_type=CUBA.PARTICLE):
+            self.assertEqual(container.get(expected.uid), expected)
+        number_of_bonds = sum(1 for _ in container.iter(item_type=CUBA.BOND))
         self.assertEqual(number_of_bonds, len(bond_uids))
-        for expected in reference.iter_bonds():
-            self.assertEqual(container.get_bond(expected.uid), expected)
+        for expected in reference.iter(item_type=CUBA.BOND):
+            self.assertEqual(container.get(expected.uid), expected)
 
     def test_initialization_with_empty_cuds(self):
         # given
@@ -257,9 +258,10 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         container = VTKParticles.from_particles(reference)
 
         # then
-        number_of_particles = sum(1 for _ in container.iter_particles())
+        number_of_particles = sum(1 for _ in container.iter(
+            item_type=CUBA.PARTICLE))
         self.assertEqual(number_of_particles, 0)
-        number_of_bonds = sum(1 for _ in container.iter_bonds())
+        number_of_bonds = sum(1 for _ in container.iter(item_type=CUBA.BOND))
         self.assertEqual(number_of_bonds, 0)
 
     def test_initialization_with_poly_data(self):
@@ -277,14 +279,17 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         container = VTKParticles.from_dataset(name='test', data_set=vtk)
 
         # then
-        number_of_particles = sum(1 for _ in container.iter_particles())
+        number_of_particles = sum(1 for _ in container.iter(
+            item_type=CUBA.PARTICLE))
         self.assertEqual(number_of_particles, 12)
-        for particle in container.iter_particles():
+        for particle in container.iter(item_type=CUBA.PARTICLE):
             self.assertIsNotNone(particle.uid)
-        number_of_bonds = sum(1 for _ in container.iter_bonds())
+        number_of_bonds = sum(1 for _ in container.iter(item_type=CUBA.BOND))
         self.assertEqual(number_of_bonds, 5)
-        uids = [particle.uid for particle in container.iter_particles()]
-        for bond in container.iter_bonds():
+        uids = [particle.uid for particle in container.iter(
+            item_type=CUBA.PARTICLE
+        )]
+        for bond in container.iter(item_type=CUBA.BOND):
             self.assertIsNotNone(bond.uid)
             self.assertTrue(set(bond.particles).issubset(uids))
 
@@ -308,14 +313,16 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         container = VTKParticles.from_dataset(name='test', data_set=vtk)
 
         # then
-        number_of_particles = sum(1 for _ in container.iter_particles())
+        number_of_particles = sum(1 for _ in container.iter(
+            item_type=CUBA.PARTICLE))
         self.assertEqual(number_of_particles, 12)
-        for particle in container.iter_particles():
+        for particle in container.iter(item_type=CUBA.PARTICLE):
             self.assertIsNotNone(particle.uid)
-        number_of_bonds = sum(1 for _ in container.iter_bonds())
+        number_of_bonds = sum(1 for _ in container.iter(item_type=CUBA.BOND))
         self.assertEqual(number_of_bonds, 5)
-        uids = [particle.uid for particle in container.iter_particles()]
-        for bond in container.iter_bonds():
+        uids = [particle.uid for particle in container.iter(
+            item_type=CUBA.PARTICLE)]
+        for bond in container.iter(item_type=CUBA.BOND):
             self.assertIsNotNone(bond.uid)
             self.assertTrue(set(bond.particles).issubset(uids))
 

@@ -5,7 +5,6 @@ import contextlib
 from tvtk.api import tvtk
 
 from simphony.cuds.abc_particles import ABCParticles
-from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.particles import Particle, Bond
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
@@ -51,8 +50,8 @@ class VTKParticles(ABCParticles):
         self.index2bond = {}
 
         self._items_count = {
-            CUDSItem.PARTICLE: lambda: self.particle2index,
-            CUDSItem.BOND: lambda: self.bond2index
+            CUBA.PARTICLE: lambda: self.particle2index,
+            CUBA.BOND: lambda: self.bond2index
         }
 
         # Setup the data_set
@@ -229,7 +228,7 @@ class VTKParticles(ABCParticles):
 
     # Particle operations ####################################################
 
-    def add_particles(self, iterable):
+    def _add_particles(self, iterable):
         data_set = self.data_set
         points = data_set.points
         particle2index = self.particle2index
@@ -264,14 +263,14 @@ class VTKParticles(ABCParticles):
 
         return item_uids
 
-    def get_particle(self, uid):
+    def _get_particle(self, uid):
         index = int(self.particle2index[uid])
         return Particle(
             uid=uid,
             coordinates=self.data_set.points[index],
             data=self.point_data[index])
 
-    def remove_particles(self, uids):
+    def _remove_particles(self, uids):
         particle2index = self.particle2index
         index2particle = self.index2particle
         points = self.data_set.points
@@ -296,7 +295,7 @@ class VTKParticles(ABCParticles):
         self.data_set.points = array[:-count]
         assert len(self.data_set.points) == len(particle2index)
 
-    def update_particles(self, iterable):
+    def _update_particles(self, iterable):
         for particle in iterable:
             try:
                 index = self.particle2index[particle.uid]
@@ -306,7 +305,7 @@ class VTKParticles(ABCParticles):
             self.data_set.points[index] = particle.coordinates
             self.point_data[index] = particle.data
 
-    def iter_particles(self, uids=None):
+    def _iter_particles(self, uids=None):
         if uids is None:
             for uid in self.particle2index:
                 yield self.get_particle(uid)
@@ -314,7 +313,7 @@ class VTKParticles(ABCParticles):
             for uid in uids:
                 yield self.get_particle(uid)
 
-    def has_particle(self, uid):
+    def _has_particle(self, uid):
         return uid in self.particle2index
 
     # Bond operations ########################################################
@@ -333,7 +332,7 @@ class VTKParticles(ABCParticles):
         """
         return all((self.has_particle(uid) for uid in bond.particles))
 
-    def add_bonds(self, iterable):
+    def _add_bonds(self, iterable):
         data_set = self.data_set
         bond2index = self.bond2index
         item_uids = []
@@ -351,7 +350,7 @@ class VTKParticles(ABCParticles):
                 item_uids.append(item.uid)
         return item_uids
 
-    def get_bond(self, uid):
+    def _get_bond(self, uid):
         index = self.bond2index[uid]
 
         # cannot use self.data_set.get_cell(index) here because
@@ -363,7 +362,7 @@ class VTKParticles(ABCParticles):
             particles=[self.index2particle[i] for i in point_ids],
             data=self.bond_data[index])
 
-    def update_bonds(self, iterable):
+    def _update_bonds(self, iterable):
         for bond in iterable:
             if not self.is_connected(bond):
                 message = "Cannot update Bond {} with missing uids: {}"
@@ -377,10 +376,10 @@ class VTKParticles(ABCParticles):
             self.bonds[index] = point_ids
             self.bond_data[index] = bond.data
 
-    def has_bond(self, uid):
+    def _has_bond(self, uid):
         return uid in self.bond2index
 
-    def remove_bonds(self, uids):
+    def _remove_bonds(self, uids):
         bond2index = self.bond2index
         index2bond = self.index2bond
         bond_data = self.bond_data
@@ -400,7 +399,7 @@ class VTKParticles(ABCParticles):
             del bond2index[uid]
             del index2bond[index]
 
-    def iter_bonds(self, uids=None):
+    def _iter_bonds(self, uids=None):
         if uids is None:
             for uid in self.bond2index:
                 yield self.get_bond(uid)

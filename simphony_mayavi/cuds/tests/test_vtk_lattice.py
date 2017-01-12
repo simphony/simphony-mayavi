@@ -100,12 +100,13 @@ class TestVTKLattice(unittest.TestCase):
         vtk_lattice = VTKLattice.from_lattice(lattice)
 
         # when/then
-        for node in vtk_lattice.iter_nodes():
+        for node in vtk_lattice.iter(item_type=CUBA.NODE):
             self.assertEqual(
                 node, LatticeNode(
                     node.index,
                     data=DataContainer(VELOCITY=node.index)))
-        self.assertEqual(sum(1 for _ in vtk_lattice.iter_nodes()), 120)
+        self.assertEqual(sum(1 for _ in vtk_lattice.iter(
+            item_type=CUBA.NODE)), 120)
 
     def test_update_nodes_on_a_xy_plane_hexagonal_lattice(self):
         # given
@@ -132,7 +133,7 @@ class TestVTKLattice(unittest.TestCase):
         vtk_lattice = VTKLattice.from_lattice(lattice)
 
         # when/then
-        for node in lattice.iter_nodes():
+        for node in lattice.iter(item_type=CUBA.NODE):
             assert_array_equal(
                 vtk_lattice.get_coordinate(node.index),
                 lattice.get_coordinate(node.index))
@@ -239,7 +240,7 @@ class TestVTKLattice(unittest.TestCase):
 
     def add_velocity(self, lattice):
         new_nodes = []
-        for node in lattice.iter_nodes():
+        for node in lattice.iter(item_type=CUBA.NODE):
             node.data[CUBA.VELOCITY] = node.index
             new_nodes.append(node)
         lattice.update_nodes(new_nodes)
