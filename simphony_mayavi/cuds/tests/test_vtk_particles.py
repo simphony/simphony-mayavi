@@ -212,7 +212,8 @@ class TestVTKParticlesDataContainer(unittest.TestCase):
         uid = container.add((particle,))[0]
         self.assertTrue(container.has(uid))
         self.assertEqual(list(container.iter(item_type=CUBA.BOND)), [])
-        self.assertEqual(len(tuple(container.iter(item_type=CUBA.PARTICLE))), 1)
+        self.assertEqual(len(tuple(container.iter(
+            item_type=CUBA.PARTICLE))), 1)
         self.assertEqual(container.get(uid), particle)
 
     def test_initialization_with_cuds(self):
