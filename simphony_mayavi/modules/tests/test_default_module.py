@@ -94,24 +94,24 @@ class TestDefaultModule(unittest.TestCase):
                             data=DataContainer(TEMPERATURE=index,
                                                VELOCITY=(index, 0., 0)))
                       for index, point in enumerate(points))
-        uids = mesh.add_points(point_iter)
+        uids = mesh.add(point_iter)
 
         # add edges
         edge_iter = (Edge(points=[uids[index] for index in element])
                      for index, element in enumerate(edges))
-        mesh.add_edges(edge_iter)
+        mesh.add(edge_iter)
 
         # add faces
         face_iter = (Face(points=[uids[index] for index in element])
                      for index, element in enumerate(faces))
-        mesh.add_faces(face_iter)
+        mesh.add(face_iter)
 
         # add cells
         cell_iter = (Cell(points=[uids[index] for index in element],
                           data=DataContainer(TEMPERATURE=index,
                                              VELOCITY=(index, 0., 0)))
                      for index, element in enumerate(cells))
-        mesh.add_cells(cell_iter)
+        mesh.add(cell_iter)
         return mesh
 
     def test_default_module_particles(self):
