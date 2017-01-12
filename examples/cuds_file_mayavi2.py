@@ -45,7 +45,7 @@ def add_temperature(lattice):
         index = numpy.array(node.index) + 1.0
         node.data[CUBA.TEMPERATURE] = numpy.prod(index)
         new_nodes.append(node)
-    lattice.update_nodes(new_nodes)
+    lattice.update(new_nodes)
 
 
 def add_velocity(lattice):
@@ -53,7 +53,7 @@ def add_velocity(lattice):
     for node in lattice.iter(item_type=CUBA.NODE):
         node.data[CUBA.VELOCITY] = node.index
         new_nodes.append(node)
-    lattice.update_nodes(new_nodes)
+    lattice.update(new_nodes)
 
 add_temperature(hexagonal)
 add_temperature(orthorhombic)

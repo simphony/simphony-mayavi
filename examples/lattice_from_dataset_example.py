@@ -139,7 +139,7 @@ def add_temperature(lattice):
         index = numpy.array(node.index) + 1.0
         node.data[CUBA.TEMPERATURE] = numpy.prod(index)
         new_nodes.append(node)
-    lattice.update_nodes(new_nodes)
+    lattice.update(new_nodes)
 
 
 # Now view the data.
