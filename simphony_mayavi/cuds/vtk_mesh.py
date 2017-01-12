@@ -126,19 +126,22 @@ class VTKMesh(ABCMesh):
         point_data = CUBADataAccumulator(point_keys)
         cell_data = CUBADataAccumulator(cell_keys)
 
-        for index, point in enumerate(mesh.iter_points()):
+        for index, point in enumerate(mesh.iter(item_type=CUBA.POINT)):
             point2index[point.uid] = index
             points.append(point.coordinates)
             point_data.append(point.data)
 
         edges, edges_size, edge_types, edge2index = gather_cells(
-            mesh.iter_edges(), EDGE2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.EDGE), EDGE2VTKCELL, point2index,
+            counter, cell_data)
 
         faces, faces_size, face_types, face2index = gather_cells(
-            mesh.iter_faces(), FACE2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.FACE), FACE2VTKCELL, point2index,
+            counter, cell_data)
 
         cells, cells_size, cell_types, cell2index = gather_cells(
-            mesh.iter_cells(), CELL2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.CELL), CELL2VTKCELL, point2index,
+            counter, cell_data)
 
         elements = edges + faces + cells
         elements_size = [0] + edges_size + faces_size + cells_size
@@ -277,10 +280,13 @@ class VTKMesh(ABCMesh):
     def _iter_points(self, uids=None):
         if uids is None:
             for uid in self.point2index:
-                yield self.get_point(uid)
+                yield self._get_point(uid)
         else:
             for uid in uids:
-                yield self.get_point(uid)
+                yield self._get_point(uid)
+
+    def _has_points(self):
+        return self.data_set.number_of_points != 0
 
     # special private ########################################################
 
@@ -312,7 +318,7 @@ class VTKMesh(ABCMesh):
                 yield edge
         else:
             for uid in uids:
-                yield self.get_edge(uid)
+                yield self._get_edge(uid)
 
     def _add_edges(self, edges):
         uids = []
@@ -340,7 +346,7 @@ class VTKMesh(ABCMesh):
                 yield face
         else:
             for uid in uids:
-                yield self.get_face(uid)
+                yield self._get_face(uid)
 
     def _add_faces(self, faces):
         uids = []
@@ -368,7 +374,7 @@ class VTKMesh(ABCMesh):
                 yield cell
         else:
             for uid in uids:
-                yield self.get_cell(uid)
+                yield self._get_cell(uid)
 
     def _add_cells(self, cells):
         uids = []

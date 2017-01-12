@@ -539,35 +539,35 @@ def _available_keys(cuds):
     cell_vectors = set()
 
     if isinstance(cuds, (ABCMesh, H5Mesh)):
-        for point in cuds.iter_points():
+        for point in cuds.iter(item_type=CUBA.POINT):
             scalar_keys, vector_keys = _extract_cuba_keys_per_data_types(
                 point.data)
             point_scalars.update(scalar_keys)
             point_vectors.update(vector_keys)
 
-        for element in itertools.chain(cuds.iter_cells(),
-                                       cuds.iter_edges(),
-                                       cuds.iter_faces()):
+        for element in itertools.chain(cuds.iter(item_type=CUBA.CELL),
+                                       cuds.iter(item_type=CUBA.EDGE),
+                                       cuds.iter(item_type=CUBA.FACE)):
             scalar_keys, vector_keys = _extract_cuba_keys_per_data_types(
                 element.data)
             cell_scalars.update(scalar_keys)
             cell_vectors.update(vector_keys)
 
     elif isinstance(cuds, ABCParticles):
-        for particle in cuds.iter_particles():
+        for particle in cuds.iter(item_type=CUBA.PARTICLE):
             scalar_keys, vector_keys = _extract_cuba_keys_per_data_types(
                 particle.data)
             point_scalars.update(scalar_keys)
             point_vectors.update(vector_keys)
 
-        for bond in cuds.iter_bonds():
+        for bond in cuds.iter(item_type=CUBA.BOND):
             scalar_keys, vector_keys = _extract_cuba_keys_per_data_types(
                 bond.data)
             cell_scalars.update(scalar_keys)
             cell_vectors.update(vector_keys)
 
     elif isinstance(cuds, ABCLattice):
-        for node in cuds.iter_nodes():
+        for node in cuds.iter(item_type=CUBA.NODE):
             scalar_keys, vector_keys = _extract_cuba_keys_per_data_types(
                 node.data)
             point_scalars.update(scalar_keys)

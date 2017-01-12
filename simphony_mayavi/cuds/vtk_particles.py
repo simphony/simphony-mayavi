@@ -6,6 +6,7 @@ from tvtk.api import tvtk
 
 from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.particles import Particle, Bond
+from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
     CubaData, CellCollection, supported_cuba, mergedocs,
@@ -148,13 +149,14 @@ class VTKParticles(ABCParticles):
         particle_data = CUBADataAccumulator(particle_keys)
         bond_data = CUBADataAccumulator(bond_keys)
 
-        for index, particle in enumerate(particles.iter_particles()):
+        for index, particle in enumerate(particles.iter(
+                item_type=CUBA.PARTICLE)):
             uid = particle.uid
             particle2index[uid] = index
             index2particle[index] = uid
             points.append(particle.coordinates)
             particle_data.append(particle.data)
-        for index, bond in enumerate(particles.iter_bonds()):
+        for index, bond in enumerate(particles.iter(item_type=CUBA.BOND)):
             uid = bond.uid
             bond2index[uid] = index
             index2bond[index] = uid
@@ -308,10 +310,10 @@ class VTKParticles(ABCParticles):
     def _iter_particles(self, uids=None):
         if uids is None:
             for uid in self.particle2index:
-                yield self.get_particle(uid)
+                yield self._get_particle(uid)
         else:
             for uid in uids:
-                yield self.get_particle(uid)
+                yield self._get_particle(uid)
 
     def _has_particle(self, uid):
         return uid in self.particle2index
@@ -402,10 +404,10 @@ class VTKParticles(ABCParticles):
     def _iter_bonds(self, uids=None):
         if uids is None:
             for uid in self.bond2index:
-                yield self.get_bond(uid)
+                yield self._get_bond(uid)
         else:
             for uid in uids:
-                yield self.get_bond(uid)
+                yield self._get_bond(uid)
 
     def count_of(self, item_type):
         try:

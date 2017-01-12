@@ -291,7 +291,7 @@ class VTKLattice(ABCLattice):
             message = 'Unknown lattice type: {}'.format(lattice_type)
             raise ValueError(message)
 
-        for node in lattice.iter_nodes(indices):
+        for node in lattice.iter(indices):
             node_data.append(node.data)
         node_data.load_onto_vtk(data_set.point_data)
 
