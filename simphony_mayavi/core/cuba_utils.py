@@ -28,6 +28,9 @@ def default_cuba_value(cuba):
     """
     description = KEYWORDS[cuba.name]
 
+    if description.dtype is None:
+        return None
+
     if description.shape == [1]:
         if numpy.issubdtype(description.dtype, numpy.float):
             return numpy.nan

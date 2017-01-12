@@ -54,6 +54,9 @@ class TestCubaUtils(unittest.TestCase):
         for cuba in self.int_vector_cuba:
             self.assertTrue(all(default_cuba_value(cuba)==-1))
 
+    def test_default_cuba_value_for_box(self):
+        self.assertIsNone(default_cuba_value(CUBA.BOX))
+
     def test_empty_scalar_array(self):
         # when
         empty = empty_array(CUBA.RADIUS, 23)
