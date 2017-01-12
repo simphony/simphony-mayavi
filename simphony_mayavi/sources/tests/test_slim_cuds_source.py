@@ -86,7 +86,7 @@ class TestMeshSlimSource(TestMeshSource):
 
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
-            cell = container.get_cell(key)
+            cell = container.get(key)
             self.assertEqual(
                 vtk_dataset.get_cell_type(index),
                 CELL2VTKCELL[len(cell.points)])
