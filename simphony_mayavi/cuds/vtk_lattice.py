@@ -140,10 +140,10 @@ class VTKLattice(ABCLattice):
     def _iter_nodes(self, indices=None):
         if indices is None:
             for index in numpy.ndindex(*self.size):
-                yield self.get_node(index)
+                yield self._get_node(index)
         else:
             for index in indices:
-                yield self.get_node(index)
+                yield self._get_node(index)
 
     def count_of(self, item_type):
         try:

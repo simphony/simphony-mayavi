@@ -85,7 +85,7 @@ class TestVTKLattice(unittest.TestCase):
         vtk_lattice = VTKLattice.from_lattice(lattice)
 
         # when
-        node = vtk_lattice.get_node((1, 1, 0))
+        node = vtk_lattice.get((1, 1, 0))
 
         # then
         self.assertEqual(
@@ -113,14 +113,14 @@ class TestVTKLattice(unittest.TestCase):
         lattice = make_hexagonal_lattice('test', 0.1, 0.2, (5, 4, 6))
         self.add_velocity(lattice)
         vtk_lattice = VTKLattice.from_lattice(lattice)
-        node = vtk_lattice.get_node((1, 1, 0))
+        node = vtk_lattice.get((1, 1, 0))
 
         # when
         node.data = DataContainer(VELOCITY=(1, 54, 0.3))
-        vtk_lattice.update_nodes((node,))
+        vtk_lattice.update((node,))
 
         # then
-        new_node = vtk_lattice.get_node((1, 1, 0))
+        new_node = vtk_lattice.get((1, 1, 0))
         self.assertEqual(
             new_node, LatticeNode(
                 (1, 1, 0),
@@ -243,7 +243,7 @@ class TestVTKLattice(unittest.TestCase):
         for node in lattice.iter(item_type=CUBA.NODE):
             node.data[CUBA.VELOCITY] = node.index
             new_nodes.append(node)
-        lattice.update_nodes(new_nodes)
+        lattice.update(new_nodes)
 
 
 if __name__ == '__main__':

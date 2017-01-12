@@ -67,7 +67,7 @@ class TestMeshSource(unittest.TestCase):
         self.assertEqual(vtk_dataset.point_data.number_of_arrays, 4)
         temperature = vtk_dataset.point_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.point2index.iteritems():
-            point = container.get_point(key)
+            point = container.get(key)
             assert_array_equal(points[index], point.coordinates)
             self.assertEqual(temperature[index], point.data[CUBA.TEMPERATURE])
 
@@ -92,7 +92,7 @@ class TestMeshSource(unittest.TestCase):
         self.assertEqual(source.data.cell_data.number_of_arrays, 1)
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
-            cell = container.get_cell(key)
+            cell = container.get(key)
             self.assertEqual(
                 vtk_dataset.get_cell_type(index),
                 CELL2VTKCELL[len(cell.points)])
@@ -123,7 +123,7 @@ class TestMeshSource(unittest.TestCase):
         self.assertEqual(vtk_dataset.cell_data.number_of_arrays, 1)
         temperature = vtk_dataset.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
-            edge = container.get_edge(key)
+            edge = container.get(key)
             self.assertEqual(
                 vtk_dataset.get_cell_type(index),
                 EDGE2VTKCELL[len(edge.points)])
@@ -155,7 +155,7 @@ class TestMeshSource(unittest.TestCase):
         self.assertEqual(vtk_dataset.cell_data.number_of_arrays, 1)
         temperature = vtk_dataset.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
-            face = container.get_face(key)
+            face = container.get(key)
             self.assertEqual(
                 vtk_dataset.get_cell_type(index),
                 FACE2VTKCELL[len(face.points)])
@@ -200,15 +200,15 @@ class TestMeshSource(unittest.TestCase):
         for key, index in vtk_cuds.element2index.iteritems():
             cell_type = vtk_dataset.get_cell_type(index)
             if cell_type in EDGE2VTKCELL.values():
-                element = container.get_edge(key)
+                element = container.get(key)
                 self.assertEqual(
                     cell_type, EDGE2VTKCELL[len(element.points)])
             elif cell_type in FACE2VTKCELL.values():
-                element = container.get_face(key)
+                element = container.get(key)
                 self.assertEqual(
                     cell_type, FACE2VTKCELL[len(element.points)])
             elif cell_type in CELL2VTKCELL.values():
-                element = container.get_cell(key)
+                element = container.get(key)
                 self.assertEqual(
                     cell_type, CELL2VTKCELL[len(element.points)])
             else:
@@ -433,7 +433,7 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(dataset.point_data.number_of_arrays, 1)
         temperature = dataset.point_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.particle2index.iteritems():
-            point = container.get_particle(key)
+            point = container.get(key)
             assert_array_equal(points[index], point.coordinates)
             self.assertEqual(temperature[index], point.data[CUBA.TEMPERATURE])
 
@@ -455,7 +455,7 @@ class TestParticlesSource(unittest.TestCase):
         self.assertEqual(dataset.cell_data.number_of_arrays, 1)
         temperature = dataset.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.bond2index.iteritems():
-            bond = container.get_bond(key)
+            bond = container.get(key)
             particles = [
                 vtk_cuds.particle2index[uid] for uid in bond.particles]
             self.assertEqual(bonds[index], particles)

@@ -332,7 +332,7 @@ class VTKParticles(ABCParticles):
         -------
         valid : bool
         """
-        return all((self.has_particle(uid) for uid in bond.particles))
+        return all((self._has_particle(uid) for uid in bond.particles))
 
     def _add_bonds(self, iterable):
         data_set = self.data_set
