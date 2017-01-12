@@ -52,7 +52,7 @@ class TestCubaUtils(unittest.TestCase):
                 self.assertTrue(
                     all(numpy.isnan(default_cuba_value(cuba))))
         for cuba in self.int_vector_cuba:
-            self.assertTrue(all(default_cuba_value(cuba)==-1))
+            self.assertTrue(all(default_cuba_value(cuba) == -1))
 
     def test_default_cuba_value_for_box(self):
         self.assertIsNone(default_cuba_value(CUBA.BOX))
