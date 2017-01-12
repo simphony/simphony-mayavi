@@ -48,13 +48,13 @@ class TestDefaultModule(unittest.TestCase):
                                       TEMPERATURE=temperature[index],
                                       VELOCITY=velocities[index]))
                          for index, point in enumerate(points))
-        uids = particles.add_particles(particle_iter)
+        uids = particles.add(particle_iter)
 
         if has_bond:
             # add bonds
             bond_iter = (Bond(particles=[uids[index] for index in indices])
                          for indices in bonds)
-            particles.add_bonds(bond_iter)
+            particles.add(bond_iter)
 
         return particles
 
@@ -63,12 +63,12 @@ class TestDefaultModule(unittest.TestCase):
         lattice = make_cubic_lattice('test', 0.1, (5, 10, 12))
 
         new_nodes = []
-        for node in lattice.iter_nodes():
+        for node in lattice.iter(item_type=CUBA.NODE):
             index = numpy.array(node.index) + 1.0
             node.data[CUBA.TEMPERATURE] = numpy.prod(index)
             new_nodes.append(node)
 
-        lattice.update_nodes(new_nodes)
+        lattice.update(new_nodes)
         return lattice
 
     def get_mesh(self):

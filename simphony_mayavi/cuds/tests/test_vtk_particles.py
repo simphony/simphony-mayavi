@@ -66,8 +66,8 @@ class TestVTKParticlesAddingBonds(
         for bond in bonds:
             uid = bond.uid
             self.assertIn(uid, uids)
-            self.assertTrue(container.has_bond(uid))
-            self.assertEqual(container.get_bond(uid), bond)
+            self.assertTrue(container.has(uid))
+            self.assertEqual(container.get(uid), bond)
 
     def test_add_multiple_bonds_with_unsupported_cuba(self):
         # for simphony-common 0.2.1 when Bond can be added
@@ -165,7 +165,7 @@ class TestVTKParticlesManipulatingBonds(
         new_ids = [uuid.uuid4() for x in xrange(5)]
 
         # when
-        bond = container.get_bond(self.ids[1])
+        bond = container.get(self.ids[1])
         bond.particles = new_ids
 
         with self.assertRaises(ValueError):
