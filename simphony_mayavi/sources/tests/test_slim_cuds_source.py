@@ -179,17 +179,17 @@ class TestMeshSlimSource(TestMeshSource):
         face_iter = (Face(points=[self.point_uids[index] for index in face],
                           data=DataContainer(TEMPERATURE=next(count)))
                      for face in self.faces)
-        container.add_faces(face_iter)
+        container.add(face_iter)
 
         edge_iter = (Edge(points=[self.point_uids[index] for index in edge],
                           data=DataContainer(TEMPERATURE=next(count)))
                      for edge in self.edges)
-        container.add_edges(edge_iter)
+        container.add(edge_iter)
 
         cell_iter = (Cell(points=[self.point_uids[index] for index in cell],
                           data=DataContainer(TEMPERATURE=next(count)))
                      for cell in self.cells)
-        container.add_cells(cell_iter)
+        container.add(cell_iter)
 
         # when
         source = self.tested_class(cuds=container)

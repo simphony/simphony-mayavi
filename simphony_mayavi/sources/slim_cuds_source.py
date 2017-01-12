@@ -170,7 +170,7 @@ class SlimCUDSSource(Source):
 
         >>> # Say each particle has scalars "TEMPERATURE" and "MASS"
         >>> # and vector data: "VELOCITY"
-        >>> cuds.add_particles([...])
+        >>> cuds.add([...])
 
         >>> # Initialise the source and specify scalar data to visualise
         >>> # but turn off the visualisation for point vectors

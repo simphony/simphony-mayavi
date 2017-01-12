@@ -135,7 +135,7 @@ datasets.append(create_polydata_from_pc(*pcs))
 
 def add_temperature(lattice):
     new_nodes = []
-    for node in lattice.iter_nodes():
+    for node in lattice.iter(item_type=CUBA.NODE):
         index = numpy.array(node.index) + 1.0
         node.data[CUBA.TEMPERATURE] = numpy.prod(index)
         new_nodes.append(node)

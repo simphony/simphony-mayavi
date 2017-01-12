@@ -118,7 +118,7 @@ class CUDSSource(VTKDataSource):
 
         >>> # Say each particle has scalars "TEMPERATURE" and "MASS"
         >>> # and vector data: "VELOCITY"
-        >>> cuds.add_particles([...])
+        >>> cuds.add([...])
 
         >>> # Initialise the source and specify scalar data to visualise
         >>> # but turn off the visualisation for point vectors
@@ -149,7 +149,7 @@ class CUDSSource(VTKDataSource):
         Examples
         --------
         >>> # Add content to cuds after visualisation is set up
-        >>> source.cuds.add_particles([...])
+        >>> source.cuds.add([...])
 
         >>> # update the scene!
         >>> source.update()
