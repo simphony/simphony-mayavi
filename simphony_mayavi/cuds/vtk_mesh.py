@@ -307,7 +307,10 @@ class VTKMesh(ABCMesh):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Edge)
+        try:
+            return self._get_element(index, Edge)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
     def _has_edges(self):
         return self._has_elements(Edge)
@@ -335,7 +338,10 @@ class VTKMesh(ABCMesh):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Face)
+        try:
+            return self._get_element(index, Face)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
     def _has_faces(self):
         return self._has_elements(Face)
@@ -363,7 +369,10 @@ class VTKMesh(ABCMesh):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Cell)
+        try:
+            return self._get_element(index, Cell)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
     def _has_cells(self):
         return self._has_elements(Cell)
@@ -406,8 +415,12 @@ class VTKMesh(ABCMesh):
 
     def _get_element(self, index, type_=None):
         data_set = self.data_set
+        stored_type = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
         if type_ is None:
-            type_ = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
+            type_ = stored_type
+
+        if type_ != stored_type:
+            raise IndexError("{}".format(index))
 
         # data_set.get_cell may return the wrong point ids
         # if the cell type is updated
