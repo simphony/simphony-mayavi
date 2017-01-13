@@ -80,7 +80,7 @@ mesh = Mesh('mesh_example')
 # add points
 uids = mesh.add((Point(coordinates=point,
                        data=DataContainer(TEMPERATURE=index))
-                        for index, point in enumerate(points)))
+                 for index, point in enumerate(points)))
 
 # add edges
 edge_iter = (Edge(points=[uids[index] for index in element],
@@ -91,12 +91,12 @@ edge_uids = mesh.add(edge_iter)
 # add faces
 face_uids = mesh.add((Face(points=[uids[index] for index in element],
                            data=DataContainer(TEMPERATURE=index + 30))
-                            for index, element in enumerate(faces)))
+                      for index, element in enumerate(faces)))
 
 # add cells
 cell_uids = mesh.add((Cell(points=[uids[index] for index in element],
                            data=DataContainer(TEMPERATURE=index + 40))
-                            for index, element in enumerate(cells)))
+                      for index, element in enumerate(cells)))
 
 
 # save the data into cuds.
