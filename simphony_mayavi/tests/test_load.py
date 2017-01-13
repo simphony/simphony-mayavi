@@ -18,15 +18,16 @@ class TestLoad(unittest.TestCase):
 
     def test_load_blowGeom_vtk(self):
         # The blowGeom.vtk files contains a mesh surface.
+
         filename = os.path.join(self.data_folder, 'blowGeom.vtk')
         container = load(filename)
         self.assertIsInstance(container, VTKMesh)
         self.assertEqual(sum(1 for item in container.iter(
             item_type=CUBA.POINT)), 687)
         self.assertEqual(sum(1 for item in container.iter(
-            item_type=CUBA.EDGE)), 1057)
+            item_type=CUBA.EDGE)), 0)
         self.assertEqual(sum(1 for item in container.iter(
-            item_type=CUBA.FACE)), 0)
+            item_type=CUBA.FACE)), 1057)
         self.assertEqual(sum(1 for item in container.iter(
             item_type=CUBA.CELL)), 0)
 

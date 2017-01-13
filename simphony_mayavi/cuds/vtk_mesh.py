@@ -439,6 +439,7 @@ class VTKMesh(ABCMesh):
         element_data = self.element_data
         data_set = self.data_set
         for index, cell_type in enumerate(cell_types):
+            print index, cell_type, types
             if cell_type in types:
                 element = data_set.get_cell(index)
                 yield type_(

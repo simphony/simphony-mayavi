@@ -40,11 +40,13 @@ def _read(filename):
     """ Find a suitable reader and read the tvtk.Dataset.
     """
     metasource = registry.get_file_reader(filename)
+    print metasource
     if metasource is None:
         message = 'No suitable reader found for file: {}'
         raise RuntimeError(message.format(filename))
     if metasource.factory is None:
         source = metasource.get_callable()()
+        print source
         source.initialize(filename)
         source.update()
         reader = source.reader
