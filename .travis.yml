@@ -6,6 +6,7 @@ virtualenv:
   system_site_packages: true
 env:
   - SIMPHONY_VERSION=master
+  - SIMPHONY_VERSION=0.5.0
 addons:
   apt:
     packages:
