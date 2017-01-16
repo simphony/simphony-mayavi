@@ -1,6 +1,11 @@
 SimPhoNy-Mayavi CHANGELOG
 =========================
 
+Release 0.5.0
+-------------
+
+- Upgraded against new (0.5.0) simphony-common API.
+
 Release 0.4.1
 -------------
 
