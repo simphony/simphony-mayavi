@@ -14,12 +14,12 @@ container = Particles('test')
 particle_iter = (Particle(coordinates=point,
                           data=DataContainer(TEMPERATURE=temperature[index]))
                  for index, point in enumerate(points))
-uids = container.add_particles(particle_iter)
+uids = container.add(particle_iter)
 
 # add bonds
 bond_iter = (Bond(particles=[uids[index] for index in indices])
              for indices in bonds)
-container.add_bonds(bond_iter)
+container.add(bond_iter)
 
 
 # Now view the data.

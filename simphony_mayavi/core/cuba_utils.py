@@ -28,6 +28,9 @@ def default_cuba_value(cuba):
     """
     description = KEYWORDS[cuba.name]
 
+    if description.dtype is None:
+        return None
+
     if description.shape == [1]:
         if numpy.issubdtype(description.dtype, numpy.float):
             return numpy.nan
@@ -72,8 +75,6 @@ def empty_array(cuba, length, fill=None):
     data = numpy.empty(shape=shape, dtype=description.dtype)
     default = default_cuba_value(cuba) if fill is None else fill
     if shape[1] == 1:
-        data.fill(default)
-    elif len(set(default)) == 1:
         data.fill(default)
     else:
         for index, value in enumerate(default):

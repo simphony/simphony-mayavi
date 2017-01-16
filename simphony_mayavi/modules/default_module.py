@@ -4,9 +4,9 @@ from mayavi.modules.api import Surface, Glyph
 from mayavi.tools.tools import _typical_distance
 from tvtk.tvtk_classes.sphere_source import SphereSource
 
+from simphony.core.cuba import CUBA
 from simphony.cuds.abc_mesh import ABCMesh
 from simphony.cuds.abc_particles import ABCParticles
-from simphony.core.cuds_item import CUDSItem
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ def default_module(source):
 
     # default module for particle bonds
     if (isinstance(source.cuds, ABCParticles) and
-            source.cuds.count_of(CUDSItem.BOND) > 0):
+            source.cuds.count_of(CUBA.BOND) > 0):
         modules.append(default_bond_module())
 
     if modules:

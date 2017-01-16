@@ -5,8 +5,8 @@ from itertools import count
 import numpy
 from tvtk.api import tvtk
 
+from simphony.core.cuba import CUBA
 from simphony.cuds.abc_mesh import ABCMesh
-from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.mesh import Point, Edge, Face, Cell
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
@@ -126,19 +126,22 @@ class VTKMesh(ABCMesh):
         point_data = CUBADataAccumulator(point_keys)
         cell_data = CUBADataAccumulator(cell_keys)
 
-        for index, point in enumerate(mesh.iter_points()):
+        for index, point in enumerate(mesh.iter(item_type=CUBA.POINT)):
             point2index[point.uid] = index
             points.append(point.coordinates)
             point_data.append(point.data)
 
         edges, edges_size, edge_types, edge2index = gather_cells(
-            mesh.iter_edges(), EDGE2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.EDGE), EDGE2VTKCELL, point2index,
+            counter, cell_data)
 
         faces, faces_size, face_types, face2index = gather_cells(
-            mesh.iter_faces(), FACE2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.FACE), FACE2VTKCELL, point2index,
+            counter, cell_data)
 
         cells, cells_size, cell_types, cell2index = gather_cells(
-            mesh.iter_cells(), CELL2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.CELL), CELL2VTKCELL, point2index,
+            counter, cell_data)
 
         elements = edges + faces + cells
         elements_size = [0] + edges_size + faces_size + cells_size
@@ -227,10 +230,10 @@ class VTKMesh(ABCMesh):
             return counts[type_ids].sum()
 
         items_count = {
-            CUDSItem.POINT: lambda: self.data_set.number_of_points,
-            CUDSItem.EDGE: lambda: count_element(Edge),
-            CUDSItem.FACE: lambda: count_element(Face),
-            CUDSItem.CELL: lambda: count_element(Cell)
+            CUBA.POINT: lambda: self.data_set.number_of_points,
+            CUBA.EDGE: lambda: count_element(Edge),
+            CUBA.FACE: lambda: count_element(Face),
+            CUBA.CELL: lambda: count_element(Cell)
         }
 
         try:
@@ -241,7 +244,7 @@ class VTKMesh(ABCMesh):
 
     # Point operations ####################################################
 
-    def add_points(self, points):
+    def _add_points(self, points):
         data_set = self.data_set
         own_points = data_set.points
         point2index = self.point2index
@@ -255,7 +258,7 @@ class VTKMesh(ABCMesh):
                 new_uids.append(item.uid)
         return new_uids
 
-    def get_point(self, uid):
+    def _get_point(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = int(self.point2index[uid])
@@ -264,7 +267,7 @@ class VTKMesh(ABCMesh):
             coordinates=self.data_set.points[index],
             data=self.point_data[index])
 
-    def update_points(self, points):
+    def _update_points(self, points):
         for point in points:
             try:
                 index = self.point2index[point.uid]
@@ -274,13 +277,16 @@ class VTKMesh(ABCMesh):
             self.data_set.points[index] = point.coordinates
             self.point_data[index] = point.data
 
-    def iter_points(self, uids=None):
+    def _iter_points(self, uids=None):
         if uids is None:
             for uid in self.point2index:
-                yield self.get_point(uid)
+                yield self._get_point(uid)
         else:
             for uid in uids:
-                yield self.get_point(uid)
+                yield self._get_point(uid)
+
+    def _has_points(self):
+        return self.data_set.number_of_points != 0
 
     # special private ########################################################
 
@@ -297,86 +303,95 @@ class VTKMesh(ABCMesh):
 
     # Edge operations ########################################################
 
-    def get_edge(self, uid):
+    def _get_edge(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Edge)
+        try:
+            return self._get_element(index, Edge)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
-    def has_edges(self):
+    def _has_edges(self):
         return self._has_elements(Edge)
 
-    def iter_edges(self, uids=None):
+    def _iter_edges(self, uids=None):
         if uids is None:
             for edge in self._iter_elements(Edge):
                 yield edge
         else:
             for uid in uids:
-                yield self.get_edge(uid)
+                yield self._get_edge(uid)
 
-    def add_edges(self, edges):
+    def _add_edges(self, edges):
         uids = []
         for edge in edges:
             uids.append(self._add_element(edge, mapping=EDGE2VTKCELL))
         return uids
 
-    def update_edges(self, edges):
+    def _update_edges(self, edges):
         return self._update_elements(edges)
 
     # Face operations ########################################################
 
-    def get_face(self, uid):
+    def _get_face(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Face)
+        try:
+            return self._get_element(index, Face)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
-    def has_faces(self):
+    def _has_faces(self):
         return self._has_elements(Face)
 
-    def iter_faces(self, uids=None):
+    def _iter_faces(self, uids=None):
         if uids is None:
             for face in self._iter_elements(Face):
                 yield face
         else:
             for uid in uids:
-                yield self.get_face(uid)
+                yield self._get_face(uid)
 
-    def add_faces(self, faces):
+    def _add_faces(self, faces):
         uids = []
         for face in faces:
             uids.append(self._add_element(face, mapping=FACE2VTKCELL))
         return uids
 
-    def update_faces(self, faces):
+    def _update_faces(self, faces):
         return self._update_elements(faces)
 
     # Cell operations ########################################################
 
-    def get_cell(self, uid):
+    def _get_cell(self, uid):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Cell)
+        try:
+            return self._get_element(index, Cell)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
-    def has_cells(self):
+    def _has_cells(self):
         return self._has_elements(Cell)
 
-    def iter_cells(self, uids=None):
+    def _iter_cells(self, uids=None):
         if uids is None:
             for cell in self._iter_elements(Cell):
                 yield cell
         else:
             for uid in uids:
-                yield self.get_cell(uid)
+                yield self._get_cell(uid)
 
-    def add_cells(self, cells):
+    def _add_cells(self, cells):
         uids = []
         for cell in cells:
             uids.append(self._add_element(cell, mapping=CELL2VTKCELL))
         return uids
 
-    def update_cells(self, cells):
+    def _update_cells(self, cells):
         return self._update_elements(cells)
 
     # Private interface ######################################################
@@ -400,8 +415,12 @@ class VTKMesh(ABCMesh):
 
     def _get_element(self, index, type_=None):
         data_set = self.data_set
+        stored_type = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
         if type_ is None:
-            type_ = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
+            type_ = stored_type
+
+        if type_ != stored_type:
+            raise IndexError("{}".format(index))
 
         # data_set.get_cell may return the wrong point ids
         # if the cell type is updated

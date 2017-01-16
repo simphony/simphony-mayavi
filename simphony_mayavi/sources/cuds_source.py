@@ -1,6 +1,6 @@
 import logging
 
-from traits.api import Either, Instance, TraitError, Property, HasTraits
+from traits.api import Either, Instance, TraitError, Property
 from traitsui.api import View, Group, Item
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
@@ -118,7 +118,7 @@ class CUDSSource(VTKDataSource):
 
         >>> # Say each particle has scalars "TEMPERATURE" and "MASS"
         >>> # and vector data: "VELOCITY"
-        >>> cuds.add_particles([...])
+        >>> cuds.add([...])
 
         >>> # Initialise the source and specify scalar data to visualise
         >>> # but turn off the visualisation for point vectors
@@ -132,7 +132,7 @@ class CUDSSource(VTKDataSource):
         # required by Traits
         super(CUDSSource, self).__init__(**traits)
 
-        if cuds:
+        if cuds is not None:
             self.cuds = cuds
 
         # if cuds is not defined, _point_scalars_list (etc.) is empty
@@ -149,7 +149,7 @@ class CUDSSource(VTKDataSource):
         Examples
         --------
         >>> # Add content to cuds after visualisation is set up
-        >>> source.cuds.add_particles([...])
+        >>> source.cuds.add([...])
 
         >>> # update the scene!
         >>> source.update()

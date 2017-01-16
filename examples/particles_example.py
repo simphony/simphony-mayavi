@@ -13,12 +13,12 @@ particles = Particles('test')
 particle_iter = (Particle(coordinates=point,
                           data=DataContainer(TEMPERATURE=temperature[index]))
                  for index, point in enumerate(points))
-uids = particles.add_particles(particle_iter)
+uids = particles.add(particle_iter)
 
 # add bonds
 bond_iter = (Bond(particles=[uids[index] for index in indices])
              for indices in bonds)
-particles.add_bonds(bond_iter)
+particles.add(bond_iter)
 
 if __name__ == '__main__':
     from simphony.visualisation import mayavi_tools

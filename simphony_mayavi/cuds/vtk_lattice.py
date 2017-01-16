@@ -5,8 +5,8 @@ import numpy
 from tvtk.api import tvtk
 from simphony.cuds.abc_lattice import ABCLattice
 from simphony.cuds.lattice import LatticeNode
+from simphony.core.cuba import CUBA
 from simphony.cuds.primitive_cell import BravaisLattice, PrimitiveCell
-from simphony.core.cuds_item import CUDSItem
 from simphony.core.data_container import DataContainer
 
 from simphony_mayavi.core.api import CubaData, supported_cuba, mergedocs
@@ -53,7 +53,7 @@ class VTKLattice(ABCLattice):
         self.data_set = data_set
 
         self._items_count = {
-            CUDSItem.NODE: lambda: self.size
+            CUBA.NODE: lambda: self.size
             }
 
         #: The currently supported and stored CUBA keywords.
@@ -128,22 +128,22 @@ class VTKLattice(ABCLattice):
 
     # Node operations ########################################################
 
-    def get_node(self, index):
+    def _get_node(self, index):
         point_id = self._get_point_id(index)
         return LatticeNode(index, data=self.point_data[point_id])
 
-    def update_nodes(self, nodes):
+    def _update_nodes(self, nodes):
         for node in nodes:
             point_id = self._get_point_id(node.index)
             self.point_data[point_id] = node.data
 
-    def iter_nodes(self, indices=None):
+    def _iter_nodes(self, indices=None):
         if indices is None:
             for index in numpy.ndindex(*self.size):
-                yield self.get_node(index)
+                yield self._get_node(index)
         else:
             for index in indices:
-                yield self.get_node(index)
+                yield self._get_node(index)
 
     def count_of(self, item_type):
         try:
@@ -291,7 +291,7 @@ class VTKLattice(ABCLattice):
             message = 'Unknown lattice type: {}'.format(lattice_type)
             raise ValueError(message)
 
-        for node in lattice.iter_nodes(indices):
+        for node in lattice.iter(indices):
             node_data.append(node.data)
         node_data.load_onto_vtk(data_set.point_data)
 

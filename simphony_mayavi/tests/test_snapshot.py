@@ -42,7 +42,7 @@ class TestSnapShot(unittest.TestCase):
             'f')
         mesh = Mesh('test')
         point_iter = (Point(coordinates=point) for point in points)
-        mesh.add_points(point_iter)
+        mesh.add(point_iter)
 
         snapshot(mesh, filename)
         self.assertImageSavedWithContent(filename)
@@ -57,7 +57,7 @@ class TestSnapShot(unittest.TestCase):
         particles = Particles('test')
         particle_iter = (Particle(coordinates=point+3)
                          for point in coordinates)
-        particles.add_particles(particle_iter)
+        particles.add(particle_iter)
 
         snapshot(particles, filename)
         self.assertImageSavedWithContent(filename)
