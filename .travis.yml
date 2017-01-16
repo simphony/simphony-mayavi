@@ -37,7 +37,7 @@ install:
   - python setup.py develop
 script:
   - flake8 .
-  - coverage run -m unittest simphony_mayavi.sources.tests.test_cuds_source
+  - coverage run -m unittest simphony_mayavi.sources.tests
 after_success:
   - pip install codecov
   - codecov
