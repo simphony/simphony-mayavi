@@ -1,6 +1,6 @@
 import logging
 
-from traits.api import Either, Instance, TraitError, Property, HasTraits
+from traits.api import Either, Instance, TraitError, Property
 from traitsui.api import View, Group, Item
 from mayavi.core.api import PipelineInfo
 from mayavi.sources.vtk_data_source import VTKDataSource
@@ -130,8 +130,10 @@ class CUDSSource(VTKDataSource):
         >>> mlab.pipeline.glyph(source)
         """
         # required by Traits
+        print("initializing cudssource")
         super(CUDSSource, self).__init__(**traits)
 
+        print(cuds)
         if cuds is not None:
             self.cuds = cuds
 
@@ -141,6 +143,7 @@ class CUDSSource(VTKDataSource):
                                 point_vectors=point_vectors,
                                 cell_scalars=cell_scalars,
                                 cell_vectors=cell_vectors)
+        print("done")
 
     def update(self):
         """ Recalculate the VTK data from the CUDS dataset.
@@ -182,6 +185,7 @@ class CUDSSource(VTKDataSource):
         """ Returns the name to display on the tree view.  Note that
         this is not a property getter.
         """
+        print("cuds inside _get_name", self.cuds)
         cuds = self.cuds
         if isinstance(cuds, (ABCMesh, H5Mesh)):
             name = cuds.name
