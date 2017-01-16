@@ -465,6 +465,7 @@ class TestParticlesSource(unittest.TestCase):
         # given
         particles = Particles(name='my_particles')
 
+        print self.tested_class, particles.name
         # when
         source = self.tested_class(cuds=particles)
 
