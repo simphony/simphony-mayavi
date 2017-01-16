@@ -193,7 +193,7 @@ class SlimCUDSSource(Source):
             "cell_vectors": cell_vectors
         }
 
-        if cuds:
+        if cuds is not None:
             self.cuds = cuds
 
     # Public
