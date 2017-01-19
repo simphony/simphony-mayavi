@@ -1,6 +1,11 @@
 SimPhoNy-Mayavi CHANGELOG
 =========================
 
+Release 0.5.1
+-------------
+
+- Fix: Adds required conversion to int for VTK extracted data. (#198)
+
 Release 0.5.0
 -------------
 
