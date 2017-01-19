@@ -59,6 +59,7 @@ class CellCollection(MutableSequence):
         start = location + 1
         data = cells.data
         npoints = data[location]
+        print data, npoints
         if npoints == len(value):
             for i, j in enumerate(value):
                 data[start + i] = j
