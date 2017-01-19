@@ -3,3 +3,4 @@ envisage==4.5.1
 # Pinned in response to failing test. 
 # See https://github.com/simphony/simphony-mayavi/pull/173
 mayavi==4.4.4
+numpy>=1.12
