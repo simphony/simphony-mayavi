@@ -58,8 +58,7 @@ class CellCollection(MutableSequence):
         location = self._cell_location(index)
         start = location + 1
         data = cells.data
-        npoints = data[location]
-        print data, npoints
+        npoints = int(data[location])
         if npoints == len(value):
             for i, j in enumerate(value):
                 data[start + i] = j
@@ -86,7 +85,7 @@ class CellCollection(MutableSequence):
         cells = self._cell_array
         new_length = len(self) - 1
         start = location + 1
-        npoints = cells.data[location]
+        npoints = int(cells.data[location])
         array = cells.to_array()
         left, _, right = numpy.split(
             array, [location, start + npoints])
