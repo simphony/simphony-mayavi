@@ -422,12 +422,6 @@ class VTKMesh(ABCMesh):
         if type_ != stored_type:
             raise IndexError("{}".format(index))
 
-        if type_ != VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]:
-            # Recheck the type if it matches with the request, if it
-            # was specified. If it doesn't match, raise a KeyError
-            # exception, which indicates we need to try something else.
-            raise KeyError()
-
         # data_set.get_cell may return the wrong point ids
         # if the cell type is updated
         # Use elements[index] to retrieve point ids instead
