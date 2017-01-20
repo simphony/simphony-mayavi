@@ -383,10 +383,8 @@ class CubaData(MutableSequence):
             else:
                 # First bit is value 1: present 0: not present.
                 # Second bit is 1: None, 0: not None.
-                array = numpy.stack([
-                    numpy.ones(shape=length, dtype=numpy.int8),
-                    numpy.zeros(shape=length, dtype=numpy.int8)
-                ], axis=1)
+                array = numpy.zeros(shape=(length, 2), dtype=numpy.int8)
+                array[:, 0] = 1
 
             mask.from_array(array)
             mask.name = name
