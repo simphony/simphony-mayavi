@@ -21,7 +21,7 @@ if on_rtd:
     requirements = ["traits"],
 else:
     requirements = [
-        "simphony[H5IO]>0.4,<0.6",
+        "simphony[H5IO]>0.4,<0.7",
         "mayavi[app]==4.4.4"
         ],
 
