@@ -5,11 +5,8 @@ python:
 virtualenv:
   system_site_packages: true
 env:
+  - SIMPHONY_VERSION=0.5.0
   - SIMPHONY_VERSION=master
-  - SIMPHONY_VERSION=0.3.0
-matrix:
-  allow_failures:
-    - env: SIMPHONY_VERSION=master
 addons:
   apt:
     packages:

@@ -22,22 +22,22 @@ mesh = Mesh('example')
 # add points
 point_iter = (Point(coordinates=point, data=DataContainer(TEMPERATURE=index))
               for index, point in enumerate(points))
-uids = mesh.add_points(point_iter)
+uids = mesh.add(point_iter)
 
 # add edges
 edge_iter = (Edge(points=[uids[index] for index in element])
              for index, element in enumerate(edges))
-edge_uids = mesh.add_edges(edge_iter)
+edge_uids = mesh.add(edge_iter)
 
 # add faces
 face_iter = (Face(points=[uids[index] for index in element])
              for index, element in enumerate(faces))
-face_uids = mesh.add_faces(face_iter)
+face_uids = mesh.add(face_iter)
 
 # add cells
 cell_iter = (Cell(points=[uids[index] for index in element])
              for index, element in enumerate(cells))
-cell_uids = mesh.add_cells(cell_iter)
+cell_uids = mesh.add(cell_iter)
 
 
 if __name__ == '__main__':

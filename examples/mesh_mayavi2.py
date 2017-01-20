@@ -23,25 +23,25 @@ container = Mesh('test')
 # add points
 point_iter = (Point(coordinates=point, data=DataContainer(TEMPERATURE=index))
               for index, point in enumerate(points))
-uids = container.add_points(point_iter)
+uids = container.add(point_iter)
 
 # add edges
 edge_iter = (Edge(points=[uids[index] for index in element],
                   data=DataContainer(TEMPERATURE=index + 20))
              for index, element in enumerate(edges))
-edge_uids = container.add_edges(edge_iter)
+edge_uids = container.add(edge_iter)
 
 # add faces
 face_iter = (Face(points=[uids[index] for index in element],
                   data=DataContainer(TEMPERATURE=index + 30))
              for index, element in enumerate(faces))
-face_uids = container.add_faces(face_iter)
+face_uids = container.add(face_iter)
 
 # add cells
 cell_iter = (Cell(points=[uids[index] for index in element],
                   data=DataContainer(TEMPERATURE=index + 40))
              for index, element in enumerate(cells))
-cell_uids = container.add_cells(cell_iter)
+cell_uids = container.add(cell_iter)
 
 
 # Now view the data.

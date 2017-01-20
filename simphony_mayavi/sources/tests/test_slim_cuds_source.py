@@ -56,7 +56,7 @@ class TestMeshSlimSource(TestMeshSource):
 
         temperature = vtk_dataset.point_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.point2index.iteritems():
-            point = container.get_point(key)
+            point = container.get(key)
             assert_array_equal(points[index], point.coordinates)
             self.assertEqual(temperature[index], point.data[CUBA.TEMPERATURE])
 
@@ -66,7 +66,7 @@ class TestMeshSlimSource(TestMeshSource):
         cell_iter = (Cell(points=[self.point_uids[index] for index in cell],
                           data=DataContainer(TEMPERATURE=i))
                      for i, cell in enumerate(self.cells))
-        container.add_cells(cell_iter)
+        container.add(cell_iter)
 
         # when
         source = self.tested_class(cuds=container)
@@ -86,7 +86,7 @@ class TestMeshSlimSource(TestMeshSource):
 
         temperature = source.data.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
-            cell = container.get_cell(key)
+            cell = container.get(key)
             self.assertEqual(
                 vtk_dataset.get_cell_type(index),
                 CELL2VTKCELL[len(cell.points)])
@@ -100,7 +100,7 @@ class TestMeshSlimSource(TestMeshSource):
         edge_iter = (Edge(points=[self.point_uids[index] for index in edge],
                           data=DataContainer(TEMPERATURE=i))
                      for i, edge in enumerate(self.edges))
-        container.add_edges(edge_iter)
+        container.add(edge_iter)
 
         # when
         source = self.tested_class(cuds=container)
@@ -125,7 +125,7 @@ class TestMeshSlimSource(TestMeshSource):
         self.assertEqual(source.data.cell_data.number_of_arrays, 1)
         temperature = vtk_dataset.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
-            edge = container.get_edge(key)
+            edge = container.get(key)
             self.assertEqual(
                 vtk_dataset.get_cell_type(index),
                 EDGE2VTKCELL[len(edge.points)])
@@ -139,7 +139,7 @@ class TestMeshSlimSource(TestMeshSource):
         face_iter = (Face(points=[self.point_uids[index] for index in face],
                           data=DataContainer(TEMPERATURE=i))
                      for i, face in enumerate(self.faces))
-        container.add_faces(face_iter)
+        container.add(face_iter)
 
         # when
         source = self.tested_class(cuds=container)
@@ -164,7 +164,7 @@ class TestMeshSlimSource(TestMeshSource):
         self.assertEqual(vtk_dataset.cell_data.number_of_arrays, 1)
         temperature = vtk_dataset.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.element2index.iteritems():
-            face = container.get_face(key)
+            face = container.get(key)
             self.assertEqual(
                 vtk_dataset.get_cell_type(index),
                 FACE2VTKCELL[len(face.points)])
@@ -179,17 +179,17 @@ class TestMeshSlimSource(TestMeshSource):
         face_iter = (Face(points=[self.point_uids[index] for index in face],
                           data=DataContainer(TEMPERATURE=next(count)))
                      for face in self.faces)
-        container.add_faces(face_iter)
+        container.add(face_iter)
 
         edge_iter = (Edge(points=[self.point_uids[index] for index in edge],
                           data=DataContainer(TEMPERATURE=next(count)))
                      for edge in self.edges)
-        container.add_edges(edge_iter)
+        container.add(edge_iter)
 
         cell_iter = (Cell(points=[self.point_uids[index] for index in cell],
                           data=DataContainer(TEMPERATURE=next(count)))
                      for cell in self.cells)
-        container.add_cells(cell_iter)
+        container.add(cell_iter)
 
         # when
         source = self.tested_class(cuds=container)
@@ -217,15 +217,15 @@ class TestMeshSlimSource(TestMeshSource):
         for key, index in vtk_cuds.element2index.iteritems():
             cell_type = vtk_dataset.get_cell_type(index)
             if cell_type in EDGE2VTKCELL.values():
-                element = container.get_edge(key)
+                element = container.get(key)
                 self.assertEqual(
                     cell_type, EDGE2VTKCELL[len(element.points)])
             elif cell_type in FACE2VTKCELL.values():
-                element = container.get_face(key)
+                element = container.get(key)
                 self.assertEqual(
                     cell_type, FACE2VTKCELL[len(element.points)])
             elif cell_type in CELL2VTKCELL.values():
-                element = container.get_cell(key)
+                element = container.get(key)
                 self.assertEqual(
                     cell_type, CELL2VTKCELL[len(element.points)])
             else:
@@ -263,7 +263,7 @@ class TestParticlesSlimSource(TestParticlesSource):
                                    RADIUS=radius,
                                    MASS=mass))
 
-        self.point_uids = self.container.add_particles(particle_iter())
+        self.point_uids = self.container.add(particle_iter())
 
         # add bonds
         def bond_iter():
@@ -274,7 +274,7 @@ class TestParticlesSlimSource(TestParticlesSource):
                                TEMPERATURE=temp,
                                ))
 
-        self.bond_uids = self.container.add_bonds(bond_iter())
+        self.bond_uids = self.container.add(bond_iter())
 
         # for testing save/load visualization
         self.temp_dir = tempfile.mkdtemp()
@@ -300,7 +300,7 @@ class TestParticlesSlimSource(TestParticlesSource):
         self.assertEqual(dataset.point_data.number_of_arrays, 1)
         temperature = dataset.point_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.particle2index.iteritems():
-            point = self.container.get_particle(key)
+            point = self.container.get(key)
             assert_array_equal(points[index], point.coordinates)
             self.assertEqual(temperature[index], point.data[CUBA.TEMPERATURE])
 
@@ -309,7 +309,7 @@ class TestParticlesSlimSource(TestParticlesSource):
         dataset = source.data
         mass = dataset.point_data.get_array('MASS')
         for key, index in vtk_cuds.particle2index.iteritems():
-            point = self.container.get_particle(key)
+            point = self.container.get(key)
             assert_array_equal(points[index], point.coordinates)
             self.assertEqual(mass[index], point.data[CUBA.MASS])
 
@@ -363,7 +363,7 @@ class TestParticlesSlimSource(TestParticlesSource):
 
         temperature = dataset.cell_data.get_array('TEMPERATURE')
         for key, index in vtk_cuds.bond2index.iteritems():
-            bond = self.container.get_bond(key)
+            bond = self.container.get(key)
             particles = [
                 vtk_cuds.particle2index[uid] for uid in bond.particles]
             self.assertEqual(bonds[index], particles)
@@ -469,7 +469,7 @@ class TestLatticeSlimSource(TestLatticeSource):
         self.assertEqual(source.data.point_data.number_of_arrays, 1)
         vectors = source.data.point_data.vectors.to_array()
 
-        for node in cuds.iter_nodes():
+        for node in cuds.iter(item_type=CUBA.NODE):
             point_id = source.data.compute_point_id(node.index)
             assert_array_equal(
                 cuds.get_coordinate(node.index),
@@ -499,7 +499,7 @@ class TestLatticeSlimSource(TestLatticeSource):
         self.assertEqual(source.data.point_data.number_of_arrays, 1)
 
         vectors = source.data.point_data.vectors.to_array()
-        for node in cuds.iter_nodes():
+        for node in cuds.iter(item_type=CUBA.NODE):
             point_id = source.data.compute_point_id(node.index)
             assert_array_equal(
                 cuds.get_coordinate(node.index),
@@ -539,7 +539,7 @@ class TestLatticeSlimSource(TestLatticeSource):
                     0.0))
 
         vectors = source.data.point_data.vectors.to_array()
-        for node in cuds.iter_nodes():
+        for node in cuds.iter(item_type=CUBA.NODE):
             position = (
                 node.index[0] * xspace + 0.5 * xspace * node.index[1],
                 node.index[1] * yspace,
@@ -549,7 +549,7 @@ class TestLatticeSlimSource(TestLatticeSource):
 
     def _add_velocity(self, lattice):
         new_nodes = []
-        for node in lattice.iter_nodes():
+        for node in lattice.iter(item_type=CUBA.NODE):
             node.data[CUBA.VELOCITY] = node.index
             new_nodes.append(node)
-        lattice.update_nodes(new_nodes)
+        lattice.update(new_nodes)

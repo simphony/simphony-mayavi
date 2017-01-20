@@ -56,7 +56,7 @@ class TestShow(unittest.TestCase):
 
         mesh = Mesh('test')
         point_iter = (Point(coordinates=point) for point in points)
-        mesh.add_points(point_iter)
+        mesh.add(point_iter)
 
         def function():
             show(mesh)
@@ -78,7 +78,7 @@ class TestShow(unittest.TestCase):
         particles = Particles('test')
         particle_iter = (Particle(coordinates=point+3)
                          for point in coordinates)
-        particles.add_particles(particle_iter)
+        particles.add(particle_iter)
 
         def function():
             show(particles)

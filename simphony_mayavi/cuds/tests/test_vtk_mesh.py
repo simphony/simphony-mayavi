@@ -8,7 +8,6 @@ from tvtk.api import tvtk
 from simphony.cuds.mesh import Mesh, Point, Face, Edge, Cell
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
-from simphony.core.cuds_item import CUDSItem
 from simphony.testing.abc_check_mesh import (
     CheckMeshContainer, CheckMeshItemOperations,
     CheckMeshPointOperations, CheckMeshEdgeOperations,
@@ -123,7 +122,7 @@ class TestVTKMesh(unittest.TestCase):
             for index, point in enumerate(self.points)]
 
         container = Mesh('test')
-        container.add_points(points)
+        container.add(points)
 
         faces = [
             Face(
@@ -140,27 +139,34 @@ class TestVTKMesh(unittest.TestCase):
                 points=[points[index].uid for index in cell],
                 data=DataContainer(TEMPERATURE=next(count)))
             for cell in self.cells]
-        container.add_edges(edges)
-        container.add_faces(faces)
-        container.add_cells(cells)
+        container.add(edges)
+        container.add(faces)
+        container.add(cells)
 
         # when
         vtk_container = VTKMesh.from_mesh(container)
 
         # then
         self.assertEqual(vtk_container.name, container.name)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_points()), 12)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_edges()), 2)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_faces()), 1)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_cells()), 2)
+        self.assertEqual(sum(1 for _ in vtk_container.iter(
+            item_type=CUBA.POINT)), 12)
+        self.assertEqual(sum(1 for _ in vtk_container.iter(
+            item_type=CUBA.EDGE
+        )), 2)
+        self.assertEqual(sum(1 for _ in vtk_container.iter(
+            item_type=CUBA.FACE
+        )), 1)
+        self.assertEqual(sum(1 for _ in vtk_container.iter(
+            item_type=CUBA.CELL
+        )), 2)
         for point in points:
-            self.assertEqual(vtk_container.get_point(point.uid), point)
+            self.assertEqual(vtk_container.get(point.uid), point)
         for edge in edges:
-            self.assertEqual(vtk_container.get_edge(edge.uid), edge)
+            self.assertEqual(vtk_container.get(edge.uid), edge)
         for face in faces:
-            self.assertEqual(vtk_container.get_face(face.uid), face)
+            self.assertEqual(vtk_container.get(face.uid), face)
         for cell in cells:
-            self.assertEqual(vtk_container.get_cell(cell.uid), cell)
+            self.assertEqual(vtk_container.get(cell.uid), cell)
 
     def test_initialization_from_empty_cuds(self):
         # given
@@ -171,10 +177,18 @@ class TestVTKMesh(unittest.TestCase):
 
         # then
         self.assertEqual(vtk_container.name, container.name)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_points()), 0)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_edges()), 0)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_faces()), 0)
-        self.assertEqual(sum(1 for _ in vtk_container.iter_cells()), 0)
+        self.assertEqual(sum(1 for _ in vtk_container.iter(
+            item_type=CUBA.POINT
+        )), 0)
+        self.assertEqual(sum(1 for _ in vtk_container.iter(
+            item_type=CUBA.EDGE
+        )), 0)
+        self.assertEqual(sum(1 for _ in vtk_container.iter(
+            item_type=CUBA.FACE
+        )), 0)
+        self.assertEqual(sum(1 for _ in vtk_container.iter(
+            item_type=CUBA.CELL
+        )), 0)
 
     def test_initialization_from_data_set(self):
         # given
@@ -206,21 +220,21 @@ class TestVTKMesh(unittest.TestCase):
         vtk_container = VTKMesh.from_dataset('test', data_set=data_set)
 
         # then
-        self.assertEqual(vtk_container.count_of(CUDSItem.POINT), 12)
-        self.assertEqual(vtk_container.count_of(CUDSItem.EDGE), 2)
-        self.assertEqual(vtk_container.count_of(CUDSItem.FACE), 1)
-        self.assertEqual(vtk_container.count_of(CUDSItem.CELL), 2)
+        self.assertEqual(vtk_container.count_of(CUBA.POINT), 12)
+        self.assertEqual(vtk_container.count_of(CUBA.EDGE), 2)
+        self.assertEqual(vtk_container.count_of(CUBA.FACE), 1)
+        self.assertEqual(vtk_container.count_of(CUBA.CELL), 2)
         index2point = vtk_container.index2point
         point2index = vtk_container.point2index
         for index, uid in index2point.items():
-            point = vtk_container.get_point(uid)
+            point = vtk_container.get(uid)
             point.uid = None
             self.assertEqual(
                 point,
                 Point(
                     coordinates=self.points[index],
                     data=DataContainer(TEMPERATURE=index)))
-        for edge in vtk_container.iter_edges():
+        for edge in vtk_container.iter(item_type=CUBA.EDGE):
             edge.uid = None
             links = [point2index[uid] for uid in edge.points]
             index = self.edges.index(links)
@@ -229,14 +243,14 @@ class TestVTKMesh(unittest.TestCase):
                 Edge(
                     points=[index2point[i] for i in self.edges[index]],
                     data=DataContainer(TEMPERATURE=index)))
-        for face in vtk_container.iter_faces():
+        for face in vtk_container.iter(item_type=CUBA.FACE):
             face.uid = None
             self.assertEqual(
                 face,
                 Face(
                     points=[index2point[i] for i in self.faces[0]],
                     data=DataContainer(TEMPERATURE=2.0)))
-        for cell in vtk_container.iter_cells():
+        for cell in vtk_container.iter(item_type=CUBA.CELL):
             cell.uid = None
             links = [point2index[uid] for uid in cell.points]
             index = self.cells.index(links)

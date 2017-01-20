@@ -5,7 +5,6 @@ from traits.etsconfig.etsconfig import ETSConfig
 from mayavi import __version__ as MAYAVI_VERSION
 
 from simphony.core.cuba import CUBA
-from simphony.core.cuds_item import CUDSItem
 from simphony.core.data_container import DataContainer
 from simphony.cuds import Particles, Particle, Mesh, Point, Face, ABCLattice, \
     ABCMesh, ABCParticles
@@ -102,20 +101,20 @@ class DummyEngine(ABCModelingEngine):
         lattice = make_tetragonal_lattice("lattice", 1., 1.1, (4, 5, 6))
         size = numpy.prod(lattice.size)
         new_node = []
-        for node in lattice.iter_nodes():
+        for node in lattice.iter(item_type=CUBA.NODE):
             index = numpy.prod(numpy.array(node.index)) + 1.0
             node.data[CUBA.TEMPERATURE] = numpy.sin(index/size/2.)*size
             node.data[CUBA.MASS] = index
             new_node.append(node)
-        lattice.update_nodes(new_node)
+        lattice.update(new_node)
         self.datasets["lattice"] = lattice
 
         # add particles from lattice
         particles = Particles("particles")
-        for node in lattice.iter_nodes():
+        for node in lattice.iter(item_type=CUBA.NODE):
             particle = Particle(coordinates=node.index, data=node.data)
             particle.data[CUBA.VELOCITY] = numpy.random.uniform(-0.1, 0.1, 3)
-            particles.add_particles([particle])
+            particles.add([particle])
         self.datasets["particles"] = particles
 
         # add mesh
@@ -129,12 +128,12 @@ class DummyEngine(ABCModelingEngine):
         point_iter = (Point(coordinates=point,
                             data=DataContainer(TEMPERATURE=index))
                       for index, point in enumerate(points))
-        uids = mesh.add_points(point_iter)
+        uids = mesh.add(point_iter)
         face_iter = (Face(points=[uids[index] for index in element],
                           data=DataContainer(TEMPERATURE=index,
                                              VELOCITY=(index, 0., 0.)))
                      for index, element in enumerate(faces))
-        mesh.add_faces(face_iter)
+        mesh.add(face_iter)
         self.datasets["mesh"] = mesh
 
     def run(self):
@@ -143,12 +142,12 @@ class DummyEngine(ABCModelingEngine):
 
         mappings = {
             ABCLattice:
-                ("iter_nodes", CUDSItem.NODE, "update_nodes", "index"),
+                ("iter", CUBA.NODE, "update", "index"),
             ABCMesh:
-                ("iter_points", CUDSItem.POINT, "update_points",
+                ("iter", CUBA.POINT, "update",
                  "coordinates"),
             ABCParticles:
-                ("iter_particles", CUDSItem.PARTICLE, "update_particles",
+                ("iter", CUBA.PARTICLE, "update",
                  "coordinates")
         }
         for dataset in self.datasets.values():
@@ -158,7 +157,8 @@ class DummyEngine(ABCModelingEngine):
             iter_func, cudsitem, update_fun, index_name = mappings[parent]
 
             # list of items in the datasets
-            item_list = [item for item in getattr(dataset, iter_func)()]
+            item_list = [item for item in getattr(dataset, iter_func)(
+                item_type=cudsitem)]
             # number of items
             size = dataset.count_of(cudsitem)
             # function for updating items

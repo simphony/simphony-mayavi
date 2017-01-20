@@ -14,20 +14,24 @@ class TestCubaUtils(unittest.TestCase):
     def setUp(self):
         self.float_scalar_cuba = [
             cuba for cuba in CUBA
-            if KEYWORDS[cuba.name].shape == [1] and numpy.issubdtype(
-                KEYWORDS[cuba.name].dtype, numpy.float)]
+            if (KEYWORDS[cuba.name].shape == [1] and
+                KEYWORDS[cuba.name].dtype is not None and
+                numpy.issubdtype(KEYWORDS[cuba.name].dtype, numpy.float))]
         self.int_scalar_cuba = [
             cuba for cuba in CUBA
-            if KEYWORDS[cuba.name].shape == [1] and numpy.issubdtype(
-                KEYWORDS[cuba.name].dtype, numpy.int)]
+            if (KEYWORDS[cuba.name].shape == [1] and
+                KEYWORDS[cuba.name].dtype is not None and
+                numpy.issubdtype(KEYWORDS[cuba.name].dtype, numpy.int))]
         self.float_vector_cuba = [
             cuba for cuba in CUBA
-            if KEYWORDS[cuba.name].shape == [3] and numpy.issubdtype(
-                KEYWORDS[cuba.name].dtype, numpy.float)]
+            if (KEYWORDS[cuba.name].shape == [3] and
+                KEYWORDS[cuba.name].dtype is not None and
+                numpy.issubdtype(KEYWORDS[cuba.name].dtype, numpy.float))]
         self.int_vector_cuba = [
             cuba for cuba in CUBA
-            if KEYWORDS[cuba.name].shape == [3] and numpy.issubdtype(
-                KEYWORDS[cuba.name].dtype, numpy.int)]
+            if (KEYWORDS[cuba.name].shape == [3] and
+                KEYWORDS[cuba.name].dtype is not None and
+                numpy.issubdtype(KEYWORDS[cuba.name].dtype, numpy.int))]
 
     def test_supported_cuba(self):
         # given
@@ -53,6 +57,9 @@ class TestCubaUtils(unittest.TestCase):
                     all(numpy.isnan(default_cuba_value(cuba))))
         for cuba in self.int_vector_cuba:
             self.assertTrue(all(default_cuba_value(cuba) == -1))
+
+    def test_default_cuba_value_for_box(self):
+        self.assertIsNone(default_cuba_value(CUBA.BOX))
 
     def test_empty_scalar_array(self):
         # when

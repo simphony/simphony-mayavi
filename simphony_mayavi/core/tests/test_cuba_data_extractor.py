@@ -1,5 +1,5 @@
 import unittest
-
+import functools
 import numpy
 
 from traits.testing.api import UnittestTools
@@ -30,36 +30,40 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
                 TEMPERATURE=self.temperature[index],
                 VELOCITY=self.velocity[index])
             particle_list.append(Particle(coordinates=point, data=data))
-        self.point_uids = self.container.add_particles(particle_list)
+        self.point_uids = self.container.add(particle_list)
 
         # add bonds
         bond_iter = (Bond(particles=[self.point_uids[index]
                                      for index in indices],
                           data=DataContainer(NAME=str(len(indices))))
                      for indices in self.bonds)
-        self.bond_uids = self.container.add_bonds(bond_iter)
+        self.bond_uids = self.container.add(bond_iter)
 
     def test_initialization(self):
         container = self.container
-        extractor = CUBADataExtractor(function=container.iter_particles)
+        extractor = CUBADataExtractor(function=functools.partial(
+            container.iter, item_type=CUBA.PARTICLE))
         self.assertEqual(
             extractor.available, set((CUBA.TEMPERATURE, CUBA.VELOCITY)))
         self.assertEqual(extractor.data, {})
 
     def test_selectinng_available(self):
         container = self.container
-        extractor = CUBADataExtractor(function=container.iter_particles)
+        extractor = CUBADataExtractor(function=functools.partial(
+            container.iter, item_type=CUBA.PARTICLE))
 
         with self.assertTraitChanges(extractor, 'data', count=1):
             extractor.selected = CUBA.TEMPERATURE
 
         self.assertEqual(len(extractor.data), 4)
         for uid, data in extractor.data.iteritems():
-            particle = container.get_particle(uid)
+            particle = container.get(uid)
             self.assertEqual(particle.data[CUBA.TEMPERATURE], data)
 
     def test_selecting_none(self):
-        extractor = CUBADataExtractor(function=self.container.iter_particles)
+        extractor = CUBADataExtractor(
+            function=functools.partial(
+                self.container.iter, item_type=CUBA.PARTICLE))
 
         with self.assertTraitChanges(extractor, 'data', count=2):
             extractor.selected = CUBA.TEMPERATURE
@@ -69,31 +73,39 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
 
     def test_selecting_unavailable(self):
         container = self.container
-        extractor = CUBADataExtractor(function=container.iter_particles)
+        extractor = CUBADataExtractor(
+            function=functools.partial(container.iter,
+                                       item_type=CUBA.PARTICLE))
 
         with self.assertTraitChanges(extractor, 'data', count=1):
             extractor.selected = CUBA.NAME
 
         self.assertEqual(len(extractor.data), 4)
         for uid, data in extractor.data.iteritems():
-            self.assertTrue(container.has_particle(uid))
+            self.assertTrue(container.has(uid))
             self.assertEqual(data, None)
 
     def test_function_change(self):
         container = self.container
-        extractor = CUBADataExtractor(function=container.iter_particles)
+        extractor = CUBADataExtractor(
+            function=functools.partial(container.iter,
+                                       item_type=CUBA.PARTICLE))
         extractor.selected = CUBA.TEMPERATURE
 
         with self.assertRaises(TraitError):
-            extractor.function = container.iter_bonds
+            extractor.function = functools.partial(container.iter,
+                                                   item_type=CUBA.BOND)
 
     def test_keys_filtering(self):
         container = self.container
         extractor = CUBADataExtractor(
-            function=container.iter_particles, keys=set(self.point_uids[:1]))
+            function=functools.partial(
+                container.iter,
+                item_type=CUBA.PARTICLE),
+            keys=set(self.point_uids[:1]))
         extractor.selected = CUBA.TEMPERATURE
 
-        particle = container.get_particle(self.point_uids[0])
+        particle = container.get(self.point_uids[0])
         self.assertEqual(
             extractor.data,
             {self.point_uids[0]: particle.data[CUBA.TEMPERATURE]})
@@ -101,7 +113,9 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
     def test_keys_filtering_change(self):
         container = self.container
         extractor = CUBADataExtractor(
-            function=container.iter_particles, keys=set(self.point_uids[:1]))
+            function=functools.partial(
+                container.iter,
+                item_type=CUBA.PARTICLE), keys=set(self.point_uids[:1]))
         extractor.selected = CUBA.TEMPERATURE
 
         with self.assertTraitChanges(extractor, 'data', count=1):
@@ -109,5 +123,5 @@ class TestCUBADataExtractor(UnittestTools, unittest.TestCase):
 
         self.assertEqual(len(extractor.data), 4)
         for uid, data in extractor.data.iteritems():
-            particle = container.get_particle(uid)
+            particle = container.get(uid)
             self.assertEqual(particle.data[CUBA.TEMPERATURE], data)

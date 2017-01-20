@@ -5,8 +5,8 @@ from itertools import count
 import numpy
 from tvtk.api import tvtk
 
+from simphony.core.cuba import CUBA
 from simphony.cuds.abc_mesh import ABCMesh
-from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.mesh import Point, Edge, Face, Cell
 from simphony.core.data_container import DataContainer
 from simphony_mayavi.core.api import (
@@ -126,19 +126,22 @@ class VTKMesh(ABCMesh):
         point_data = CUBADataAccumulator(point_keys)
         cell_data = CUBADataAccumulator(cell_keys)
 
-        for index, point in enumerate(mesh.iter_points()):
+        for index, point in enumerate(mesh.iter(item_type=CUBA.POINT)):
             point2index[point.uid] = index
             points.append(point.coordinates)
             point_data.append(point.data)
 
         edges, edges_size, edge_types, edge2index = gather_cells(
-            mesh.iter_edges(), EDGE2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.EDGE), EDGE2VTKCELL, point2index,
+            counter, cell_data)
 
         faces, faces_size, face_types, face2index = gather_cells(
-            mesh.iter_faces(), FACE2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.FACE), FACE2VTKCELL, point2index,
+            counter, cell_data)
 
         cells, cells_size, cell_types, cell2index = gather_cells(
-            mesh.iter_cells(), CELL2VTKCELL, point2index, counter, cell_data)
+            mesh.iter(item_type=CUBA.CELL), CELL2VTKCELL, point2index,
+            counter, cell_data)
 
         elements = edges + faces + cells
         elements_size = [0] + edges_size + faces_size + cells_size
@@ -227,10 +230,10 @@ class VTKMesh(ABCMesh):
             return counts[type_ids].sum()
 
         items_count = {
-            CUDSItem.POINT: lambda: self.data_set.number_of_points,
-            CUDSItem.EDGE: lambda: count_element(Edge),
-            CUDSItem.FACE: lambda: count_element(Face),
-            CUDSItem.CELL: lambda: count_element(Cell)
+            CUBA.POINT: lambda: self.data_set.number_of_points,
+            CUBA.EDGE: lambda: count_element(Edge),
+            CUBA.FACE: lambda: count_element(Face),
+            CUBA.CELL: lambda: count_element(Cell)
         }
 
         try:
@@ -240,9 +243,6 @@ class VTKMesh(ABCMesh):
             raise ValueError(error_str.format(item_type))
 
     # Point operations ####################################################
-
-    def _has_points(self):
-        return self._has_elements(Point)
 
     def _add_points(self, points):
         data_set = self.data_set
@@ -280,10 +280,13 @@ class VTKMesh(ABCMesh):
     def _iter_points(self, uids=None):
         if uids is None:
             for uid in self.point2index:
-                yield self.get_point(uid)
+                yield self._get_point(uid)
         else:
             for uid in uids:
-                yield self.get_point(uid)
+                yield self._get_point(uid)
+
+    def _has_points(self):
+        return self.data_set.number_of_points != 0
 
     # special private ########################################################
 
@@ -304,7 +307,10 @@ class VTKMesh(ABCMesh):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Edge)
+        try:
+            return self._get_element(index, Edge)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
     def _has_edges(self):
         return self._has_elements(Edge)
@@ -315,7 +321,7 @@ class VTKMesh(ABCMesh):
                 yield edge
         else:
             for uid in uids:
-                yield self.get_edge(uid)
+                yield self._get_edge(uid)
 
     def _add_edges(self, edges):
         uids = []
@@ -332,7 +338,10 @@ class VTKMesh(ABCMesh):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Face)
+        try:
+            return self._get_element(index, Face)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
     def _has_faces(self):
         return self._has_elements(Face)
@@ -343,7 +352,7 @@ class VTKMesh(ABCMesh):
                 yield face
         else:
             for uid in uids:
-                yield self.get_face(uid)
+                yield self._get_face(uid)
 
     def _add_faces(self, faces):
         uids = []
@@ -360,7 +369,10 @@ class VTKMesh(ABCMesh):
         if not isinstance(uid, uuid.UUID):
             raise TypeError("{} is not a uuid".format(uid))
         index = self.element2index[uid]
-        return self._get_element(index, Cell)
+        try:
+            return self._get_element(index, Cell)
+        except IndexError:
+            raise KeyError("{}".format(uid))
 
     def _has_cells(self):
         return self._has_elements(Cell)
@@ -371,7 +383,7 @@ class VTKMesh(ABCMesh):
                 yield cell
         else:
             for uid in uids:
-                yield self.get_cell(uid)
+                yield self._get_cell(uid)
 
     def _add_cells(self, cells):
         uids = []
@@ -403,8 +415,12 @@ class VTKMesh(ABCMesh):
 
     def _get_element(self, index, type_=None):
         data_set = self.data_set
+        stored_type = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
         if type_ is None:
-            type_ = VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]
+            type_ = stored_type
+
+        if type_ != stored_type:
+            raise IndexError("{}".format(index))
 
         if type_ != VTKCELLTYPE2ELEMENT[data_set.get_cell_type(index)]:
             # Recheck the type if it matches with the request, if it
