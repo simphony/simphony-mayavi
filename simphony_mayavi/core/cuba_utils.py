@@ -74,6 +74,7 @@ def empty_array(cuba, length, fill=None):
     shape = [length] + description.shape
     data = numpy.empty(shape=shape, dtype=description.dtype)
     default = default_cuba_value(cuba) if fill is None else fill
+
     if shape[1] == 1:
         data.fill(default)
     else:

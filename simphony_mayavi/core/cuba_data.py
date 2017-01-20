@@ -31,7 +31,7 @@ class CubaData(MutableSequence):
     access provided by a list of
     :class:`~.DataContainer<DataContainers>`.
 
-    While the wrapped tvkt container is empty the following behaviour is
+    While the wrapped tvtk container is empty the following behaviour is
     active:
 
     - Using ``len`` will return the ``initial_size``, if defined, or 0.
@@ -78,6 +78,7 @@ class CubaData(MutableSequence):
 
         """
         check_attribute_arrays(attribute_data)
+        check_masks(masks)
 
         if attribute_data.number_of_arrays != 0 and size is not None:
             message = "Using initial_size for a non-empty dataset is invalid"
@@ -148,8 +149,10 @@ class CubaData(MutableSequence):
                 array = data.get_array(array_id)
                 mask = masks.get_array(array_id)
                 cuba = CUBA[array.name]
-                array[index] = value.get(cuba, self._defaults[cuba])
-                mask[index] = cuba in value
+                value_to_set = value.get(cuba, self._defaults[cuba])
+                array[index] = (value_to_set
+                                if value_to_set is not None else 0.0)
+                mask[index] = (cuba in value, value_to_set is None)
         else:
             raise IndexError('{} is out of index range'.format(index))
 
@@ -163,9 +166,15 @@ class CubaData(MutableSequence):
         names = self._names
         arrays = [data.get_array(name) for name in names]
         masks = [self.masks.get_array(name) for name in names]
+        # Observe: BitArray returns a floating point regardless.
+        # so we are forced to check against 1.0 and 0.0
         values = {
-            CUBA[array.name]: KEYWORDS[array.name].dtype(array[index])
-            for mask, array in zip(masks, arrays) if mask[index] == 1.0}
+            CUBA[array.name]: (
+                KEYWORDS[array.name].dtype(array[index])
+                if mask[index][1] == 0.0
+                else None
+            )
+            for mask, array in zip(masks, arrays) if mask[index][0] == 1.0}
         return DataContainer(values)
 
     def __delitem__(self, index):
@@ -191,7 +200,7 @@ class CubaData(MutableSequence):
                         bit_array.remove_last_tuple(index)
                     else:
                         temp = bit_array.to_array()
-                        bit_array.from_array(numpy.delete(temp, index))
+                        bit_array.from_array(numpy.delete(temp, index, axis=0))
             else:
                 for array_id in reversed(range(n)):
                     name = data.get_array_name(array_id)
@@ -199,7 +208,8 @@ class CubaData(MutableSequence):
                     masks.remove_array(name)
 
     def insert(self, index, value):
-        """ Insert the values of the DataContainer in the arrays at row=``index``.
+        """ Insert the values of the DataContainer in the arrays at
+        row=``index``.
 
         If the provided DataContainer contains new, but supported, cuba keys
         then a new empty array is created for them and updated with
@@ -220,7 +230,6 @@ class CubaData(MutableSequence):
 
         new_cubas = (set(value.keys()) & stored_cuba) - cubas
         length = len(self)
-
         if 0 <= index < length:
             n = data.number_of_arrays
             arrays = []
@@ -232,20 +241,32 @@ class CubaData(MutableSequence):
                 name = temp.name
                 cuba = CUBA[name]
                 new_value = value.get(cuba, self._defaults[cuba])
-                temp = numpy.insert(temp.to_array(), index, new_value, axis=0)
+                temp = numpy.insert(temp.to_array(),
+                                    index,
+                                    (new_value
+                                     if new_value is not None else 0.0
+                                     ),
+                                    axis=0)
                 arrays.append((name, temp))
                 data.remove_array(name)  # remove array from vtk container.
                 temp = masks.get_array(0)
-                temp = numpy.insert(temp.to_array(), index, cuba in value)
+                temp = numpy.insert(temp.to_array(),
+                                    index,
+                                    (cuba in value, new_value is None),
+                                    axis=0)
                 mask_arrays.append((name, temp))
                 masks.remove_array(name)  # remove array from vtk container.
 
             # Create data and mask arrays from new CUBA keys
             for cuba in new_cubas:
                 array = empty_array(cuba, length + 1)
-                mask = numpy.zeros(shape=length + 1, dtype=numpy.int8)
-                array[index] = value.get(cuba, self._defaults[cuba])
-                mask[index] = int(cuba in value)
+                mask = numpy.zeros(shape=(length + 1, 2), dtype=numpy.int8)
+                value_to_set = value.get(cuba, self._defaults[cuba])
+
+                array[index] = (value_to_set
+                                if value_to_set is not None else 0.0)
+                mask[index, :] = (int(cuba in value),
+                                  int(value_to_set is None))
                 arrays.append((cuba.name, array))
                 mask_arrays.append((cuba.name, mask))
 
@@ -263,12 +284,13 @@ class CubaData(MutableSequence):
             for array_id in range(n):
                 array = data.get_array(array_id)
                 cuba = CUBA[array.name]
-                array.append(value.get(cuba, self._defaults[cuba]))
+                value_to_set = value.get(cuba, self._defaults[cuba])
+                array.append(value_to_set if value_to_set is not None else 0.0)
                 # invalidate the numpy cache, see issue
                 # https://github.com/enthought/mayavi/issues/197
                 _array_cache._remove_array(tvtk.to_vtk(array).__this__)
                 array = masks.get_array(array_id)
-                array.append(cuba in value)
+                array.append((cuba in value, value_to_set is None))
                 # invalidate the numpy cache, see issue
                 # https://github.com/enthought/mayavi/issues/197
                 _array_cache._remove_array(tvtk.to_vtk(array).__this__)
@@ -320,6 +342,7 @@ class CubaData(MutableSequence):
         masks = self.masks
         for name, array in arrays:
             bit_array = tvtk.BitArray()
+            bit_array.number_of_components = 2
             bit_array.name = name
             bit_array.from_array(array)
             masks.add_array(bit_array)
@@ -329,7 +352,7 @@ class CubaData(MutableSequence):
         new_masks = []
         for cuba in cubas:
             array = empty_array(cuba, length)
-            mask = numpy.zeros(shape=length, dtype=numpy.int8)
+            mask = numpy.zeros(shape=(length, 2), dtype=numpy.int8)
             new_arrays.append((cuba.name, array))
             new_masks.append((cuba.name, mask))
         self._add_arrays(new_arrays)
@@ -355,10 +378,16 @@ class CubaData(MutableSequence):
             if CUBA[name] not in self._stored_cuba:
                 continue
             mask = tvtk.BitArray()
+            mask.number_of_components = 2
+
             if default is not None and default.has_array(name):
                 array = default.get_array(name).to_array()
             else:
-                array = numpy.ones(shape=length, dtype=numpy.int8)
+                # First bit is value 1: present 0: not present.
+                # Second bit is 1: None, 0: not None.
+                array = numpy.zeros(shape=(length, 2), dtype=numpy.int8)
+                array[:, 0] = 1
+
             mask.from_array(array)
             mask.name = name
             masks.add_array(mask)
@@ -396,3 +425,15 @@ def check_attribute_arrays(attribute_data):
             for array_id in range(data.number_of_arrays)}
         message = "vtk object arrays are not the same size: {}"
         raise ValueError(message.format(info))
+
+
+def check_masks(masks):
+    """Check if the masks in input comply with the expected (n, 2)
+    or are None"""
+    if masks is None:
+        return
+
+    for index in range(masks.number_of_arrays):
+        mask = masks.get_array(index)
+        if mask.number_of_components != 2:
+            raise ValueError("Mask must have two components")

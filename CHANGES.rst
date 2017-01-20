@@ -36,10 +36,12 @@ Release 0.4.0
 
 Release 0.3.1
 -------------
+
 - Corrections in setup.py regarding version number
 
 Release 0.3.0
 -------------
+
 - Support simphony-common 0.2.1 and 0.2.2
 - Support PrimitiveCell in VTKLattice
 - Added lattice_tools for deducing primitive cells from data ported from tvtk.Dataset
