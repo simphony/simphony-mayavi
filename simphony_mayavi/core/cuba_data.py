@@ -166,6 +166,8 @@ class CubaData(MutableSequence):
         names = self._names
         arrays = [data.get_array(name) for name in names]
         masks = [self.masks.get_array(name) for name in names]
+        # Observe: BitArray returns a floating point regardless.
+        # so we are forced to check against 1.0 and 0.0
         values = {
             CUBA[array.name]: (
                 KEYWORDS[array.name].dtype(array[index])
