@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 MAJOR = 0
 MINOR = 5
-MICRO = 1
+MICRO = 2
 IS_RELEASED = True
 
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
@@ -21,7 +21,7 @@ if on_rtd:
     requirements = ["traits"],
 else:
     requirements = [
-        "simphony[H5IO]>0.4,<0.6",
+        "simphony[H5IO]>=0.5",
         "mayavi[app]==4.4.4"
         ],
 
