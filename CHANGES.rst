@@ -1,6 +1,11 @@
 SimPhoNy-Mayavi CHANGELOG
 =========================
 
+Release 0.4.4
+-------------
+
+- Backported fix converting data from VTK. Ref PR #198
+
 Release 0.4.3/0.4.2
 -------------------
 
