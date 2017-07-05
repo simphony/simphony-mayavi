@@ -51,4 +51,5 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
-
+.devenv
+simphony_mayavi/_version.py

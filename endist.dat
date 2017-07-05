@@ -1,0 +1,4 @@
+packages = [
+  'mayavi 4.5.0',
+  'simphony 0.4.1',
+]
