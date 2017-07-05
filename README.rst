@@ -129,3 +129,13 @@ Directory structure
   - examples -- Holds examples of loading and visualising SimPhoNy objects with simphony-mayavi.
 - doc -- Documentation related files:
   - The rst source files for the documentation
+
+
+EDM package building
+--------------------
+
+You can build an EDM egg with the command::
+
+    python edmsetup.py egg
+
+See repository simphony/buildrecipes-common for more documentation.
